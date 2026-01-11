@@ -1,4 +1,4 @@
-# JH App Service - 前台用户/后台管理员微服务
+# JH App Service - 前台用户/后台管理员微服务(private)
 
 基于 GoFrame 框架的前台用户/后台管理员微服务，提供 gRPC 接口。
 
