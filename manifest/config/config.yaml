@@ -38,10 +38,6 @@ minio:
   useSSL: false # 是否使用SSL
   publicURL: "http://localhost:19000" # 公网访问地址
 
-# 站点配置
-site:
-  code: "site_1" # 站点代码
-
 # 上传配置
 upload:
   default:

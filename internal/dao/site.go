@@ -5,6 +5,8 @@
 package dao
 
 import (
+	"context"
+	"fmt"
 	"jh_app_service/internal/dao/internal"
 )
 
@@ -20,3 +22,32 @@ var (
 )
 
 // Add your custom methods and functionality below.
+
+//GetCodeById
+/**
+ * @desc：
+ * @param ctx
+ * @param siteId
+ * @return string
+ * @return error
+ * @author : Carson
+ */
+func (s *siteDao) GetCodeById(ctx context.Context, siteId uint) (string, error) {
+	var site struct {
+		Code string `json:"code"`
+	}
+	err := s.Ctx(ctx).
+		Fields("code").
+		Where("id", siteId).
+		Scan(&site)
+
+	if err != nil {
+		return "", err
+	}
+
+	if site.Code == "" {
+		return "", fmt.Errorf("siteId [%d] not found", siteId)
+	}
+
+	return site.Code, nil
+}

@@ -44,14 +44,20 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 	))
 	defer span.End()
 
-	// 获取站点ID (从配置中获取，如果没有则尝试查找)
-	siteId := 1 // 默认站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("点ID不存在")
+	}
+	siteCode, err := dao.Site.GetCodeById(ctx, siteId)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "未获取站点code")
+		return nil, fmt.Errorf("获取站点CODE失败: %v", err)
+	}
 
-	// 尝试从配置获取站点代码对应的ID
-	siteCode := g.Cfg().MustGet(ctx, "site.code", "site_1").String()
 	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("配置的站点代码: %s", siteCode))
 
-	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
+	tracing.SetSpanAttributes(span, attribute.Int("site_id", int(siteId)))
 
 	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("开始查询用户列表，站点ID: %d, 页码: %d, 每页: %d", siteId, req.Page, req.Size))
 
@@ -749,11 +755,21 @@ func (s *sUser) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLoginLogsRe
 	defer span.End()
 
 	// 获取站点ID
-	siteId := 1 // 默认站点ID
-	siteCode := g.Cfg().MustGet(ctx, "site.code", "site_1").String()
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("点ID不存在")
+	}
+	siteCode, err := dao.Site.GetCodeById(ctx, siteId)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "未获取站点code")
+		return nil, fmt.Errorf("获取站点CODE失败: %v", err)
+	}
+
 	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("配置的站点代码: %s", siteCode))
 
-	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
+	tracing.SetSpanAttributes(span, attribute.Int("site_id", int(siteId)))
 
 	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("开始查询用户登录日志，站点ID: %d, 页码: %d, 每页: %d", siteId, req.Page, req.Size))
 

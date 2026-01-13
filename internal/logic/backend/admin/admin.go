@@ -43,9 +43,9 @@ func (s *sAdmin) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, err
 	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
 	siteId, exists := middleware.GetSiteIdFromContext(ctx)
 	if !exists {
-		tracing.AddSpanEvent(span, "admin_id_not_found")
-		middleware.LogWithTrace(ctx, "error", "无法获取管理员ID")
-		return nil, fmt.Errorf("未登录或登录已过期")
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
 	}
 	tracing.SetSpanAttributes(span, attribute.Int("site_id", int(siteId)))
 

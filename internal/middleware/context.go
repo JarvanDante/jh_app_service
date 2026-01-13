@@ -25,8 +25,14 @@ func GetAdminIdFromContext(ctx context.Context) (uint, bool) {
 	return 0, false
 }
 
-// GetSiteIdFromContext 从上下文中获取商户ID
-// 优先从 gRPC metadata 获取，如果没有再从 context 获取
+//GetSiteIdFromContext
+/**
+ * @desc：获取siteId -优先从 gRPC metadata 获取，如果没有再从 context 获取
+ * @param ctx
+ * @return uint
+ * @return bool
+ * @author : Carson
+ */
 func GetSiteIdFromContext(ctx context.Context) (uint, bool) {
 	// 首先尝试从 gRPC metadata 获取
 	if siteId, ok := GetSiteIdFromGRPCMetadata(ctx); ok {

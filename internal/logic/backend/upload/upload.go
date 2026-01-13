@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	v1 "jh_app_service/api/backend/upload/v1"
+	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/service/backend"
 	"jh_app_service/internal/tracing"
@@ -74,7 +75,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 	}
 
 	// 生成存储路径
-	storagePath := s.generateStoragePath(req.FileName)
+	storagePath := s.generateStoragePath(ctx, req.FileName)
 	tracing.SetSpanAttributes(span, attribute.String("storage_path", storagePath))
 
 	// 上传到 MinIO
@@ -207,9 +208,17 @@ func (s *sUpload) getMaxFileSize(uploadCode string) int64 {
 }
 
 // generateStoragePath 生成存储路径
-func (s *sUpload) generateStoragePath(fileName string) string {
-	// 获取站点代码
-	siteCode := g.Cfg().MustGet(context.Background(), "site.code", "site_1").String()
+func (s *sUpload) generateStoragePath(ctx context.Context, fileName string) string {
+	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return ""
+	}
+	siteCode, err := dao.Site.GetCodeById(ctx, siteId)
+	if err != nil {
+		return ""
+	}
 
 	// 生成路径: /site_code/YYYY/MM/filename
 	now := time.Now()
