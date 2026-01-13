@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	SiteIdContextKey   = "site_id"
 	AdminIdContextKey  = "admin_id"
 	ClientIPContextKey = "client_ip"
 )
@@ -18,8 +19,23 @@ func GetAdminIdFromContext(ctx context.Context) (uint, bool) {
 	}
 
 	// 如果 gRPC metadata 中没有，尝试从 context 获取
-	if adminId, ok := ctx.Value(AdminIdContextKey).(uint); ok {
+	if adminId, ok := ctx.Value(SiteIdContextKey).(uint); ok {
 		return adminId, true
+	}
+	return 0, false
+}
+
+// GetSiteIdFromContext 从上下文中获取商户ID
+// 优先从 gRPC metadata 获取，如果没有再从 context 获取
+func GetSiteIdFromContext(ctx context.Context) (uint, bool) {
+	// 首先尝试从 gRPC metadata 获取
+	if siteId, ok := GetSiteIdFromGRPCMetadata(ctx); ok {
+		return siteId, true
+	}
+
+	// 如果 gRPC metadata 中没有，尝试从 context 获取
+	if siteId, ok := ctx.Value(AdminIdContextKey).(uint); ok {
+		return siteId, true
 	}
 	return 0, false
 }

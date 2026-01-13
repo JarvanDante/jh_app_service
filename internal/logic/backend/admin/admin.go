@@ -41,8 +41,13 @@ func (s *sAdmin) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, err
 	defer span.End()
 
 	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
-	siteId := 1 // 临时硬编码，实际应该从请求中获取
-	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "admin_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "无法获取管理员ID")
+		return nil, fmt.Errorf("未登录或登录已过期")
+	}
+	tracing.SetSpanAttributes(span, attribute.Int("site_id", int(siteId)))
 
 	// 数据库查询span
 	ctx, dbSpan := tracing.StartSpan(ctx, "db.query.admin", trace.WithAttributes(

@@ -27,6 +27,20 @@ func GetAdminIdFromGRPCMetadata(ctx context.Context) (uint, bool) {
 	return uint(adminId), true
 }
 
+// GetSiteIdFromGRPCMetadata 从 gRPC metadata 中获取商户ID
+func GetSiteIdFromGRPCMetadata(ctx context.Context) (uint, bool) {
+
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if siteIDs := md.Get("site_id"); len(siteIDs) > 0 {
+			siteID, _ := strconv.ParseInt(siteIDs[0], 10, 64)
+			// 使用siteID
+			return uint(siteID), true
+		}
+	}
+
+	return 0, true
+}
+
 // GetUserIdFromGRPCMetadata 从 gRPC metadata 中获取用户ID
 func GetUserIdFromGRPCMetadata(ctx context.Context) (uint, bool) {
 	md, ok := metadata.FromIncomingContext(ctx)
