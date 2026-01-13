@@ -7,6 +7,16 @@ echo "=== 开始生成protobuf文件 ==="
 # 生成protobuf文件
 gf gen pb
 
+echo "=== 开始清理omitempty标签 ==="
+
+# 查找并清理所有生成的protobuf Go文件中的omitempty标签
+find api -name "*.pb.go" | while read file; do
+    if grep -q "omitempty" "$file"; then
+        echo "清理文件: $file"
+        sed -i '' 's/,omitempty//g' "$file"
+    fi
+done
+
 echo "=== protobuf文件生成完成 ==="
 echo
 
