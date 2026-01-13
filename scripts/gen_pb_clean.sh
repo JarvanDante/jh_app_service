@@ -88,9 +88,6 @@ find internal/dao -name "*.go" -not -path "*/internal/*" -not -name "dynamic_db_
     # 检查需要的额外imports
     extra_imports=$(check_imports "$custom_methods")
     
-    # 备份原文件
-    cp "$file" "$file.bak"
-    
     # 创建新的统一结构的DAO文件
     cat > "$file" << EOF
 // =================================================================================
