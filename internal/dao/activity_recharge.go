@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // activityRechargeDao is the data access object for the table activity_recharge.
@@ -16,7 +19,14 @@ type activityRechargeDao struct {
 
 var (
 	// ActivityRecharge is a globally accessible object for table activity_recharge operations.
-	ActivityRecharge = activityRechargeDao{internal.NewActivityRechargeDao()}
+	ActivityRecharge = activityRechargeDao{internal.NewActivityRechargeDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d activityRechargeDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.ActivityRechargeDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

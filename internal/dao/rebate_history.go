@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // rebateHistoryDao is the data access object for the table rebate_history.
@@ -16,7 +19,14 @@ type rebateHistoryDao struct {
 
 var (
 	// RebateHistory is a globally accessible object for table rebate_history operations.
-	RebateHistory = rebateHistoryDao{internal.NewRebateHistoryDao()}
+	RebateHistory = rebateHistoryDao{internal.NewRebateHistoryDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d rebateHistoryDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.RebateHistoryDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

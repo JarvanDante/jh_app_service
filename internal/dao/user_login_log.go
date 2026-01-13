@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // userLoginLogDao is the data access object for the table user_login_log.
@@ -16,7 +19,14 @@ type userLoginLogDao struct {
 
 var (
 	// UserLoginLog is a globally accessible object for table user_login_log operations.
-	UserLoginLog = userLoginLogDao{internal.NewUserLoginLogDao()}
+	UserLoginLog = userLoginLogDao{internal.NewUserLoginLogDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d userLoginLogDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.UserLoginLogDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

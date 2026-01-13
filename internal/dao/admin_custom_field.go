@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // adminCustomFieldDao is the data access object for the table admin_custom_field.
@@ -16,7 +19,14 @@ type adminCustomFieldDao struct {
 
 var (
 	// AdminCustomField is a globally accessible object for table admin_custom_field operations.
-	AdminCustomField = adminCustomFieldDao{internal.NewAdminCustomFieldDao()}
+	AdminCustomField = adminCustomFieldDao{internal.NewAdminCustomFieldDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d adminCustomFieldDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.AdminCustomFieldDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

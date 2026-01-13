@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // messageLogDao is the data access object for the table message_log.
@@ -16,7 +19,14 @@ type messageLogDao struct {
 
 var (
 	// MessageLog is a globally accessible object for table message_log operations.
-	MessageLog = messageLogDao{internal.NewMessageLogDao()}
+	MessageLog = messageLogDao{internal.NewMessageLogDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d messageLogDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.MessageLogDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

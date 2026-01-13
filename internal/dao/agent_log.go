@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // agentLogDao is the data access object for the table agent_log.
@@ -16,7 +19,14 @@ type agentLogDao struct {
 
 var (
 	// AgentLog is a globally accessible object for table agent_log operations.
-	AgentLog = agentLogDao{internal.NewAgentLogDao()}
+	AgentLog = agentLogDao{internal.NewAgentLogDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d agentLogDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.AgentLogDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

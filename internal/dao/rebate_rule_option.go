@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // rebateRuleOptionDao is the data access object for the table rebate_rule_option.
@@ -16,7 +19,14 @@ type rebateRuleOptionDao struct {
 
 var (
 	// RebateRuleOption is a globally accessible object for table rebate_rule_option operations.
-	RebateRuleOption = rebateRuleOptionDao{internal.NewRebateRuleOptionDao()}
+	RebateRuleOption = rebateRuleOptionDao{internal.NewRebateRuleOptionDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d rebateRuleOptionDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.RebateRuleOptionDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

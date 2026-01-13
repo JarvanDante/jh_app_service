@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // customTagDao is the data access object for the table custom_tag.
@@ -16,7 +19,14 @@ type customTagDao struct {
 
 var (
 	// CustomTag is a globally accessible object for table custom_tag operations.
-	CustomTag = customTagDao{internal.NewCustomTagDao()}
+	CustomTag = customTagDao{internal.NewCustomTagDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d customTagDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.CustomTagDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

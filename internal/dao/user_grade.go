@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // userGradeDao is the data access object for the table user_grade.
@@ -16,7 +19,14 @@ type userGradeDao struct {
 
 var (
 	// UserGrade is a globally accessible object for table user_grade operations.
-	UserGrade = userGradeDao{internal.NewUserGradeDao()}
+	UserGrade = userGradeDao{internal.NewUserGradeDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d userGradeDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.UserGradeDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

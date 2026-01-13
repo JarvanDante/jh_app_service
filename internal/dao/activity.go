@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // activityDao is the data access object for the table activity.
@@ -16,7 +19,14 @@ type activityDao struct {
 
 var (
 	// Activity is a globally accessible object for table activity operations.
-	Activity = activityDao{internal.NewActivityDao()}
+	Activity = activityDao{internal.NewActivityDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d activityDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.ActivityDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

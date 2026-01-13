@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // userLevelDao is the data access object for the table user_level.
@@ -16,7 +19,14 @@ type userLevelDao struct {
 
 var (
 	// UserLevel is a globally accessible object for table user_level operations.
-	UserLevel = userLevelDao{internal.NewUserLevelDao()}
+	UserLevel = userLevelDao{internal.NewUserLevelDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d userLevelDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.UserLevelDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

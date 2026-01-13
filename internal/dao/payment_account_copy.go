@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // paymentAccountCopyDao is the data access object for the table payment_account_copy.
@@ -16,7 +19,14 @@ type paymentAccountCopyDao struct {
 
 var (
 	// PaymentAccountCopy is a globally accessible object for table payment_account_copy operations.
-	PaymentAccountCopy = paymentAccountCopyDao{internal.NewPaymentAccountCopyDao()}
+	PaymentAccountCopy = paymentAccountCopyDao{internal.NewPaymentAccountCopyDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d paymentAccountCopyDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.PaymentAccountCopyDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // userShippingAddressDao is the data access object for the table user_shipping_address.
@@ -16,7 +19,14 @@ type userShippingAddressDao struct {
 
 var (
 	// UserShippingAddress is a globally accessible object for table user_shipping_address operations.
-	UserShippingAddress = userShippingAddressDao{internal.NewUserShippingAddressDao()}
+	UserShippingAddress = userShippingAddressDao{internal.NewUserShippingAddressDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d userShippingAddressDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.UserShippingAddressDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // siteDao is the data access object for the table site.
@@ -18,8 +20,15 @@ type siteDao struct {
 
 var (
 	// Site is a globally accessible object for table site operations.
-	Site = siteDao{internal.NewSiteDao()}
+	Site = siteDao{internal.NewSiteDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d siteDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.SiteDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.
 

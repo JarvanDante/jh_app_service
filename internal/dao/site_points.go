@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // sitePointsDao is the data access object for the table site_points.
@@ -16,7 +19,14 @@ type sitePointsDao struct {
 
 var (
 	// SitePoints is a globally accessible object for table site_points operations.
-	SitePoints = sitePointsDao{internal.NewSitePointsDao()}
+	SitePoints = sitePointsDao{internal.NewSitePointsDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d sitePointsDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.SitePointsDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

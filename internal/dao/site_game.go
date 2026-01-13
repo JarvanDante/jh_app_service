@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // siteGameDao is the data access object for the table site_game.
@@ -16,7 +19,14 @@ type siteGameDao struct {
 
 var (
 	// SiteGame is a globally accessible object for table site_game operations.
-	SiteGame = siteGameDao{internal.NewSiteGameDao()}
+	SiteGame = siteGameDao{internal.NewSiteGameDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d siteGameDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.SiteGameDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

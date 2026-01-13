@@ -110,7 +110,7 @@ func getContainerIP() string {
 	return "127.0.0.1"
 }
 
-func InitConsul() {
+func InitConsul() *api.Client {
 	ctx := context.Background()
 	cfg := api.DefaultConfig()
 	addr := g.Cfg().MustGet(ctx, "consul.addr").String()
@@ -121,6 +121,8 @@ func InitConsul() {
 	if err != nil {
 		g.Log().Fatalf(ctx, "init consul failed: %v", err)
 	}
+
+	return client
 }
 
 func RegisterService() error {

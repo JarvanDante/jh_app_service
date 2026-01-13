@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // riskForewarnLogDao is the data access object for the table risk_forewarn_log.
@@ -16,7 +19,14 @@ type riskForewarnLogDao struct {
 
 var (
 	// RiskForewarnLog is a globally accessible object for table risk_forewarn_log operations.
-	RiskForewarnLog = riskForewarnLogDao{internal.NewRiskForewarnLogDao()}
+	RiskForewarnLog = riskForewarnLogDao{internal.NewRiskForewarnLogDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d riskForewarnLogDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.RiskForewarnLogDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

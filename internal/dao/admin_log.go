@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // adminLogDao is the data access object for the table admin_log.
@@ -16,7 +19,14 @@ type adminLogDao struct {
 
 var (
 	// AdminLog is a globally accessible object for table admin_log operations.
-	AdminLog = adminLogDao{internal.NewAdminLogDao()}
+	AdminLog = adminLogDao{internal.NewAdminLogDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d adminLogDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.AdminLogDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.
