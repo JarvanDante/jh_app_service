@@ -52,11 +52,6 @@ upload:
       - "image/svg+xml"
     maxSize: 100 # KB
 
-# Workerman 配置 (用于Socket地址)
-workerman:
-  host: "localhost"
-  port: "2346"
-
 # Global logging - JSON格式
 logger:
   level: "all"
