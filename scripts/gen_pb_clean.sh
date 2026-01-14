@@ -20,6 +20,11 @@ find api -name "*.pb.go" | while read file; do
     fi
 done
 
+echo "=== 格式化所有生成的 Go 文件 ==="
+
+# 使用 gofmt 格式化所有生成的文件，确保格式一致
+find api -name "*.pb.go" -exec gofmt -w {} \;
+
 echo "=== protobuf文件生成完成 ==="
 echo
 
@@ -135,6 +140,11 @@ find internal/dao -name "*.go" -not -path "*/internal/*" -not -name "dynamic_db_
 done
 
 echo
+echo "=== 格式化所有 DAO 文件 ==="
+
+# 使用 gofmt 格式化所有 DAO 文件，确保格式一致
+find internal/dao -name "*.go" -not -path "*/internal/*" -exec gofmt -w {} \;
+
 echo "=== DAO文件更新完成 ==="
 echo
 echo "📝 更新说明："
