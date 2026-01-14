@@ -360,12 +360,35 @@ func (s *sAdmin) GetInfo(ctx context.Context, req *v1.GetInfoReq) (*v1.GetInfoRe
 		// 角色查询失败不影响基本信息返回，使用默认值
 	}
 
+	// 查询站点信息
+	ctx, siteSpan := tracing.StartSpan(ctx, "db.query.site", trace.WithAttributes(
+		attribute.String("db.operation", "select"),
+		attribute.String("db.table", "site"),
+	))
+
+	var site *entity.Site
+	err = dao.Site.Ctx(ctx).Where(do.Site{Id: admin.SiteId}).Scan(&site)
+	siteSpan.End()
+
+	if err != nil {
+		tracing.SetSpanError(siteSpan, err)
+		middleware.LogWithTrace(ctx, "error", "查询站点信息失败: %v", err)
+	}
+
 	// 构建角色列表
 	roles := []string{}
 	if role != nil {
 		roles = append(roles, role.Name)
 	} else {
 		roles = append(roles, "未知角色")
+	}
+
+	// 获取站点代码和名称
+	siteCode := ""
+	siteName := ""
+	if site != nil {
+		siteCode = site.Code
+		siteName = site.Name
 	}
 
 	// 查询菜单权限 - 这里需要根据实际的权限系统实现
@@ -379,6 +402,8 @@ func (s *sAdmin) GetInfo(ctx context.Context, req *v1.GetInfoReq) (*v1.GetInfoRe
 		Avatar:       "https://wpimg.wallstcn.com/577965b9-bb9e-4e02-9f0c-095b41417191", // 默认头像
 		Introduction: fmt.Sprintf("管理员 %s", admin.Username),
 		Menus:        menus,
+		SiteCode:     siteCode,
+		SiteName:     siteName,
 	}
 
 	tracing.AddSpanEvent(span, "get_info_success",

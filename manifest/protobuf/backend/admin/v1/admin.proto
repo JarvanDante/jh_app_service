@@ -60,6 +60,8 @@ message GetInfoRes {
     string avatar = 3;                // 头像
     string introduction = 4;          // 介绍
     repeated MenuInfo menus = 5;      // 菜单权限
+    string site_code = 6;             // 站点代码
+    string site_name = 7;             // 站点名称
 }
 
 // 获取菜单列表请求
