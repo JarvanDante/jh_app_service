@@ -7,7 +7,7 @@ package dao
 import (
 	"context"
 	"jh_app_service/internal/dao/internal"
-	
+
 	"github.com/gogf/gf/v2/database/gdb"
 )
 
@@ -30,4 +30,3 @@ func (d siteRegisterDao) Ctx(ctx context.Context) *gdb.Model {
 }
 
 // Add your custom methods and functionality below.
-
