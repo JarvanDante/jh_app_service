@@ -89,16 +89,23 @@ func (m *DBConfigManagerV2) loadAllSiteConfigs() error {
 		return fmt.Errorf("获取站点配置列表失败: %v", err)
 	}
 
+	updatedCount := 0
 	for _, pair := range pairs {
 		// 只处理 sites/{code}/base 格式的key
 		if len(pair.Key) > 6 && pair.Key[len(pair.Key)-5:] == "/base" {
-			if err := m.updateSiteConfig(pair.Key, pair.Value); err != nil {
+			updated, err := m.updateSiteConfig(pair.Key, pair.Value)
+			if err != nil {
 				g.Log().Errorf(m.ctx, "更新站点配置失败: key=%s, error=%v", pair.Key, err)
+			} else if updated {
+				updatedCount++
 			}
 		}
 	}
 
-	g.Log().Infof(m.ctx, "App服务V2加载了 %d 个站点配置", len(m.siteConfigs))
+	// 只在有配置更新时输出日志
+	if updatedCount > 0 {
+		g.Log().Infof(m.ctx, "App服务V2更新了 %d 个站点配置，当前共 %d 个站点", updatedCount, len(m.siteConfigs))
+	}
 	return nil
 }
 
@@ -118,11 +125,11 @@ func (m *DBConfigManagerV2) watchSiteConfigs() {
 	}
 }
 
-// updateSiteConfig 更新站点配置
-func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) error {
+// updateSiteConfig 更新站点配置，返回是否有更新
+func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) (bool, error) {
 	var config SiteConfig
 	if err := json.Unmarshal(value, &config); err != nil {
-		return fmt.Errorf("解析站点配置失败: %v", err)
+		return false, fmt.Errorf("解析站点配置失败: %v", err)
 	}
 
 	m.mutex.Lock()
@@ -131,7 +138,7 @@ func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) error {
 	// 检查配置是否有变化
 	oldConfig, exists := m.siteConfigs[config.Code]
 	if exists && oldConfig.Version >= config.Version {
-		return nil // 配置没有变化或版本更旧
+		return false, nil // 配置没有变化或版本更旧
 	}
 
 	// 更新配置
@@ -140,11 +147,11 @@ func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) error {
 	// 动态注册数据库配置组
 	if err := m.registerDBGroup(config.Code, &config); err != nil {
 		g.Log().Errorf(m.ctx, "注册数据库配置组失败: site=%s, error=%v", config.Code, err)
-		return err
+		return false, err
 	}
 
 	g.Log().Infof(m.ctx, "App服务V2站点配置已更新: site=%s, version=%d", config.Code, config.Version)
-	return nil
+	return true, nil
 }
 
 // registerDBGroup 动态注册数据库配置组
