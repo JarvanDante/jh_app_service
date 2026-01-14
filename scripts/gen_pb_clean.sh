@@ -7,13 +7,16 @@ echo "=== 开始生成protobuf文件 ==="
 # 生成protobuf文件
 gf gen pb
 
-echo "=== 开始清理omitempty标签 ==="
+echo "=== 开始清理omitempty标签和重复的dc标签 ==="
 
-# 查找并清理所有生成的protobuf Go文件中的omitempty标签
+# 查找并清理所有生成的protobuf Go文件中的omitempty标签和重复的dc标签
 find api -name "*.pb.go" | while read file; do
-    if grep -q "omitempty" "$file"; then
+    if grep -q "omitempty" "$file" || grep -q 'dc:".*" dc:"' "$file"; then
         echo "清理文件: $file"
+        # 移除 omitempty
         sed -i '' 's/,omitempty//g' "$file"
+        # 清理重复的 dc: 标签，使用 Perl 正则表达式只保留第一个
+        perl -i -pe 's/(dc:"[^"]*")(\s+dc:"[^"]*")+/$1/g' "$file"
     fi
 done
 
