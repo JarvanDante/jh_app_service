@@ -246,10 +246,10 @@ func (*ManageGetInfoReq) Descriptor() ([]byte, []int) {
 // 获取管理员信息响应
 type ManageGetInfoRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Roles         []string               `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表"` // 角色列表
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称"`          // 管理员名称
-	Avatar        string                 `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像"`     // 头像
-	Introduction  string                 `protobuf:"bytes,4,opt,name=introduction,proto3" json:"introduction" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍"`         // 介绍
+	Roles         []string               `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表" dc:"角色列表"`     // 角色列表
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称" dc:"管理员名称"`   // 管理员名称
+	Avatar        string                 `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像" dc:"头像"` // 头像
+	Introduction  string                 `protobuf:"bytes,4,opt,name=introduction,proto3" json:"introduction" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍" dc:"介绍"`     // 介绍
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -352,8 +352,8 @@ func (*ManageLogoutReq) Descriptor() ([]byte, []int) {
 // 退出登录响应
 type ManageLogoutRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息"`  // 响应消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功" dc:"是否成功"`          // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息" dc:"响应消息"` // 响应消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -442,16 +442,16 @@ func (*ManageMenusReq) Descriptor() ([]byte, []int) {
 // 菜单信息
 type MenuInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID"`    // 菜单ID
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型"`          // 菜单类型
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称"` // 菜单名称
-	Path          string                 `protobuf:"bytes,4,opt,name=path,proto3" json:"path" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径"` // 菜单路径
-	Sort          int32                  `protobuf:"varint,5,opt,name=sort,proto3" json:"sort" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序"`            // 排序
-	Children      []*MenuInfo            `protobuf:"bytes,6,rep,name=children,proto3" json:"children" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单"`  // 子菜单
-	RouteUrl      string                 `protobuf:"bytes,7,opt,name=route_url,json=routeUrl,proto3" json:"route_url" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL"`   // 前端URL
-	Open          bool                   `protobuf:"varint,8,opt,name=open,proto3" json:"open" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开"`          // 是否展开
-	Checked       bool                   `protobuf:"varint,9,opt,name=checked,proto3" json:"checked" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中"`    // 是否选中
-	Icon          string                 `protobuf:"bytes,10,opt,name=icon,proto3" json:"icon" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标"`            // 图标
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID" dc:"菜单ID"`   // 菜单ID
+	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型" dc:"菜单类型"`         // 菜单类型
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称" dc:"菜单名称"`          // 菜单名称
+	Path          string                 `protobuf:"bytes,4,opt,name=path,proto3" json:"path" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径" dc:"菜单路径"`          // 菜单路径
+	Sort          int32                  `protobuf:"varint,5,opt,name=sort,proto3" json:"sort" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序" dc:"排序"`             // 排序
+	Children      []*MenuInfo            `protobuf:"bytes,6,rep,name=children,proto3" json:"children" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单" dc:"子菜单"`  // 子菜单
+	RouteUrl      string                 `protobuf:"bytes,7,opt,name=route_url,json=routeUrl,proto3" json:"route_url" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL" dc:"前端URL"` // 前端URL
+	Open          bool                   `protobuf:"varint,8,opt,name=open,proto3" json:"open" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开" dc:"是否展开"`         // 是否展开
+	Checked       bool                   `protobuf:"varint,9,opt,name=checked,proto3" json:"checked" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中" dc:"是否选中"`   // 是否选中
+	Icon          string                 `protobuf:"bytes,10,opt,name=icon,proto3" json:"icon" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标" dc:"图标"`             // 图标
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
