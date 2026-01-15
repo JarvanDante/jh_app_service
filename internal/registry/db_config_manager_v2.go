@@ -15,18 +15,38 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// SiteConfig 站点配置结构
+// SiteConfig 站点配置结构（匹配新的KV格式）
 type SiteConfig struct {
-	SiteID        int    `json:"site_id"`
+	Meta   MetaConfig   `json:"Meta"`
+	Base   BaseConfig   `json:"Base"`
+	Domain DomainConfig `json:"Domain"`
+}
+
+// MetaConfig 元数据配置
+type MetaConfig struct {
+	Version     int64  `json:"version"`
+	PublishedAt string `json:"published_at"`
+	AdminId     int    `json:"admin_id"`
+}
+
+// BaseConfig 基础配置
+type BaseConfig struct {
+	SiteId        int    `json:"site_id"`
 	Code          string `json:"code"`
+	TimeZone      string `json:"timezone"`
 	Currency      string `json:"currency"`
 	DbLinkSite    string `json:"db_link_site"`
 	DbLinkBalance string `json:"db_link_balance"`
 	DbLinkGame    string `json:"db_link_game"`
 	Status        int    `json:"status"`
-	Timezone      string `json:"timezone"`
-	Version       int64  `json:"version"`
-	PublishedAt   string `json:"published_at"`
+}
+
+// DomainConfig 域名配置
+type DomainConfig struct {
+	API      []string `json:"api"`
+	H5       []string `json:"h5"`
+	Admin    []string `json:"admin"`
+	Callback []string `json:"callback"`
 }
 
 // DBConfigManagerV2 数据库配置管理器V2 - 无侵入版本
@@ -91,14 +111,17 @@ func (m *DBConfigManagerV2) loadAllSiteConfigs() error {
 
 	updatedCount := 0
 	for _, pair := range pairs {
-		// 只处理 sites/{code}/base 格式的key
-		if len(pair.Key) > 6 && pair.Key[len(pair.Key)-5:] == "/base" {
-			updated, err := m.updateSiteConfig(pair.Key, pair.Value)
-			if err != nil {
-				g.Log().Errorf(m.ctx, "更新站点配置失败: key=%s, error=%v", pair.Key, err)
-			} else if updated {
-				updatedCount++
-			}
+		// 解析 key: sites/{site_code}
+		parts := strings.Split(pair.Key, "/")
+		if len(parts) != 2 {
+			continue
+		}
+
+		updated, err := m.updateSiteConfig(pair.Key, pair.Value)
+		if err != nil {
+			g.Log().Errorf(m.ctx, "更新站点配置失败: key=%s, error=%v", pair.Key, err)
+		} else if updated {
+			updatedCount++
 		}
 	}
 
@@ -132,31 +155,55 @@ func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) (bool, er
 		return false, fmt.Errorf("解析站点配置失败: %v", err)
 	}
 
+	siteCode := config.Base.Code
+	if siteCode == "" {
+		return false, fmt.Errorf("站点代码为空")
+	}
+
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
 	// 检查配置是否有变化
-	oldConfig, exists := m.siteConfigs[config.Code]
-	if exists && oldConfig.Version >= config.Version {
+	oldConfig, exists := m.siteConfigs[siteCode]
+	if exists && oldConfig.Meta.Version >= config.Meta.Version {
 		return false, nil // 配置没有变化或版本更旧
 	}
 
-	// 更新配置
-	m.siteConfigs[config.Code] = &config
-
-	// 动态注册数据库配置组
-	if err := m.registerDBGroup(config.Code, &config); err != nil {
-		g.Log().Errorf(m.ctx, "注册数据库配置组失败: site=%s, error=%v", config.Code, err)
-		return false, err
+	// 检查数据库连接是否变化
+	dbChanged := false
+	if !exists {
+		// 新站点，需要注册连接池
+		dbChanged = true
+	} else {
+		// 检查三个数据库连接是否有任何变化
+		if oldConfig.Base.DbLinkSite != config.Base.DbLinkSite ||
+			oldConfig.Base.DbLinkBalance != config.Base.DbLinkBalance ||
+			oldConfig.Base.DbLinkGame != config.Base.DbLinkGame {
+			dbChanged = true
+			g.Log().Infof(m.ctx, "站点 %s 数据库连接配置发生变化，将重新注册连接池", siteCode)
+		}
 	}
 
-	g.Log().Infof(m.ctx, "App服务V2站点配置已更新: site=%s, version=%d", config.Code, config.Version)
+	// 更新配置到内存
+	m.siteConfigs[siteCode] = &config
+
+	// 只在数据库连接变化时才重新注册连接池
+	if dbChanged {
+		if err := m.registerDBGroup(siteCode, &config); err != nil {
+			g.Log().Errorf(m.ctx, "注册数据库配置组失败: site=%s, error=%v", siteCode, err)
+			return false, err
+		}
+		g.Log().Infof(m.ctx, "App服务V2站点配置已更新（含DB连接池）: site=%s, version=%d", siteCode, config.Meta.Version)
+	} else {
+		g.Log().Infof(m.ctx, "App服务V2站点配置已更新（仅业务配置）: site=%s, version=%d", siteCode, config.Meta.Version)
+	}
+
 	return true, nil
 }
 
-// registerDBGroup 动态注册数据库配置组
+// registerDBGroup 动态注册数据库配置组（预建连接池）
 func (m *DBConfigManagerV2) registerDBGroup(siteCode string, config *SiteConfig) error {
-	if config.DbLinkSite == "" {
+	if config.Base.DbLinkSite == "" {
 		g.Log().Warningf(m.ctx, "站点 %s 没有配置Site数据库连接", siteCode)
 		return nil
 	}
@@ -164,12 +211,12 @@ func (m *DBConfigManagerV2) registerDBGroup(siteCode string, config *SiteConfig)
 	// 创建数据库配置组名称
 	groupName := fmt.Sprintf("site_%s", siteCode)
 
-	// 动态设置数据库配置
+	// 动态设置数据库配置（这里会预建连接池）
 	gdb.AddConfigNode(groupName, gdb.ConfigNode{
-		Link: config.DbLinkSite,
+		Link: config.Base.DbLinkSite,
 	})
 
-	g.Log().Infof(m.ctx, "已注册数据库配置组: %s -> %s", groupName, config.DbLinkSite)
+	g.Log().Infof(m.ctx, "已注册数据库连接池: %s -> %s", groupName, config.Base.DbLinkSite)
 	return nil
 }
 
@@ -204,17 +251,23 @@ func (m *DBConfigManagerV2) getSiteCodeFromContext(ctx context.Context) string {
 		}
 	}
 
-	// 如果没有site_code，尝试从gRPC metadata获取site_id
+	// 尝试从gRPC metadata获取site_code
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if siteCodes := md.Get("site_code"); len(siteCodes) > 0 {
+			if siteCode := strings.TrimSpace(siteCodes[0]); siteCode != "" {
+				return siteCode
+			}
+		}
+
+		// 如果没有site_code，尝试从site_id查找
 		if siteIDs := md.Get("site_id"); len(siteIDs) > 0 {
 			if siteIDStr := strings.TrimSpace(siteIDs[0]); siteIDStr != "" {
-				// 转换为int64
 				if siteID, err := strconv.ParseInt(siteIDStr, 10, 64); err == nil && siteID > 0 {
 					// 根据site_id查找对应的site_code
 					m.mutex.RLock()
 					defer m.mutex.RUnlock()
 					for code, config := range m.siteConfigs {
-						if int64(config.SiteID) == siteID {
+						if int64(config.Base.SiteId) == siteID {
 							g.Log().Debugf(ctx, "site_id=%d 对应 site_code=%s", siteID, code)
 							return code
 						}
@@ -259,7 +312,7 @@ func (m *DBConfigManagerV2) GetSiteCodeBySiteID(siteID int64) string {
 	defer m.mutex.RUnlock()
 
 	for code, config := range m.siteConfigs {
-		if int64(config.SiteID) == siteID {
+		if int64(config.Base.SiteId) == siteID {
 			return code
 		}
 	}
