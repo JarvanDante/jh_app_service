@@ -26,3 +26,6 @@ internal/controller/*
 # 但保留 backend 目录
 !internal/controller/backend/
 !internal/controller/backend/**
+# 但保留 frontend 目录
+!internal/controller/frontend/
+!internal/controller/frontend/**
