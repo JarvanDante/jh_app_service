@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package public;
+
+option go_package = "jh_app_service/api/frontend/public/v1";
+
+service Public {
+    rpc QuickRegister(QuickRegisterReq) returns (QuickRegisterRes) {}
+}
+
+// 快速注册请求
+message QuickRegisterReq {
+    string code = 1;      // 验证码
+    string time = 2;      // v: required
+    string domain = 3;    // 注册域名
+}
+
+// 快速注册响应
+message QuickRegisterRes {
+    string token = 1;       // JWT token
+    string username = 2;    // 用户名
+    string password = 3;    // 密码
+}

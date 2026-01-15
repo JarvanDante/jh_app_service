@@ -12,6 +12,7 @@ import (
 	"jh_app_service/internal/controller/backend/site"
 	"jh_app_service/internal/controller/backend/upload"
 	"jh_app_service/internal/controller/backend/user"
+	"jh_app_service/internal/controller/frontend/public"
 	"os"
 	"time"
 
@@ -91,6 +92,7 @@ var (
 				),
 			}...)
 			s := grpcx.Server.New(c)
+			/*---------后台---------*/
 			admin.Register(s)
 			site.Register(s)
 			role.Register(s)
@@ -100,6 +102,9 @@ var (
 			ad.Register(s)
 			notice.Register(s)
 			option.Register(s)
+
+			/*---------前台---------*/
+			public.Register(s)
 
 			fmt.Println("gRPC服务器启动中...")
 

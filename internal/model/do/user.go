@@ -24,7 +24,6 @@ type User struct {
 	RegisterIp        any         //
 	RegisterTime      *gtime.Time //
 	RegisterUrl       any         // 注册来源
-	RegisterDevice    any         // 1=电脑；2=手机；3=平板
 	LastLoginIp       any         //
 	LastLoginTime     *gtime.Time //
 	LastLoginAddress  any         // 最后登录地址

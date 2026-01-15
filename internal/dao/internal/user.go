@@ -33,7 +33,6 @@ type UserColumns struct {
 	RegisterIp        string //
 	RegisterTime      string //
 	RegisterUrl       string // 注册来源
-	RegisterDevice    string // 1=电脑；2=手机；3=平板
 	LastLoginIp       string //
 	LastLoginTime     string //
 	LastLoginAddress  string // 最后登录地址
@@ -69,7 +68,6 @@ var userColumns = UserColumns{
 	RegisterIp:        "register_ip",
 	RegisterTime:      "register_time",
 	RegisterUrl:       "register_url",
-	RegisterDevice:    "register_device",
 	LastLoginIp:       "last_login_ip",
 	LastLoginTime:     "last_login_time",
 	LastLoginAddress:  "last_login_address",

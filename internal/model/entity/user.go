@@ -22,7 +22,6 @@ type User struct {
 	RegisterIp        string      `json:"registerIp"        orm:"register_ip"         description:""`
 	RegisterTime      *gtime.Time `json:"registerTime"      orm:"register_time"       description:""`
 	RegisterUrl       string      `json:"registerUrl"       orm:"register_url"        description:"注册来源"`
-	RegisterDevice    int         `json:"registerDevice"    orm:"register_device"     description:"1=电脑；2=手机；3=平板"`
 	LastLoginIp       string      `json:"lastLoginIp"       orm:"last_login_ip"       description:""`
 	LastLoginTime     *gtime.Time `json:"lastLoginTime"     orm:"last_login_time"     description:""`
 	LastLoginAddress  string      `json:"lastLoginAddress"  orm:"last_login_address"  description:"最后登录地址"`

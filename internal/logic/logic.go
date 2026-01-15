@@ -14,4 +14,5 @@ import (
 	_ "jh_app_service/internal/logic/backend/site"
 	_ "jh_app_service/internal/logic/backend/upload"
 	_ "jh_app_service/internal/logic/backend/user"
+	_ "jh_app_service/internal/logic/frontend/public"
 )
