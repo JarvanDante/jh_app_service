@@ -2,7 +2,6 @@ package public
 
 import (
 	"context"
-	"crypto/md5"
 	"fmt"
 	"time"
 
@@ -46,8 +45,21 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	//     return nil, gerror.New("请输入正确的验证码")
 	// }
 
+	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	siteCode, err := dao.Site.GetCodeById(ctx, siteId)
+	if err != nil {
+		return nil, fmt.Errorf("未获取站点CODE")
+	}
 	// 生成随机用户名（6位MD5）
-	username := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%d", time.Now().UnixNano()))))[:6]
+	username := siteCode + "_" + grand.S(12)
+
 	password := username
 
 	// 使用bcrypt加密密码
@@ -55,14 +67,6 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	if err != nil {
 		g.Log().Error(ctx, "密码加密失败:", err)
 		return nil, fmt.Errorf("注册失败")
-	}
-
-	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
-	siteId, exists := middleware.GetSiteIdFromContext(ctx)
-	if !exists {
-		tracing.AddSpanEvent(span, "site_id_not_found")
-		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
-		return nil, fmt.Errorf("未获取站点ID")
 	}
 
 	// 获取客户端IP
