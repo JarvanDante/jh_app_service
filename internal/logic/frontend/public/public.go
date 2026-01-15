@@ -53,12 +53,8 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		return nil, fmt.Errorf("未获取站点ID")
 	}
 
-	siteCode, err := dao.Site.GetCodeById(ctx, siteId)
-	if err != nil {
-		return nil, fmt.Errorf("未获取站点CODE")
-	}
 	// 生成随机用户名（6位MD5）
-	username := siteCode + "_" + grand.S(12)
+	username := grand.S(12)
 
 	password := username
 
