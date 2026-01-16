@@ -53,7 +53,7 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		return nil, fmt.Errorf("未获取站点ID")
 	}
 
-	// 生成随机用户名（6位MD5）
+	// 生成随机用户名（12位M）
 	username := grand.S(12)
 
 	password := username
@@ -180,4 +180,71 @@ func (s *sPublic) hashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hashedBytes), nil
+}
+
+// Login 用户登录
+func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.Login", trace.WithAttributes(
+		attribute.String("method", "Login"),
+		attribute.String("username", req.Username),
+	))
+	defer span.End()
+
+	// 获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// TODO: 验证验证码（如果需要）
+	// if req.Code != "" {
+	//     isValid := checkCaptcha(req.Code, req.Time)
+	//     if !isValid {
+	//         return nil, fmt.Errorf("验证码错误")
+	//     }
+	// }
+
+	// 查询用户
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("username", req.Username).
+		Where("site_id", siteId).
+		Where("status", 1).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %s", req.Username)
+		return nil, fmt.Errorf("用户名或密码错误")
+	}
+
+	// 验证密码
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "密码错误: %s", req.Username)
+		// TODO: 记录登录失败次数
+		return nil, fmt.Errorf("用户名或密码错误")
+	}
+
+	// 更新最后登录信息
+	_, err = dao.User.Ctx(ctx).Where("id", user.Id).Update(map[string]interface{}{
+		"last_login_ip":   "127.0.0.1", // TODO: 获取真实IP
+		"last_login_time": gtime.Now(),
+	})
+
+	// TODO: 记录登录日志
+	// TODO: 清空登录失败次数
+
+	// 生成JWT Token
+	token, err := s.generateJWTTokenUser(user)
+	if err != nil {
+		g.Log().Error(ctx, "生成token失败:", err)
+		return nil, fmt.Errorf("登录失败")
+	}
+
+	res = &v1.LoginRes{
+		Token: token,
+	}
+
+	return res, nil
 }

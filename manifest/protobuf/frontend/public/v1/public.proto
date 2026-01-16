@@ -6,6 +6,7 @@ option go_package = "jh_app_service/api/frontend/public/v1";
 
 service Public {
     rpc QuickRegister(QuickRegisterReq) returns (QuickRegisterRes) {}
+    rpc Login(LoginReq) returns (LoginRes) {}
 }
 
 // 快速注册请求
@@ -20,4 +21,18 @@ message QuickRegisterRes {
     string token = 1;       // JWT token
     string username = 2;    // 用户名
     string password = 3;    // 密码
+}
+
+
+// 登录请求
+message LoginReq {
+    string username = 1;  // v: required
+    string password = 2;  // v: required
+    string code = 3;      // 验证码
+    string time = 4;      // 时间戳
+}
+
+// 登录响应
+message LoginRes {
+    string token = 1;     // JWT token
 }

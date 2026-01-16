@@ -21,3 +21,8 @@ func Register(s *grpcx.GrpcServer) {
 func (c *Controller) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (*v1.QuickRegisterRes, error) {
 	return frontend.Public().QuickRegister(ctx, req)
 }
+
+// Login 用户登录
+func (c *Controller) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, error) {
+	return frontend.Public().Login(ctx, req)
+}
