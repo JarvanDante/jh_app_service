@@ -26,3 +26,8 @@ func (c *Controller) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq
 func (c *Controller) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, error) {
 	return frontend.Public().Login(ctx, req)
 }
+
+// GenerateCaptcha 生成验证码
+func (c *Controller) GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaReq) (*v1.GenerateCaptchaRes, error) {
+	return frontend.Public().GenerateCaptcha(ctx, req)
+}

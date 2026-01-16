@@ -7,6 +7,7 @@ option go_package = "jh_app_service/api/frontend/public/v1";
 service Public {
     rpc QuickRegister(QuickRegisterReq) returns (QuickRegisterRes) {}
     rpc Login(LoginReq) returns (LoginRes) {}
+    rpc GenerateCaptcha(GenerateCaptchaReq) returns (GenerateCaptchaRes) {}
 }
 
 // 快速注册请求
@@ -35,4 +36,16 @@ message LoginReq {
 // 登录响应
 message LoginRes {
     string token = 1;     // JWT token
+}
+
+
+// 生成验证码请求
+message GenerateCaptchaReq {
+    string time = 1;      // v: required
+}
+
+// 生成验证码响应
+message GenerateCaptchaRes {
+    bytes image = 1;      // 验证码图片数据
+    string content_type = 2; // 图片类型
 }

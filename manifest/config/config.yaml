@@ -73,3 +73,11 @@ database:
   default:
     link: "mysql:root:654321@tcp(172.19.0.4:3306)/jh_site?parseTime=true&loc=Local" # 容器内直接访问MySQL
     debug: true
+
+# Redis 配置示例
+redis:
+  # 单实例配置示例1
+  default:
+    address: 172.19.0.6:6379
+    db:
+    pass: 654321
