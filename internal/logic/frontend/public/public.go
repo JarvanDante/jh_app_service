@@ -23,6 +23,7 @@ import (
 	"jh_app_service/internal/model/entity"
 	"jh_app_service/internal/service/frontend"
 	"jh_app_service/internal/tracing"
+	"jh_app_service/internal/util"
 )
 
 type sPublic struct{}
@@ -288,13 +289,20 @@ func (s *sPublic) GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaRe
 			}
 		}()
 
-		clientIp := "127.0.0.1" // TODO: 从context获取真实IP
-		cacheKey := fmt.Sprintf("captcha:%s:%s", clientIp, req.Time)
+		clientIp := util.GetClientIP(ctx)
+
+		// 从context获取站点代码
+		siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
+		if siteCode == "" {
+			siteCode = "default"
+		}
+
+		cacheKey := fmt.Sprintf("%s:captcha:%s:%s", siteCode, clientIp, req.Time)
 
 		if err := g.Redis().SetEX(ctx, cacheKey, code, int64(300)); err != nil {
 			middleware.LogWithTrace(ctx, "warn", "验证码缓存失败: %v", err)
 		} else {
-			middleware.LogWithTrace(ctx, "info", "验证码已缓存: %s = %s", cacheKey, code)
+			middleware.LogWithTrace(ctx, "info", "验证码已缓存: %s = %s (IP: %s)", cacheKey, code, clientIp)
 		}
 	}()
 

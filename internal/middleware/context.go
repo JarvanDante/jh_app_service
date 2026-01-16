@@ -6,6 +6,7 @@ import (
 
 const (
 	SiteIdContextKey   = "site_id"
+	SiteCodeContextKey = "site_code"
 	AdminIdContextKey  = "admin_id"
 	ClientIPContextKey = "client_ip"
 )
@@ -44,6 +45,27 @@ func GetSiteIdFromContext(ctx context.Context) (uint, bool) {
 		return siteId, true
 	}
 	return 0, false
+}
+
+//GetSiteCodeFromContext
+/**
+ * @desc：获取siteCode -优先从 gRPC metadata 获取，如果没有再从 context 获取
+ * @param ctx
+ * @return uint
+ * @return bool
+ * @author : Carson
+ */
+func GetSiteCodeFromContext(ctx context.Context) (string, bool) {
+	// 首先尝试从 gRPC metadata 获取
+	if siteCode, ok := GetSiteCodeFromGRPCMetadata(ctx); ok {
+		return siteCode, true
+	}
+
+	// 如果 gRPC metadata 中没有，尝试从 context 获取
+	if siteCode, ok := ctx.Value(SiteCodeContextKey).(string); ok {
+		return siteCode, true
+	}
+	return "", false
 }
 
 // SetAdminIdToContext 将管理员ID设置到上下文中
