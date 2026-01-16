@@ -7,6 +7,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"strings"
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -195,6 +196,8 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 	))
 	defer span.End()
 
+	middleware.LogWithTrace(ctx, "info", "开始登录: username=%s, code=%s, time=%s", req.Username, req.Code, req.Time)
+
 	// 获取站点ID
 	siteId, exists := middleware.GetSiteIdFromContext(ctx)
 	if !exists {
@@ -203,13 +206,43 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 		return nil, fmt.Errorf("未获取站点ID")
 	}
 
-	// TODO: 验证验证码（如果需要）
-	//if req.Code != "" {
-	//	isValid := checkCaptcha(req.Code, req.Time)
-	//	if !isValid {
-	//		return nil, fmt.Errorf("验证码错误")
-	//	}
-	//}
+	middleware.LogWithTrace(ctx, "info", "站点ID: %d", siteId)
+
+	// 验证验证码
+	if req.Code != "" && req.Time != "" {
+		clientIp := util.GetClientIP(ctx)
+
+		// 从context获取站点代码
+		siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
+		if siteCode == "" {
+			siteCode = "default"
+		}
+
+		cacheKey := fmt.Sprintf("%s:captcha:%s:%s", siteCode, clientIp, req.Time)
+		middleware.LogWithTrace(ctx, "info", "验证验证码: key=%s, code=%s, ip=%s, siteCode=%s", cacheKey, req.Code, clientIp, siteCode)
+
+		// 从Redis获取验证码
+		cachedCode, err := g.Redis().Get(ctx, cacheKey)
+		if err != nil {
+			middleware.LogWithTrace(ctx, "error", "Redis获取验证码失败: %v", err)
+			return nil, fmt.Errorf("验证码验证失败")
+		}
+
+		if cachedCode.IsNil() {
+			middleware.LogWithTrace(ctx, "error", "验证码不存在或已过期: %s", cacheKey)
+			return nil, fmt.Errorf("验证码已过期，请重新获取")
+		}
+
+		// 验证码不区分大小写
+		if !strings.EqualFold(cachedCode.String(), req.Code) {
+			middleware.LogWithTrace(ctx, "error", "验证码错误: 输入=%s, 期望=%s", req.Code, cachedCode.String())
+			return nil, fmt.Errorf("验证码错误")
+		}
+
+		// 验证成功后删除验证码（一次性使用）
+		g.Redis().Del(ctx, cacheKey)
+		middleware.LogWithTrace(ctx, "info", "验证码验证成功并已删除: %s", cacheKey)
+	}
 
 	// 查询用户
 	var user *entity.User
@@ -232,8 +265,9 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 	}
 
 	// 更新最后登录信息
+	clientIp := util.GetClientIP(ctx)
 	_, err = dao.User.Ctx(ctx).Where("id", user.Id).Update(map[string]interface{}{
-		"last_login_ip":   "127.0.0.1", // TODO: 获取真实IP
+		"last_login_ip":   clientIp,
 		"last_login_time": gtime.Now(),
 	})
 

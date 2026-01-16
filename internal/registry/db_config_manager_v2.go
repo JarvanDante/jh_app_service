@@ -150,10 +150,16 @@ func (m *DBConfigManagerV2) watchSiteConfigs() {
 
 // updateSiteConfig 更新站点配置，返回是否有更新
 func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) (bool, error) {
+	g.Log().Infof(m.ctx, "开始解析站点配置: key=%s", key)
+	g.Log().Infof(m.ctx, "配置内容: %s", string(value))
+
 	var config SiteConfig
 	if err := json.Unmarshal(value, &config); err != nil {
 		return false, fmt.Errorf("解析站点配置失败: %v", err)
 	}
+
+	g.Log().Infof(m.ctx, "解析后的配置: site_id=%d, code=%s, db_link_site=%s",
+		config.Base.SiteId, config.Base.Code, config.Base.DbLinkSite)
 
 	siteCode := config.Base.Code
 	if siteCode == "" {
@@ -211,12 +217,51 @@ func (m *DBConfigManagerV2) registerDBGroup(siteCode string, config *SiteConfig)
 	// 创建数据库配置组名称
 	groupName := fmt.Sprintf("site_%s", siteCode)
 
-	// 动态设置数据库配置（这里会预建连接池）
-	gdb.AddConfigNode(groupName, gdb.ConfigNode{
-		Link: config.Base.DbLinkSite,
-	})
+	// 解析连接字符串
+	// 格式: mysql:root:654321@tcp(172.19.0.4:3306)/jh_site?parseTime=true&loc=Local
+	// 需要提取: type, user, pass, protocol, address, dbname, params
+	link := config.Base.DbLinkSite
 
-	g.Log().Infof(m.ctx, "已注册数据库连接池: %s -> %s", groupName, config.Base.DbLinkSite)
+	g.Log().Infof(m.ctx, "准备注册数据库连接池: %s", groupName)
+	g.Log().Infof(m.ctx, "原始连接字符串: %s", link)
+
+	// 使用ConfigNode的各个字段而不是Link
+	// 从link中提取信息: mysql:root:654321@tcp(172.19.0.4:3306)/jh_site?parseTime=true&loc=Local
+	// 移除 "mysql:" 前缀
+	if len(link) > 6 && link[:6] == "mysql:" {
+		link = link[6:] // 移除 "mysql:"
+	}
+
+	configNode := gdb.ConfigNode{
+		Type: "mysql",
+		Link: link, // 使用移除了type前缀的link
+	}
+
+	g.Log().Infof(m.ctx, "处理后的连接字符串: type=%s, link=%s", configNode.Type, configNode.Link)
+
+	gdb.AddConfigNode(groupName, configNode)
+
+	// 验证配置是否正确注册
+	registeredConfig := gdb.GetConfig(groupName)
+	if registeredConfig != nil && len(registeredConfig) > 0 {
+		g.Log().Infof(m.ctx, "验证注册的配置: %s -> type=%s, link=%s", groupName, registeredConfig[0].Type, registeredConfig[0].Link)
+
+		// 尝试实际连接测试
+		testDB := g.DB(groupName)
+		if testDB != nil {
+			// 执行一个简单的查询测试连接
+			_, err := testDB.GetValue(m.ctx, "SELECT 1")
+			if err != nil {
+				g.Log().Errorf(m.ctx, "数据库连接测试失败: %s, error: %v", groupName, err)
+			} else {
+				g.Log().Infof(m.ctx, "数据库连接测试成功: %s", groupName)
+			}
+		}
+	} else {
+		g.Log().Errorf(m.ctx, "配置注册失败: %s", groupName)
+	}
+
+	g.Log().Infof(m.ctx, "已注册数据库连接池: %s", groupName)
 	return nil
 }
 
