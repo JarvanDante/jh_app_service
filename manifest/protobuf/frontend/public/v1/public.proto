@@ -21,7 +21,6 @@ message QuickRegisterReq {
 message QuickRegisterRes {
     string token = 1;       // JWT token
     string username = 2;    // 用户名
-    string password = 3;    // 密码
 }
 
 

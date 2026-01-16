@@ -133,7 +133,6 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	res = &v1.QuickRegisterRes{
 		Token:    token,
 		Username: username,
-		Password: password,
 	}
 
 	return res, nil
