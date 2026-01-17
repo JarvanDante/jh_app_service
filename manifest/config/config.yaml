@@ -9,6 +9,7 @@ grpc:
   errorLogPattern: "error-{Ymd}.log"
   accessLogEnabled: true
   accessLogPattern: "access-{Ymd}.log"
+  balanceService: "jh_balance_service:8003" # balance服务地址
 
 # Consul 配置
 consul:
@@ -81,3 +82,7 @@ redis:
     address: 172.19.0.6:6379
     db: 1
     pass: 654321
+
+# RabbitMQ 配置
+rabbitmq:
+  url: "amqp://admin:admin123@172.19.0.36:5672/" # RabbitMQ连接地址

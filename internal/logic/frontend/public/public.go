@@ -22,6 +22,8 @@ import (
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/entity"
+	"jh_app_service/internal/mq"
+	"jh_app_service/internal/registry"
 	"jh_app_service/internal/service/frontend"
 	"jh_app_service/internal/tracing"
 	"jh_app_service/internal/util"
@@ -45,11 +47,6 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		attribute.String("method", "QuickRegister"),
 	))
 	defer span.End()
-	// TODO: 验证验证码
-	// isValid := checkCaptcha(req.Code, req.Time)
-	// if !isValid {
-	//     return nil, gerror.New("请输入正确的验证码")
-	// }
 
 	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
 	siteId, exists := middleware.GetSiteIdFromContext(ctx)
@@ -117,8 +114,42 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	}
 	user.Id = uint(userId)
 
+	// 异步调用balance服务初始化余额
+	go func() {
+		// 获取站点代码
+		siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
+		if siteCode == "" {
+			g.Log().Error(ctx, "获取站点代码失败，无法初始化余额")
+			return
+		}
+
+		// 从Consul KV获取站点配置的currency
+		dbManager := registry.GetDBConfigManagerV2()
+		siteConfig, err := dbManager.GetSiteConfig(siteCode)
+		if err != nil {
+			g.Log().Errorf(ctx, "获取站点配置失败: %v", err)
+			return
+		}
+
+		currency := siteConfig.Base.Currency
+		if currency == "" {
+			currency = "CNY" // 默认人民币
+		}
+
+		// 发送RabbitMQ消息
+		msg := &mq.InitBalanceUserMessage{
+			SiteID:   int32(siteId),
+			UserID:   int32(userId),
+			Username: username,
+			Currency: currency,
+		}
+
+		if err := mq.PublishInitBalanceUser(context.Background(), msg); err != nil {
+			g.Log().Errorf(ctx, "发送初始化余额消息失败: %v", err)
+		}
+	}()
+
 	// TODO: 以下操作需要调用其他微服务或异步处理
-	// 1. 添加会员余额 - 调用 balance_service
 	// 2. 代理注册奖金 - 调用 balance_service
 	// 3. 风险预警 - 异步处理
 	// 4. 自定义资源绑定 - 异步处理

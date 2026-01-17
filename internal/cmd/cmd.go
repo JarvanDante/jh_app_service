@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc"
 
 	"jh_app_service/internal/middleware"
+	"jh_app_service/internal/mq"
 	"jh_app_service/internal/registry"
 	"jh_app_service/internal/tracing"
 )
@@ -71,6 +72,25 @@ var (
 				g.Log().Fatalf(ctx, "init app db config manager v2 failed: %v", err)
 			}
 			fmt.Println("App服务数据库配置管理器V2初始化成功")
+
+			// 初始化RabbitMQ
+			fmt.Println("初始化RabbitMQ...")
+			if err := mq.InitRabbitMQ(ctx); err != nil {
+				fmt.Printf("RabbitMQ初始化失败: %v\n", err)
+				g.Log().Errorf(ctx, "init rabbitmq failed: %v", err)
+			} else {
+				fmt.Println("RabbitMQ初始化成功")
+				defer mq.CloseRabbitMQ()
+
+				// 启动消费者
+				fmt.Println("启动RabbitMQ消费者...")
+				if err := mq.StartConsumer(ctx); err != nil {
+					fmt.Printf("启动RabbitMQ消费者失败: %v\n", err)
+					g.Log().Errorf(ctx, "start rabbitmq consumer failed: %v", err)
+				} else {
+					fmt.Println("RabbitMQ消费者启动成功")
+				}
+			}
 
 			// 确保在退出时停止数据库配置管理器
 			defer dbManagerV2.Stop()
