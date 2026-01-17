@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
-	balanceV1 "jh_balance_service/api/frontend/balance/v1"
+	balanceV1 "jh_app_service/api/frontend/balance/v1"
 )
 
 // StartConsumer 启动消费者

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package frontend_balance;
+
+option go_package = "jh_app_service/api/frontend/balance/v1";
+
+service Balance {
+    // 初始化用户余额
+    rpc InitBalanceUser(InitBalanceUserReq) returns (InitBalanceUserRes) {}
+}
+
+// 初始化用户余额请求
+message InitBalanceUserReq {
+    int32 site_id = 1;      // 站点ID
+    int32 user_id = 2;      // 用户ID
+    string username = 3;    // 用户名
+    string currency = 4;    // 货币类型
+}
+
+// 初始化用户余额响应
+message InitBalanceUserRes {
+    bool success = 1;       // 是否成功
+    string message = 2;     // 消息
+}

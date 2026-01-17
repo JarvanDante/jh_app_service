@@ -18,7 +18,6 @@ require (
 	golang.org/x/crypto v0.43.0
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
-	jh_balance_service v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -79,5 +78,3 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace jh_balance_service => ../jh_balance_service
