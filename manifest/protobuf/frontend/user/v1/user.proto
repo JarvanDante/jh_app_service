@@ -6,6 +6,7 @@ option go_package = "jh_app_service/api/frontend/user/v1";
 
 service User {
     rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoRes) {}
+    rpc Logout(LogoutReq) returns (LogoutRes) {}
 }
 
 // 获取用户信息请求
@@ -68,4 +69,13 @@ message LastMessage {
     int32 id = 1;
     string title = 2;
     string created_at = 3;
+}
+
+// 退出登录请求
+message LogoutReq {
+}
+
+// 退出登录响应
+message LogoutRes {
+    string message = 1;  // 提示消息
 }

@@ -140,3 +140,29 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 
 	return res, nil
 }
+
+// Logout 用户退出登录
+func (s *sUser) Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.Logout", trace.WithAttributes(
+		attribute.String("method", "Logout"),
+	))
+	defer span.End()
+
+	// 从JWT token获取用户ID（可选，用于记录日志）
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if exists {
+		middleware.LogWithTrace(ctx, "info", "用户退出登录: user_id=%d", userId)
+	}
+
+	// JWT模式下，退出登录主要由前端删除token完成
+	// 后端可以在这里做一些清理工作，比如：
+	// 1. 记录退出日志
+	// 2. 清理在线状态
+	// 3. 通知其他服务（如Workerman）
+
+	res = &v1.LogoutRes{
+		Message: "退出成功",
+	}
+
+	return res, nil
+}

@@ -32,6 +32,11 @@ func (c *Controller) GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptch
 	return frontend.Public().GenerateCaptcha(ctx, req)
 }
 
+// RefreshToken 刷新token
+func (c *Controller) RefreshToken(ctx context.Context, req *v1.RefreshTokenReq) (*v1.RefreshTokenRes, error) {
+	return frontend.Public().RefreshToken(ctx, req)
+}
+
 // Register 用户注册
 func (c *Controller) Register(ctx context.Context, req *v1.RegisterReq) (*v1.RegisterRes, error) {
 	return frontend.Public().Register(ctx, req)

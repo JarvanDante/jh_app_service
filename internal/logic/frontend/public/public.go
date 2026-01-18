@@ -154,47 +154,81 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	// 3. 风险预警 - 异步处理
 	// 4. 自定义资源绑定 - 异步处理
 
-	// 生成JWT Token
-	token, err := s.generateJWTTokenUser(user)
+	// 生成JWT Token和Refresh Token
+	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
 	if err != nil {
 		g.Log().Error(ctx, "生成token失败:", err)
 		return nil, fmt.Errorf("注册失败")
 	}
 
 	res = &v1.QuickRegisterRes{
-		Token:    token,
-		Username: username,
+		Token:            token,
+		Username:         username,
+		RefreshToken:     refreshToken,
+		ExpiresIn:        expiresIn,
+		RefreshExpiresIn: refreshExpiresIn,
 	}
 
 	return res, nil
 }
 
-// generateJWTTokenUser 生成JWT token
-func (s *sPublic) generateJWTTokenUser(user *entity.User) (string, error) {
+// generateJWTTokenUser 生成JWT token和refresh token
+func (s *sPublic) generateJWTTokenUser(user *entity.User) (token string, refreshToken string, expiresIn int64, refreshExpiresIn int64, err error) {
 	// 从配置文件获取JWT密钥
 	jwtSecret := g.Cfg().MustGet(context.Background(), "jwt.secret").String()
 	if jwtSecret == "" {
-		return "", fmt.Errorf("JWT secret not configured")
+		return "", "", 0, 0, fmt.Errorf("JWT secret not configured")
 	}
 
-	// 创建token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		//"user_id":  admin.Id, // 使用 user_id 字段名，与 Gateway 的 Claims 结构体匹配
-		"user_id":  user.Id, // 后台使用 user_id =0
-		"admin_id": 0,       // 保留 admin_id 用于兼容
+	now := time.Now()
+
+	// Token过期时间：1小时
+	expiresIn = 3600
+	tokenExpireTime := now.Add(time.Duration(expiresIn) * time.Second)
+
+	// Refresh token过期时间：30天
+	refreshExpiresIn = 2592000 // 30 * 24 * 3600
+	refreshTokenExpireTime := now.Add(time.Duration(refreshExpiresIn) * time.Second)
+
+	// 生成唯一的token ID（jti）
+	tokenJti := fmt.Sprintf("%d_%d_%d", user.Id, user.SiteId, now.UnixNano())
+	refreshJti := fmt.Sprintf("refresh_%d_%d_%d", user.Id, user.SiteId, now.UnixNano())
+
+	// 创建access token
+	token_claims := jwt.MapClaims{
+		"user_id":  user.Id,
+		"admin_id": 0,
 		"username": user.Username,
 		"site_id":  user.SiteId,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // 24小时过期
-		"iat":      time.Now().Unix(),
-	})
-
-	// 签名token
-	tokenString, err := token.SignedString([]byte(jwtSecret))
+		"exp":      tokenExpireTime.Unix(),
+		"iat":      now.Unix(),
+		"type":     "access", // 标记为access token
+		"jti":      tokenJti, // JWT ID，用于黑名单
+	}
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, token_claims)
+	token, err = accessToken.SignedString([]byte(jwtSecret))
 	if err != nil {
-		return "", err
+		return "", "", 0, 0, err
 	}
 
-	return tokenString, nil
+	// 创建refresh token（包含关联的access token jti）
+	refresh_claims := jwt.MapClaims{
+		"user_id":          user.Id,
+		"username":         user.Username,
+		"site_id":          user.SiteId,
+		"exp":              refreshTokenExpireTime.Unix(),
+		"iat":              now.Unix(),
+		"type":             "refresh",  // 标记为refresh token
+		"jti":              refreshJti, // JWT ID，用于黑名单
+		"access_token_jti": tokenJti,   // 关联的access token jti
+	}
+	refreshTokenObj := jwt.NewWithClaims(jwt.SigningMethodHS256, refresh_claims)
+	refreshToken, err = refreshTokenObj.SignedString([]byte(jwtSecret))
+	if err != nil {
+		return "", "", 0, 0, err
+	}
+
+	return token, refreshToken, expiresIn, refreshExpiresIn, nil
 }
 
 // generateGamePassword 生成游戏密码
@@ -304,15 +338,18 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 	// TODO: 记录登录日志
 	// TODO: 清空登录失败次数
 
-	// 生成JWT Token
-	token, err := s.generateJWTTokenUser(user)
+	// 生成JWT Token和Refresh Token
+	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
 	if err != nil {
 		g.Log().Error(ctx, "生成token失败:", err)
 		return nil, fmt.Errorf("登录失败")
 	}
 
 	res = &v1.LoginRes{
-		Token: token,
+		Token:            token,
+		RefreshToken:     refreshToken,
+		ExpiresIn:        expiresIn,
+		RefreshExpiresIn: refreshExpiresIn,
 	}
 
 	return res, nil
@@ -614,6 +651,138 @@ func abs(x int) int {
 	return x
 }
 
+// RefreshToken 刷新token
+func (s *sPublic) RefreshToken(ctx context.Context, req *v1.RefreshTokenReq) (res *v1.RefreshTokenRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.RefreshToken", trace.WithAttributes(
+		attribute.String("method", "RefreshToken"),
+	))
+	defer span.End()
+
+	if req.RefreshToken == "" {
+		return nil, fmt.Errorf("refresh_token必填")
+	}
+
+	// 验证refresh token
+	jwtSecret := g.Cfg().MustGet(ctx, "jwt.secret").String()
+	if jwtSecret == "" {
+		return nil, fmt.Errorf("JWT secret not configured")
+	}
+
+	// 解析refresh token
+	token, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return []byte(jwtSecret), nil
+	})
+
+	if err != nil || !token.Valid {
+		middleware.LogWithTrace(ctx, "error", "refresh token无效: %v", err)
+		return nil, fmt.Errorf("refresh token无效或已过期")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("refresh token格式错误")
+	}
+
+	// 验证token类型
+	tokenType, _ := claims["type"].(string)
+	if tokenType != "refresh" {
+		return nil, fmt.Errorf("token类型错误")
+	}
+
+	// 检查refresh token是否已被使用（黑名单检查 - 使用jti）
+	refreshJti, _ := claims["jti"].(string)
+	if refreshJti != "" {
+		blacklistKey := fmt.Sprintf("token_blacklist:%s", refreshJti)
+		isBlacklisted, err := g.Redis().Exists(ctx, blacklistKey)
+		if err == nil && isBlacklisted > 0 {
+			middleware.LogWithTrace(ctx, "error", "refresh token已被使用: jti=%s", refreshJti)
+			return nil, fmt.Errorf("refresh token已被使用，请使用最新的token")
+		}
+	}
+
+	// 获取用户信息
+	userId, ok := claims["user_id"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("refresh token中缺少用户信息")
+	}
+
+	siteId, ok := claims["site_id"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("refresh token中缺少站点信息")
+	}
+
+	// 查询用户（确保用户仍然有效）
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", uint(userId)).
+		Where("site_id", int(siteId)).
+		Where("status", 1).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在或已禁用: %d", uint(userId))
+		return nil, fmt.Errorf("用户不存在或已禁用")
+	}
+
+	// 生成新的token和refresh token
+	newToken, newRefreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
+	if err != nil {
+		g.Log().Error(ctx, "生成新token失败:", err)
+		return nil, fmt.Errorf("刷新token失败")
+	}
+
+	// 将旧的refresh token和access token的jti都加入黑名单
+	// refreshJti已在前面定义
+	accessTokenJti, _ := claims["access_token_jti"].(string)
+
+	exp, ok := claims["exp"].(float64)
+	if ok {
+		expTime := time.Unix(int64(exp), 0)
+		ttl := time.Until(expTime)
+		if ttl > 0 {
+			// 将旧refresh token jti加入黑名单
+			if refreshJti != "" {
+				blacklistKey := fmt.Sprintf("token_blacklist:%s", refreshJti)
+				err = g.Redis().SetEX(ctx, blacklistKey, "1", int64(ttl.Seconds()))
+				if err != nil {
+					middleware.LogWithTrace(ctx, "warn", "添加refresh token jti到黑名单失败: %v", err)
+				} else {
+					middleware.LogWithTrace(ctx, "info", "旧refresh token jti已加入黑名单: %s, TTL: %v", refreshJti, ttl)
+				}
+			}
+
+			// 将关联的旧access token jti也加入黑名单
+			if accessTokenJti != "" {
+				blacklistKey := fmt.Sprintf("token_blacklist:%s", accessTokenJti)
+				// access token的TTL使用1小时（access token的有效期）
+				accessTTL := int64(3600)
+				if ttl.Seconds() < float64(accessTTL) {
+					accessTTL = int64(ttl.Seconds())
+				}
+				err = g.Redis().SetEX(ctx, blacklistKey, "1", accessTTL)
+				if err != nil {
+					middleware.LogWithTrace(ctx, "warn", "添加access token jti到黑名单失败: %v", err)
+				} else {
+					middleware.LogWithTrace(ctx, "info", "旧access token jti已加入黑名单: %s, TTL: %d", accessTokenJti, accessTTL)
+				}
+			}
+		}
+	}
+
+	middleware.LogWithTrace(ctx, "info", "刷新token成功: user_id=%d, username=%s", user.Id, user.Username)
+
+	res = &v1.RefreshTokenRes{
+		Token:            newToken,
+		RefreshToken:     newRefreshToken,
+		ExpiresIn:        expiresIn,
+		RefreshExpiresIn: refreshExpiresIn,
+	}
+
+	return res, nil
+}
+
 // Register 用户注册
 func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.RegisterRes, err error) {
 	ctx, span := tracing.StartSpan(ctx, "user.Register", trace.WithAttributes(
@@ -767,15 +936,18 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		}
 	}()
 
-	// 生成JWT Token
-	token, err := s.generateJWTTokenUser(user)
+	// 生成JWT Token和Refresh Token
+	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
 	if err != nil {
 		g.Log().Error(ctx, "生成token失败:", err)
 		return nil, fmt.Errorf("注册失败")
 	}
 
 	res = &v1.RegisterRes{
-		Token: token,
+		Token:            token,
+		RefreshToken:     refreshToken,
+		ExpiresIn:        expiresIn,
+		RefreshExpiresIn: refreshExpiresIn,
 	}
 
 	return res, nil

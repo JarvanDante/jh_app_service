@@ -9,6 +9,7 @@ service Public {
     rpc Register(RegisterReq) returns (RegisterRes) {}
     rpc Login(LoginReq) returns (LoginRes) {}
     rpc GenerateCaptcha(GenerateCaptchaReq) returns (GenerateCaptchaRes) {}
+    rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes) {}
 }
 
 // 快速注册请求
@@ -20,8 +21,11 @@ message QuickRegisterReq {
 
 // 快速注册响应
 message QuickRegisterRes {
-    string token = 1;       // JWT token
-    string username = 2;    // 用户名
+    string token = 1;              // JWT token
+    string username = 2;           // 用户名
+    string refresh_token = 3;      // 刷新token
+    int64 expires_in = 4;          // token过期时间（秒）
+    int64 refresh_expires_in = 5;  // refresh_token过期时间（秒）
 }
 
 
@@ -35,7 +39,10 @@ message LoginReq {
 
 // 登录响应
 message LoginRes {
-    string token = 1;     // JWT token
+    string token = 1;              // JWT token
+    string refresh_token = 2;      // 刷新token
+    int64 expires_in = 3;          // token过期时间（秒）
+    int64 refresh_expires_in = 4;  // refresh_token过期时间（秒）
 }
 
 
@@ -48,6 +55,19 @@ message GenerateCaptchaReq {
 message GenerateCaptchaRes {
     bytes image = 1;      // 验证码图片数据
     string content_type = 2; // 图片类型
+}
+
+// 刷新token请求
+message RefreshTokenReq {
+    string refresh_token = 1;  // v: required
+}
+
+// 刷新token响应
+message RefreshTokenRes {
+    string token = 1;              // 新的JWT token
+    string refresh_token = 2;      // 新的刷新token
+    int64 expires_in = 3;          // token过期时间（秒）
+    int64 refresh_expires_in = 4;  // refresh_token过期时间（秒）
 }
 
 // 注册请求
@@ -68,7 +88,10 @@ message RegisterReq {
 
 // 注册响应
 message RegisterRes {
-    string token = 1;         // JWT token
+    string token = 1;              // JWT token
+    string refresh_token = 2;      // 刷新token
+    int64 expires_in = 3;          // token过期时间（秒）
+    int64 refresh_expires_in = 4;  // refresh_token过期时间（秒）
 }
 
 // 获取用户信息请求

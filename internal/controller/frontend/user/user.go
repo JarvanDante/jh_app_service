@@ -21,3 +21,8 @@ func Register(s *grpcx.GrpcServer) {
 func (c *Controller) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (*v1.GetUserInfoRes, error) {
 	return frontend.User().GetUserInfo(ctx, req)
 }
+
+// Logout 用户退出登录
+func (c *Controller) Logout(ctx context.Context, req *v1.LogoutReq) (*v1.LogoutRes, error) {
+	return frontend.User().Logout(ctx, req)
+}

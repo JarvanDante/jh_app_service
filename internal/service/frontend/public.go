@@ -12,6 +12,7 @@ type (
 		Register(ctx context.Context, req *v1.RegisterReq) (*v1.RegisterRes, error)
 		Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, error)
 		GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaReq) (*v1.GenerateCaptchaRes, error)
+		RefreshToken(ctx context.Context, req *v1.RefreshTokenReq) (*v1.RefreshTokenRes, error)
 	}
 )
 
