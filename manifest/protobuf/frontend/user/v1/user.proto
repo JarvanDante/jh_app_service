@@ -11,6 +11,7 @@ service User {
     rpc BindMobile(BindMobileReq) returns (BindMobileRes) {}
     rpc ChangeLoginPassword(ChangeLoginPasswordReq) returns (ChangeLoginPasswordRes) {}
     rpc BindLoginPassword(BindLoginPasswordReq) returns (BindLoginPasswordRes) {}
+    rpc GetGradeList(GetGradeListReq) returns (GetGradeListRes) {}
 }
 
 // 获取用户信息请求
@@ -123,4 +124,29 @@ message BindLoginPasswordReq {
 // 绑定登录密码响应
 message BindLoginPasswordRes {
     string message = 1;  // 提示消息
+}
+
+// 获取会员等级列表请求
+message GetGradeListReq {
+}
+
+// 获取会员等级列表响应
+message GetGradeListRes {
+    repeated GradeItem list = 1;  // 等级列表
+}
+
+// 会员等级项
+message GradeItem {
+    int32 id = 1;                          // 等级ID
+    string name = 2;                       // 等级名称
+    int32 points_upgrade = 3;              // 升级所需积分
+    string bonus_upgrade = 4;              // 升级赠送彩金
+    string bonus_birthday = 5;             // 生日彩金
+    string rebate_percent_sports = 6;      // 体育返水比例
+    string rebate_percent_lottery = 7;     // 彩票返水比例
+    string rebate_percent_live = 8;        // 真人视讯返水比例
+    string rebate_percent_egame = 9;       // 电子游戏返水比例
+    string rebate_percent_poker = 10;      // 棋牌返水比例
+    string deposit_amount = 11;            // 充值金额
+    string bet_amount = 12;                // 投注金额
 }

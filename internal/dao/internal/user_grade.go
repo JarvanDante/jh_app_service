@@ -24,6 +24,8 @@ type UserGradeColumns struct {
 	Id                   string //
 	SiteId               string // 站点ID
 	Name                 string // 会员等级名称
+	DepositAmount        string // 充值金额
+	BetAmount            string // 投注金额
 	PointsUpgrade        string // 升级消耗积分
 	BonusUpgrade         string // 额外返水比例: 体育
 	BonusBirthday        string // 生日彩金
@@ -44,6 +46,8 @@ var userGradeColumns = UserGradeColumns{
 	Id:                   "id",
 	SiteId:               "site_id",
 	Name:                 "name",
+	DepositAmount:        "deposit_amount",
+	BetAmount:            "bet_amount",
 	PointsUpgrade:        "points_upgrade",
 	BonusUpgrade:         "bonus_upgrade",
 	BonusBirthday:        "bonus_birthday",

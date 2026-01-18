@@ -46,3 +46,8 @@ func (c *Controller) ChangeLoginPassword(ctx context.Context, req *v1.ChangeLogi
 func (c *Controller) BindLoginPassword(ctx context.Context, req *v1.BindLoginPasswordReq) (*v1.BindLoginPasswordRes, error) {
 	return frontend.User().BindLoginPassword(ctx, req)
 }
+
+// GetGradeList 获取会员等级列表
+func (c *Controller) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (*v1.GetGradeListRes, error) {
+	return frontend.User().GetGradeList(ctx, req)
+}

@@ -14,6 +14,7 @@ type (
 		BindMobile(ctx context.Context, req *v1.BindMobileReq) (*v1.BindMobileRes, error)
 		ChangeLoginPassword(ctx context.Context, req *v1.ChangeLoginPasswordReq) (*v1.ChangeLoginPasswordRes, error)
 		BindLoginPassword(ctx context.Context, req *v1.BindLoginPasswordReq) (*v1.BindLoginPasswordRes, error)
+		GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (*v1.GetGradeListRes, error)
 	}
 )
 

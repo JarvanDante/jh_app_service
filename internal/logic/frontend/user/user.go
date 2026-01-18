@@ -446,3 +446,58 @@ func (s *sUser) BindLoginPassword(ctx context.Context, req *v1.BindLoginPassword
 
 	return res, nil
 }
+
+// GetGradeList 获取会员等级列表
+func (s *sUser) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (res *v1.GetGradeListRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.GetGradeList", trace.WithAttributes(
+		attribute.String("method", "GetGradeList"),
+	))
+	defer span.End()
+
+	// 从JWT token获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询会员等级列表
+	var grades []*entity.UserGrade
+	err = dao.UserGrade.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("status", 1). // STATUS_ACTIVE = 1
+		OrderAsc("id").
+		Scan(&grades)
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "查询会员等级列表失败: %v", err)
+		return nil, fmt.Errorf("查询会员等级列表失败")
+	}
+
+	// 构建响应
+	res = &v1.GetGradeListRes{
+		List: make([]*v1.GradeItem, 0, len(grades)),
+	}
+
+	for _, grade := range grades {
+		item := &v1.GradeItem{
+			Id:                   int32(grade.Id),
+			Name:                 grade.Name,
+			DepositAmount:        fmt.Sprintf("%.2f", grade.DepositAmount), // 充值金额
+			BetAmount:            fmt.Sprintf("%.2f", grade.BetAmount),     // 投注金额
+			PointsUpgrade:        int32(grade.PointsUpgrade),
+			BonusUpgrade:         fmt.Sprintf("%.2f", grade.BonusUpgrade),
+			BonusBirthday:        fmt.Sprintf("%.2f", grade.BonusBirthday),
+			RebatePercentSports:  fmt.Sprintf("%.2f", grade.RebatePercentSports*100),
+			RebatePercentLottery: fmt.Sprintf("%.2f", grade.RebatePercentLottery*100),
+			RebatePercentLive:    fmt.Sprintf("%.2f", grade.RebatePercentLive*100),
+			RebatePercentEgame:   fmt.Sprintf("%.2f", grade.RebatePercentEgame*100),
+			RebatePercentPoker:   fmt.Sprintf("%.2f", grade.RebatePercentPoker*100),
+		}
+		res.List = append(res.List, item)
+	}
+
+	middleware.LogWithTrace(ctx, "info", "获取会员等级列表成功: site_id=%d, count=%d", siteId, len(grades))
+
+	return res, nil
+}

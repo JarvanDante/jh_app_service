@@ -13,6 +13,8 @@ type UserGrade struct {
 	Id                   uint        `json:"id"                   orm:"id"                     description:""`
 	SiteId               int         `json:"siteId"               orm:"site_id"                description:"站点ID"`
 	Name                 string      `json:"name"                 orm:"name"                   description:"会员等级名称"`
+	DepositAmount        float64     `json:"depositAmount"        orm:"deposit_amount"         description:"充值金额"`
+	BetAmount            float64     `json:"betAmount"            orm:"bet_amount"             description:"投注金额"`
 	PointsUpgrade        int         `json:"pointsUpgrade"        orm:"points_upgrade"         description:"升级消耗积分"`
 	BonusUpgrade         float64     `json:"bonusUpgrade"         orm:"bonus_upgrade"          description:"额外返水比例: 体育"`
 	BonusBirthday        float64     `json:"bonusBirthday"        orm:"bonus_birthday"         description:"生日彩金"`
