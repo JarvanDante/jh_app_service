@@ -26,3 +26,13 @@ func (c *Controller) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (*
 func (c *Controller) Logout(ctx context.Context, req *v1.LogoutReq) (*v1.LogoutRes, error) {
 	return frontend.User().Logout(ctx, req)
 }
+
+// BindEmail 绑定邮箱
+func (c *Controller) BindEmail(ctx context.Context, req *v1.BindEmailReq) (*v1.BindEmailRes, error) {
+	return frontend.User().BindEmail(ctx, req)
+}
+
+// BindMobile 绑定手机
+func (c *Controller) BindMobile(ctx context.Context, req *v1.BindMobileReq) (*v1.BindMobileRes, error) {
+	return frontend.User().BindMobile(ctx, req)
+}

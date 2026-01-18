@@ -7,6 +7,8 @@ option go_package = "jh_app_service/api/frontend/user/v1";
 service User {
     rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoRes) {}
     rpc Logout(LogoutReq) returns (LogoutRes) {}
+    rpc BindEmail(BindEmailReq) returns (BindEmailRes) {}
+    rpc BindMobile(BindMobileReq) returns (BindMobileRes) {}
 }
 
 // 获取用户信息请求
@@ -77,5 +79,25 @@ message LogoutReq {
 
 // 退出登录响应
 message LogoutRes {
+    string message = 1;  // 提示消息
+}
+
+// 绑定邮箱请求
+message BindEmailReq {
+    string email = 1;  // 邮箱地址
+}
+
+// 绑定邮箱响应
+message BindEmailRes {
+    string message = 1;  // 提示消息
+}
+
+// 绑定手机请求
+message BindMobileReq {
+    string mobile = 1;  // 手机号
+}
+
+// 绑定手机响应
+message BindMobileRes {
     string message = 1;  // 提示消息
 }

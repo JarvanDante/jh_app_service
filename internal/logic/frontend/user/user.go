@@ -166,3 +166,117 @@ func (s *sUser) Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRe
 
 	return res, nil
 }
+
+// BindEmail 绑定邮箱
+func (s *sUser) BindEmail(ctx context.Context, req *v1.BindEmailReq) (res *v1.BindEmailRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.BindEmail", trace.WithAttributes(
+		attribute.String("method", "BindEmail"),
+	))
+	defer span.End()
+
+	// 验证邮箱格式
+	if req.Email == "" {
+		return nil, fmt.Errorf("邮箱必填")
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 检查邮箱是否已被其他用户绑定
+	var existUser *entity.User
+	err = dao.User.Ctx(ctx).Where("email", req.Email).
+		Where("site_id", siteId).
+		Where("id !=", userId).
+		Scan(&existUser)
+
+	if err == nil && existUser != nil {
+		return nil, fmt.Errorf("该邮箱已被其他用户绑定")
+	}
+
+	// 更新用户邮箱
+	_, err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Update(map[string]interface{}{
+			"email": req.Email,
+		})
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "绑定邮箱失败: %v", err)
+		return nil, fmt.Errorf("绑定邮箱失败")
+	}
+
+	middleware.LogWithTrace(ctx, "info", "绑定邮箱成功: user_id=%d, email=%s", userId, req.Email)
+
+	res = &v1.BindEmailRes{
+		Message: "绑定邮箱成功",
+	}
+
+	return res, nil
+}
+
+// BindMobile 绑定手机
+func (s *sUser) BindMobile(ctx context.Context, req *v1.BindMobileReq) (res *v1.BindMobileRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.BindMobile", trace.WithAttributes(
+		attribute.String("method", "BindMobile"),
+	))
+	defer span.End()
+
+	// 验证手机号
+	if req.Mobile == "" {
+		return nil, fmt.Errorf("手机号必填")
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 检查手机号是否已被其他用户绑定
+	var existUser *entity.User
+	err = dao.User.Ctx(ctx).Where("mobile", req.Mobile).
+		Where("site_id", siteId).
+		Where("id !=", userId).
+		Scan(&existUser)
+
+	if err == nil && existUser != nil {
+		return nil, fmt.Errorf("该手机号已被其他用户绑定")
+	}
+
+	// 更新用户手机号
+	_, err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Update(map[string]interface{}{
+			"mobile": req.Mobile,
+		})
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "绑定手机号失败: %v", err)
+		return nil, fmt.Errorf("绑定手机号失败")
+	}
+
+	middleware.LogWithTrace(ctx, "info", "绑定手机号成功: user_id=%d, mobile=%s", userId, req.Mobile)
+
+	res = &v1.BindMobileRes{
+		Message: "绑定手机号成功",
+	}
+
+	return res, nil
+}
