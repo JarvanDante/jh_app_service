@@ -10,6 +10,7 @@ service User {
     rpc BindEmail(BindEmailReq) returns (BindEmailRes) {}
     rpc BindMobile(BindMobileReq) returns (BindMobileRes) {}
     rpc ChangeLoginPassword(ChangeLoginPasswordReq) returns (ChangeLoginPasswordRes) {}
+    rpc BindLoginPassword(BindLoginPasswordReq) returns (BindLoginPasswordRes) {}
 }
 
 // 获取用户信息请求
@@ -111,5 +112,15 @@ message ChangeLoginPasswordReq {
 
 // 修改登录密码响应
 message ChangeLoginPasswordRes {
+    string message = 1;  // 提示消息
+}
+
+// 绑定登录密码请求（针对快速注册用户）
+message BindLoginPasswordReq {
+    string new_password = 1;  // 新密码
+}
+
+// 绑定登录密码响应
+message BindLoginPasswordRes {
     string message = 1;  // 提示消息
 }

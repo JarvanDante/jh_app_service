@@ -41,3 +41,8 @@ func (c *Controller) BindMobile(ctx context.Context, req *v1.BindMobileReq) (*v1
 func (c *Controller) ChangeLoginPassword(ctx context.Context, req *v1.ChangeLoginPasswordReq) (*v1.ChangeLoginPasswordRes, error) {
 	return frontend.User().ChangeLoginPassword(ctx, req)
 }
+
+// BindLoginPassword 绑定登录密码（针对快速注册用户）
+func (c *Controller) BindLoginPassword(ctx context.Context, req *v1.BindLoginPasswordReq) (*v1.BindLoginPasswordRes, error) {
+	return frontend.User().BindLoginPassword(ctx, req)
+}

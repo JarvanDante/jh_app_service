@@ -368,3 +368,81 @@ func (s *sUser) ChangeLoginPassword(ctx context.Context, req *v1.ChangeLoginPass
 
 	return res, nil
 }
+
+// BindLoginPassword 绑定登录密码（针对快速注册用户）
+func (s *sUser) BindLoginPassword(ctx context.Context, req *v1.BindLoginPasswordReq) (res *v1.BindLoginPasswordRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.BindLoginPassword", trace.WithAttributes(
+		attribute.String("method", "BindLoginPassword"),
+	))
+	defer span.End()
+
+	// 验证参数
+	if req.NewPassword == "" {
+		return nil, fmt.Errorf("请输入新密码")
+	}
+
+	if len(req.NewPassword) < 6 {
+		return nil, fmt.Errorf("新密码最少需要6个字符长度")
+	}
+
+	if len(req.NewPassword) > 20 {
+		return nil, fmt.Errorf("新密码最多不超过20个字符长度")
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询用户信息
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
+	if user.HasPass > 0 {
+		middleware.LogWithTrace(ctx, "error", "已经绑定过密码: user_id=%d", userId)
+		return nil, fmt.Errorf("已经绑定过密码请勿重新修改")
+	}
+
+	// 使用bcrypt加密新密码
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "密码加密失败: %v", err)
+		return nil, fmt.Errorf("绑定登录密码失败")
+	}
+
+	// 更新密码
+	_, err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Update(map[string]interface{}{
+			"password": string(hashedPassword),
+			"has_pass": 1,
+		})
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "绑定登录密码失败: %v", err)
+		return nil, fmt.Errorf("绑定登录密码失败")
+	}
+
+	middleware.LogWithTrace(ctx, "info", "绑定登录密码成功: user_id=%d", userId)
+
+	res = &v1.BindLoginPasswordRes{
+		Message: "绑定登录密码成功",
+	}
+
+	return res, nil
+}
