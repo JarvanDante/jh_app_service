@@ -10,6 +10,7 @@ service Public {
     rpc Login(LoginReq) returns (LoginRes) {}
     rpc GenerateCaptcha(GenerateCaptchaReq) returns (GenerateCaptchaRes) {}
     rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes) {}
+    rpc GetSiteSetting(GetSiteSettingReq) returns (GetSiteSettingRes) {}
 }
 
 // 快速注册请求
@@ -143,4 +144,24 @@ message LastMessage {
     int32 id = 1;
     string title = 2;
     string created_at = 3;
+}
+
+// 获取站点设置请求
+message GetSiteSettingReq {
+    // 无需参数
+}
+
+// 获取站点设置响应
+message GetSiteSettingRes {
+    string agent_url = 1;         // 代理url
+    string site_name = 2;         // 站点名称
+    string mobile_url = 3;        // 手机url
+    int32 switch_register = 4;    // 会员注册开关 0=关闭 1=开启
+    int32 switch_grade = 5;       // 会员等级开关 0=关闭 1=开启
+    string service_url = 6;       // 客服链接
+    int32 close = 7;              // 站点关闭开关 0=正常 1=关闭
+    string min_withdraw = 8;      // 单笔最小提现金额
+    string max_withdraw = 9;      // 单笔最大提现金额
+    string mobile_logo = 10;      // 手机端logo
+    string close_reason = 11;     // 站点关闭理由
 }

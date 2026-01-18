@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package frontend_balance;
 
-option go_package = "jh_app_service/api/frontend/balance/v1";
+option go_package = "jh_app_service/api/grpc/balance/v1";
 
 service Balance {
     // 初始化用户余额

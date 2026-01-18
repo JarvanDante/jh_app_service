@@ -41,3 +41,8 @@ func (c *Controller) RefreshToken(ctx context.Context, req *v1.RefreshTokenReq) 
 func (c *Controller) Register(ctx context.Context, req *v1.RegisterReq) (*v1.RegisterRes, error) {
 	return frontend.Public().Register(ctx, req)
 }
+
+// GetSiteSetting 获取站点设置
+func (c *Controller) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq) (*v1.GetSiteSettingRes, error) {
+	return frontend.Public().GetSiteSetting(ctx, req)
+}

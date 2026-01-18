@@ -952,3 +952,57 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 
 	return res, nil
 }
+
+// GetSiteSetting 获取站点设置
+func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq) (res *v1.GetSiteSettingRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "public.GetSiteSetting", trace.WithAttributes(
+		attribute.String("method", "GetSiteSetting"),
+	))
+	defer span.End()
+
+	// 获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询站点配置
+	var siteConfig *entity.SiteConfig
+	err = dao.SiteConfig.Ctx(ctx).Where("site_id", siteId).Scan(&siteConfig)
+	if err != nil || siteConfig == nil {
+		middleware.LogWithTrace(ctx, "error", "查询站点配置失败: %v", err)
+		return nil, fmt.Errorf("获取站点配置失败")
+	}
+
+	// 查询站点信息
+	var site *entity.Site
+	err = dao.Site.Ctx(ctx).Where("id", siteId).Scan(&site)
+	if err != nil || site == nil {
+		middleware.LogWithTrace(ctx, "error", "查询站点信息失败: %v", err)
+		return nil, fmt.Errorf("获取站点信息失败")
+	}
+
+	// 默认关闭理由
+	closeReason := "您好，系统正在维护中，估计需要1个小时左右，给您造成不便，敬请谅解！"
+	if siteConfig.CloseReason != "" {
+		closeReason = siteConfig.CloseReason
+	}
+
+	res = &v1.GetSiteSettingRes{
+		AgentUrl:       siteConfig.UrlAgentPc,
+		SiteName:       site.Name,
+		MobileUrl:      siteConfig.UrlMobile,
+		SwitchRegister: int32(siteConfig.SwitchRegister),
+		SwitchGrade:    int32(siteConfig.SwitchGrade),
+		ServiceUrl:     siteConfig.UrlService,
+		Close:          int32(siteConfig.IsClose),
+		MinWithdraw:    fmt.Sprintf("%.2f", float64(siteConfig.MinWithdraw)),
+		MaxWithdraw:    fmt.Sprintf("%.2f", float64(siteConfig.MaxWithdraw)),
+		MobileLogo:     siteConfig.MobileLogo,
+		CloseReason:    closeReason,
+	}
+
+	return res, nil
+}
