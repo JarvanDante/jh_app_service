@@ -12,6 +12,7 @@ type (
 		Logout(ctx context.Context, req *v1.LogoutReq) (*v1.LogoutRes, error)
 		BindEmail(ctx context.Context, req *v1.BindEmailReq) (*v1.BindEmailRes, error)
 		BindMobile(ctx context.Context, req *v1.BindMobileReq) (*v1.BindMobileRes, error)
+		ChangeLoginPassword(ctx context.Context, req *v1.ChangeLoginPasswordReq) (*v1.ChangeLoginPasswordRes, error)
 	}
 )
 

@@ -9,6 +9,7 @@ service User {
     rpc Logout(LogoutReq) returns (LogoutRes) {}
     rpc BindEmail(BindEmailReq) returns (BindEmailRes) {}
     rpc BindMobile(BindMobileReq) returns (BindMobileRes) {}
+    rpc ChangeLoginPassword(ChangeLoginPasswordReq) returns (ChangeLoginPasswordRes) {}
 }
 
 // 获取用户信息请求
@@ -99,5 +100,16 @@ message BindMobileReq {
 
 // 绑定手机响应
 message BindMobileRes {
+    string message = 1;  // 提示消息
+}
+
+// 修改登录密码请求
+message ChangeLoginPasswordReq {
+    string old_password = 1;  // 原密码
+    string new_password = 2;  // 新密码
+}
+
+// 修改登录密码响应
+message ChangeLoginPasswordRes {
     string message = 1;  // 提示消息
 }

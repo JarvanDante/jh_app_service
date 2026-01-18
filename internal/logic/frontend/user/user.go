@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"go.opentelemetry.io/otel/attribute"
@@ -276,6 +277,93 @@ func (s *sUser) BindMobile(ctx context.Context, req *v1.BindMobileReq) (res *v1.
 
 	res = &v1.BindMobileRes{
 		Message: "绑定手机号成功",
+	}
+
+	return res, nil
+}
+
+// ChangeLoginPassword 修改登录密码
+func (s *sUser) ChangeLoginPassword(ctx context.Context, req *v1.ChangeLoginPasswordReq) (res *v1.ChangeLoginPasswordRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.ChangeLoginPassword", trace.WithAttributes(
+		attribute.String("method", "ChangeLoginPassword"),
+	))
+	defer span.End()
+
+	// 验证参数
+	if req.OldPassword == "" {
+		return nil, fmt.Errorf("请输入原密码")
+	}
+
+	if req.NewPassword == "" {
+		return nil, fmt.Errorf("请输入新密码")
+	}
+
+	if len(req.NewPassword) < 6 {
+		return nil, fmt.Errorf("新密码最少需要6个字符长度")
+	}
+
+	if len(req.NewPassword) > 20 {
+		return nil, fmt.Errorf("新密码最多不超过20个字符长度")
+	}
+
+	if req.OldPassword == req.NewPassword {
+		return nil, fmt.Errorf("新密码与原密码必须不一致")
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询用户信息
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
+	// 验证旧密码是否正确
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword))
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "原密码错误: user_id=%d", userId)
+		return nil, fmt.Errorf("原密码错误")
+	}
+
+	// 使用bcrypt加密新密码
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "密码加密失败: %v", err)
+		return nil, fmt.Errorf("修改登录密码失败")
+	}
+
+	// 更新密码
+	_, err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Update(map[string]interface{}{
+			"password": string(hashedPassword),
+		})
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "修改登录密码失败: %v", err)
+		return nil, fmt.Errorf("修改登录密码失败")
+	}
+
+	middleware.LogWithTrace(ctx, "info", "修改登录密码成功: user_id=%d", userId)
+
+	res = &v1.ChangeLoginPasswordRes{
+		Message: "修改登录密码成功",
 	}
 
 	return res, nil

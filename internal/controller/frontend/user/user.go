@@ -36,3 +36,8 @@ func (c *Controller) BindEmail(ctx context.Context, req *v1.BindEmailReq) (*v1.B
 func (c *Controller) BindMobile(ctx context.Context, req *v1.BindMobileReq) (*v1.BindMobileRes, error) {
 	return frontend.User().BindMobile(ctx, req)
 }
+
+// ChangeLoginPassword 修改登录密码
+func (c *Controller) ChangeLoginPassword(ctx context.Context, req *v1.ChangeLoginPasswordReq) (*v1.ChangeLoginPasswordRes, error) {
+	return frontend.User().ChangeLoginPassword(ctx, req)
+}
