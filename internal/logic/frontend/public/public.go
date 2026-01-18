@@ -613,3 +613,170 @@ func abs(x int) int {
 	}
 	return x
 }
+
+// Register 用户注册
+func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.RegisterRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.Register", trace.WithAttributes(
+		attribute.String("method", "Register"),
+		attribute.String("username", req.Username),
+	))
+	defer span.End()
+
+	// 获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 验证图片验证码
+	if req.Code == "" {
+		return nil, fmt.Errorf("请输入验证码")
+	}
+
+	clientIp := util.GetClientIP(ctx)
+	siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
+	if siteCode == "" {
+		siteCode = "default"
+	}
+
+	cacheKey := fmt.Sprintf("%s:captcha:%s:%s", siteCode, clientIp, req.Time)
+	cachedCode, err := g.Redis().Get(ctx, cacheKey)
+	if err != nil || cachedCode.IsNil() {
+		return nil, fmt.Errorf("验证码已过期，请重新获取")
+	}
+
+	if !strings.EqualFold(cachedCode.String(), req.Code) {
+		return nil, fmt.Errorf("验证码错误")
+	}
+
+	// 验证成功后删除验证码
+	g.Redis().Del(ctx, cacheKey)
+
+	// 验证手机验证码（如果提供）
+	// TODO: 实现手机验证码验证逻辑
+
+	// 检查用户名是否已存在
+	var existUser *entity.User
+	err = dao.User.Ctx(ctx).Where("username", req.Username).
+		Where("site_id", siteId).
+		Scan(&existUser)
+	if err == nil && existUser != nil {
+		return nil, fmt.Errorf("用户名已经被注册")
+	}
+
+	// 检查手机号是否已存在
+	if req.Mobile != "" {
+		var existMobile *entity.User
+		err = dao.User.Ctx(ctx).Where("mobile", req.Mobile).
+			Where("site_id", siteId).
+			Scan(&existMobile)
+		if err == nil && existMobile != nil {
+			return nil, fmt.Errorf("手机账号已经被注册")
+		}
+	}
+
+	// 加密密码
+	hashedPassword, err := s.hashPassword(req.Password)
+	if err != nil {
+		g.Log().Error(ctx, "密码加密失败:", err)
+		return nil, fmt.Errorf("注册失败")
+	}
+
+	// 加密资金密码（如果提供）
+	var hashedPayPassword string
+	if req.PayPassword != "" {
+		hashedPayPassword, err = s.hashPassword(req.PayPassword)
+		if err != nil {
+			g.Log().Error(ctx, "资金密码加密失败:", err)
+			return nil, fmt.Errorf("注册失败")
+		}
+	}
+
+	// 获取站点配置
+	var siteConfig *entity.SiteConfig
+	err = dao.SiteConfig.Ctx(ctx).Where("site_id", siteId).Scan(&siteConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// 创建用户
+	user := &entity.User{
+		SiteId:       int(siteId),
+		GradeId:      siteConfig.DefaultGradeId,
+		LevelId:      siteConfig.DefaultLevelId,
+		AgentId:      siteConfig.DefaultAgentId,
+		Username:     req.Username,
+		Password:     hashedPassword,
+		PayPassword:  hashedPayPassword,
+		Realname:     req.Realname,
+		Mobile:       req.Mobile,
+		Email:        req.Email,
+		SafeQuestion: "",
+		SafeAnswer:   "",
+		RegisterIp:   clientIp,
+		RegisterTime: gtime.Now(),
+		RegisterUrl:  req.Domain,
+		Status:       1,
+	}
+
+	// 保存用户
+	result, err := dao.User.Ctx(ctx).Insert(user)
+	if err != nil {
+		g.Log().Error(ctx, "注册失败:", err)
+		return nil, fmt.Errorf("注册失败")
+	}
+
+	userId, err := result.LastInsertId()
+	if err != nil {
+		g.Log().Error(ctx, "获取用户ID失败:", err)
+		return nil, fmt.Errorf("注册失败")
+	}
+	user.Id = uint(userId)
+
+	// 更新最后登录信息
+	dao.User.Ctx(ctx).Where("id", user.Id).Update(map[string]interface{}{
+		"last_login_ip":   clientIp,
+		"last_login_time": gtime.Now(),
+	})
+
+	// 异步调用balance服务初始化余额
+	go func() {
+		dbManager := registry.GetDBConfigManagerV2()
+		siteConfig, err := dbManager.GetSiteConfig(siteCode)
+		if err != nil {
+			g.Log().Errorf(ctx, "获取站点配置失败: %v", err)
+			return
+		}
+
+		currency := siteConfig.Base.Currency
+		if currency == "" {
+			currency = "CNY"
+		}
+
+		msg := &mq.InitBalanceUserMessage{
+			SiteID:   int32(siteId),
+			UserID:   int32(userId),
+			Username: req.Username,
+			Currency: currency,
+		}
+
+		if err := mq.PublishInitBalanceUser(context.Background(), msg); err != nil {
+			g.Log().Errorf(ctx, "发送初始化余额消息失败: %v", err)
+		}
+	}()
+
+	// 生成JWT Token
+	token, err := s.generateJWTTokenUser(user)
+	if err != nil {
+		g.Log().Error(ctx, "生成token失败:", err)
+		return nil, fmt.Errorf("注册失败")
+	}
+
+	res = &v1.RegisterRes{
+		Token: token,
+	}
+
+	return res, nil
+}

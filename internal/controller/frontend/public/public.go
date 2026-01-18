@@ -31,3 +31,8 @@ func (c *Controller) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes,
 func (c *Controller) GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaReq) (*v1.GenerateCaptchaRes, error) {
 	return frontend.Public().GenerateCaptcha(ctx, req)
 }
+
+// Register 用户注册
+func (c *Controller) Register(ctx context.Context, req *v1.RegisterReq) (*v1.RegisterRes, error) {
+	return frontend.Public().Register(ctx, req)
+}

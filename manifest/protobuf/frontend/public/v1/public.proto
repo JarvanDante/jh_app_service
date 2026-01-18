@@ -6,6 +6,7 @@ option go_package = "jh_app_service/api/frontend/public/v1";
 
 service Public {
     rpc QuickRegister(QuickRegisterReq) returns (QuickRegisterRes) {}
+    rpc Register(RegisterReq) returns (RegisterRes) {}
     rpc Login(LoginReq) returns (LoginRes) {}
     rpc GenerateCaptcha(GenerateCaptchaReq) returns (GenerateCaptchaRes) {}
 }
@@ -47,4 +48,25 @@ message GenerateCaptchaReq {
 message GenerateCaptchaRes {
     bytes image = 1;      // 验证码图片数据
     string content_type = 2; // 图片类型
+}
+
+// 注册请求
+message RegisterReq {
+    string username = 1;      // v: required
+    string password = 2;      // v: required
+    string mobile = 3;        // 手机号
+    string code = 4;          // 图片验证码
+    string time = 5;          // 时间戳
+    string phone_code = 6;    // 手机验证码
+    string pay_password = 7;  // 资金密码
+    string realname = 8;      // 真实姓名
+    string email = 9;         // 邮箱
+    string birthday = 10;     // 生日
+    string agent_salt = 11;   // 代理码
+    string domain = 12;       // 注册域名
+}
+
+// 注册响应
+message RegisterRes {
+    string token = 1;         // JWT token
 }
