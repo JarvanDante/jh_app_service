@@ -52,6 +52,7 @@ type UserColumns struct {
 	CreatedAt         string //
 	UpdatedAt         string //
 	PayTimes          string // 充值次数
+	HasPass           string // 是否设置密码
 }
 
 // userColumns holds the columns for the table user.
@@ -87,6 +88,7 @@ var userColumns = UserColumns{
 	CreatedAt:         "created_at",
 	UpdatedAt:         "updated_at",
 	PayTimes:          "pay_times",
+	HasPass:           "has_pass",
 }
 
 // NewUserDao creates and returns a new DAO object for table data access.

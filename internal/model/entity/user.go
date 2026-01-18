@@ -41,4 +41,5 @@ type User struct {
 	CreatedAt         *gtime.Time `json:"createdAt"         orm:"created_at"          description:""`
 	UpdatedAt         *gtime.Time `json:"updatedAt"         orm:"updated_at"          description:""`
 	PayTimes          int         `json:"payTimes"          orm:"pay_times"           description:"充值次数"`
+	HasPass           int         `json:"hasPass"           orm:"has_pass"            description:"是否设置密码"`
 }

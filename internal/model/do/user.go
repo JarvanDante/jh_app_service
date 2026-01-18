@@ -43,4 +43,5 @@ type User struct {
 	CreatedAt         *gtime.Time //
 	UpdatedAt         *gtime.Time //
 	PayTimes          any         // 充值次数
+	HasPass           any         // 是否设置密码
 }
