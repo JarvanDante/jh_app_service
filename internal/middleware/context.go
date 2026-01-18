@@ -8,6 +8,7 @@ const (
 	SiteIdContextKey   = "site_id"
 	SiteCodeContextKey = "site_code"
 	AdminIdContextKey  = "admin_id"
+	UserIdContextKey   = "user_id"
 	ClientIPContextKey = "client_ip"
 )
 
@@ -43,6 +44,27 @@ func GetSiteIdFromContext(ctx context.Context) (uint, bool) {
 	// 如果 gRPC metadata 中没有，尝试从 context 获取
 	if siteId, ok := ctx.Value(AdminIdContextKey).(uint); ok {
 		return siteId, true
+	}
+	return 0, false
+}
+
+//GetUserIdFromContext
+/**
+ * @desc：获取userId -优先从 gRPC metadata 获取，如果没有再从 context 获取
+ * @param ctx
+ * @return uint
+ * @return bool
+ * @author : Carson
+ */
+func GetUserIdFromContext(ctx context.Context) (uint, bool) {
+	// 首先尝试从 gRPC metadata 获取
+	if userId, ok := GetUserIdFromGRPCMetadata(ctx); ok {
+		return userId, true
+	}
+
+	// 如果 gRPC metadata 中没有，尝试从 context 获取
+	if userId, ok := ctx.Value(UserIdContextKey).(uint); ok {
+		return userId, true
 	}
 	return 0, false
 }

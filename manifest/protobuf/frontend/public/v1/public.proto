@@ -70,3 +70,55 @@ message RegisterReq {
 message RegisterRes {
     string token = 1;         // JWT token
 }
+
+// 获取用户信息请求
+message GetUserInfoReq {
+    // 从JWT token中获取用户信息，无需参数
+}
+
+// 获取用户信息响应
+message GetUserInfoRes {
+    string username = 1;              // 用户名
+    string realname = 2;              // 真实姓名
+    string email = 3;                 // 邮箱
+    string mobile = 4;                // 手机号
+    string qq = 5;                    // QQ号
+    int32 sex = 6;                    // 性别 0=未知 1=男 2=女
+    string birthday = 7;              // 生日
+    string last_login_time = 8;       // 最后登录时间
+    string last_login_address = 9;    // 最后登录地址
+    int32 show_beginner_guide = 10;   // 新手引导 0=不显示 1=显示
+    string gpwd = 11;                 // 游戏密码(base64)
+    string balance = 12;              // 余额(默认值)
+    string balance_frozen = 13;       // 冻结余额(默认值)
+    string points = 14;               // 积分(默认值)
+    int32 grade_id = 15;              // 会员等级ID
+    string grade_name = 16;           // 会员等级名称
+    int32 bind_safe_question = 17;    // 是否绑定安全问题 0=否 1=是
+    int32 bind_pay_password = 18;     // 是否绑定资金密码 0=否 1=是
+    int32 unread_message_count = 19;  // 未读消息数量(默认值)
+    int32 switch_sign = 20;           // 签到开关 0=关闭 1=开启
+    int32 bind_bank = 21;             // 是否绑定银行卡 0=否 1=是
+    int32 apply_birthday_bonus = 22;  // 是否可申请生日礼金 0=否 1=是
+    int32 auto_bind_game_balance = 23;// 自动绑定游戏余额 0=否 1=是
+    string total_bet = 24;            // 总投注(默认值)
+    string total_bonus = 25;          // 总彩金(默认值)
+    string total_rebate = 26;         // 总返水(默认值)
+    repeated LastRecord last_recharge = 27;  // 最后充值记录(默认值)
+    repeated LastRecord last_withdraw = 28;  // 最后提现记录(默认值)
+    repeated LastMessage last_message = 29;  // 最后消息(默认值)
+}
+
+// 最后记录
+message LastRecord {
+    int32 id = 1;
+    string amount = 2;
+    string created_at = 3;
+}
+
+// 最后消息
+message LastMessage {
+    int32 id = 1;
+    string title = 2;
+    string created_at = 3;
+}

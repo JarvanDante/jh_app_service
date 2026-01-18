@@ -13,6 +13,7 @@ import (
 	"jh_app_service/internal/controller/backend/upload"
 	"jh_app_service/internal/controller/backend/user"
 	"jh_app_service/internal/controller/frontend/public"
+	frontenduser "jh_app_service/internal/controller/frontend/user"
 	"os"
 	"time"
 
@@ -125,6 +126,7 @@ var (
 
 			/*---------前台---------*/
 			public.Register(s)
+			frontenduser.Register(s)
 
 			fmt.Println("gRPC服务器启动中...")
 
