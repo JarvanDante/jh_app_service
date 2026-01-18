@@ -14,9 +14,8 @@ service Public {
 
 // 快速注册请求
 message QuickRegisterReq {
-    string code = 1;      // 验证码
-    string time = 2;      // v: required
-    string domain = 3;    // 注册域名
+    string time = 1;      // v: required
+    string domain = 2;    // 注册域名
 }
 
 // 快速注册响应
