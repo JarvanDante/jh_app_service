@@ -481,10 +481,9 @@ func (s *sUser) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (res 
 
 	for _, grade := range grades {
 		item := &v1.GradeItem{
-			Id:                   int32(grade.Id),
-			Name:                 grade.Name,
-			DepositAmount:        fmt.Sprintf("%.2f", grade.DepositAmount), // 充值金额
-			BetAmount:            fmt.Sprintf("%.2f", grade.BetAmount),     // 投注金额
+			Id:   int32(grade.Id),
+			Name: grade.Name,
+
 			PointsUpgrade:        int32(grade.PointsUpgrade),
 			BonusUpgrade:         fmt.Sprintf("%.2f", grade.BonusUpgrade),
 			BonusBirthday:        fmt.Sprintf("%.2f", grade.BonusBirthday),
@@ -493,6 +492,9 @@ func (s *sUser) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (res 
 			RebatePercentLive:    fmt.Sprintf("%.2f", grade.RebatePercentLive*100),
 			RebatePercentEgame:   fmt.Sprintf("%.2f", grade.RebatePercentEgame*100),
 			RebatePercentPoker:   fmt.Sprintf("%.2f", grade.RebatePercentPoker*100),
+			PaymentLimit:         fmt.Sprintf("%.2f", grade.PaymentLimit), // 充值金额
+			BetLimit:             fmt.Sprintf("%.2f", grade.BetLimit),     // 投注金额
+			MoneyLimit:           fmt.Sprintf("%.2f", grade.MoneyLimit),   // 升级礼金
 		}
 		res.List = append(res.List, item)
 	}

@@ -637,7 +637,7 @@ func (s *sUser) getUserGradeList(ctx context.Context, siteId int) ([]*entity.Use
 // saveUserGrades 保存用户等级（内部方法）
 func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity.UserGrade, fieldsDisable, autoProviding string) error {
 	// 使用默认数据库连接
-	db := dao.UserGrade.DB()
+	db := dao.UserGrade.Ctx(ctx)
 
 	// 开启事务
 	return db.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {

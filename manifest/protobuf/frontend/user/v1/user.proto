@@ -147,6 +147,7 @@ message GradeItem {
     string rebate_percent_live = 8;        // 真人视讯返水比例
     string rebate_percent_egame = 9;       // 电子游戏返水比例
     string rebate_percent_poker = 10;      // 棋牌返水比例
-    string deposit_amount = 11;            // 充值金额
-    string bet_amount = 12;                // 投注金额
+    string payment_limit = 11;            // 充值金额
+    string bet_limit = 12;                // 投注金额
+    string money_limit = 13;                // 升级礼金
 }

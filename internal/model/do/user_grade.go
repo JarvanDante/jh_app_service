@@ -15,8 +15,6 @@ type UserGrade struct {
 	Id                   any         //
 	SiteId               any         // 站点ID
 	Name                 any         // 会员等级名称
-	DepositAmount        any         // 充值金额
-	BetAmount            any         // 投注金额
 	PointsUpgrade        any         // 升级消耗积分
 	BonusUpgrade         any         // 额外返水比例: 体育
 	BonusBirthday        any         // 生日彩金
@@ -30,4 +28,7 @@ type UserGrade struct {
 	Status               any         // 状态.1=可用；0=禁用
 	CreatedAt            *gtime.Time //
 	UpdatedAt            *gtime.Time //
+	PaymentLimit         any         // 充值要求
+	BetLimit             any         // 投注要求
+	MoneyLimit           any         // 升级送
 }

@@ -13,8 +13,6 @@ type UserGrade struct {
 	Id                   uint        `json:"id"                   orm:"id"                     description:""`
 	SiteId               int         `json:"siteId"               orm:"site_id"                description:"站点ID"`
 	Name                 string      `json:"name"                 orm:"name"                   description:"会员等级名称"`
-	DepositAmount        float64     `json:"depositAmount"        orm:"deposit_amount"         description:"充值金额"`
-	BetAmount            float64     `json:"betAmount"            orm:"bet_amount"             description:"投注金额"`
 	PointsUpgrade        int         `json:"pointsUpgrade"        orm:"points_upgrade"         description:"升级消耗积分"`
 	BonusUpgrade         float64     `json:"bonusUpgrade"         orm:"bonus_upgrade"          description:"额外返水比例: 体育"`
 	BonusBirthday        float64     `json:"bonusBirthday"        orm:"bonus_birthday"         description:"生日彩金"`
@@ -28,4 +26,7 @@ type UserGrade struct {
 	Status               int         `json:"status"               orm:"status"                 description:"状态.1=可用；0=禁用"`
 	CreatedAt            *gtime.Time `json:"createdAt"            orm:"created_at"             description:""`
 	UpdatedAt            *gtime.Time `json:"updatedAt"            orm:"updated_at"             description:""`
+	PaymentLimit         float64     `json:"paymentLimit"         orm:"payment_limit"          description:"充值要求"`
+	BetLimit             float64     `json:"betLimit"             orm:"bet_limit"              description:"投注要求"`
+	MoneyLimit           float64     `json:"moneyLimit"           orm:"money_limit"            description:"升级送"`
 }

@@ -24,8 +24,6 @@ type UserGradeColumns struct {
 	Id                   string //
 	SiteId               string // 站点ID
 	Name                 string // 会员等级名称
-	DepositAmount        string // 充值金额
-	BetAmount            string // 投注金额
 	PointsUpgrade        string // 升级消耗积分
 	BonusUpgrade         string // 额外返水比例: 体育
 	BonusBirthday        string // 生日彩金
@@ -39,6 +37,9 @@ type UserGradeColumns struct {
 	Status               string // 状态.1=可用；0=禁用
 	CreatedAt            string //
 	UpdatedAt            string //
+	PaymentLimit         string // 充值要求
+	BetLimit             string // 投注要求
+	MoneyLimit           string // 升级送
 }
 
 // userGradeColumns holds the columns for the table user_grade.
@@ -46,8 +47,6 @@ var userGradeColumns = UserGradeColumns{
 	Id:                   "id",
 	SiteId:               "site_id",
 	Name:                 "name",
-	DepositAmount:        "deposit_amount",
-	BetAmount:            "bet_amount",
 	PointsUpgrade:        "points_upgrade",
 	BonusUpgrade:         "bonus_upgrade",
 	BonusBirthday:        "bonus_birthday",
@@ -61,6 +60,9 @@ var userGradeColumns = UserGradeColumns{
 	Status:               "status",
 	CreatedAt:            "created_at",
 	UpdatedAt:            "updated_at",
+	PaymentLimit:         "payment_limit",
+	BetLimit:             "bet_limit",
+	MoneyLimit:           "money_limit",
 }
 
 // NewUserGradeDao creates and returns a new DAO object for table data access.
