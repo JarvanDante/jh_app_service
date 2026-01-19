@@ -14,6 +14,8 @@ type (
 		GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaReq) (*v1.GenerateCaptchaRes, error)
 		RefreshToken(ctx context.Context, req *v1.RefreshTokenReq) (*v1.RefreshTokenRes, error)
 		GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq) (*v1.GetSiteSettingRes, error)
+		GetAppNoticeList(ctx context.Context, req *v1.GetNoticeListReq) (*v1.GetNoticeListRes, error)
+		GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (*v1.GetAdListRes, error)
 	}
 )
 

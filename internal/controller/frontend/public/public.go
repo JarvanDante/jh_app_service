@@ -46,3 +46,13 @@ func (c *Controller) Register(ctx context.Context, req *v1.RegisterReq) (*v1.Reg
 func (c *Controller) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq) (*v1.GetSiteSettingRes, error) {
 	return frontend.Public().GetSiteSetting(ctx, req)
 }
+
+// GetAppNoticeList 获取公告列表
+func (c *Controller) GetAppNoticeList(ctx context.Context, req *v1.GetNoticeListReq) (*v1.GetNoticeListRes, error) {
+	return frontend.Public().GetAppNoticeList(ctx, req)
+}
+
+// GetAppAdList 获取广告列表
+func (c *Controller) GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (*v1.GetAdListRes, error) {
+	return frontend.Public().GetAppAdList(ctx, req)
+}

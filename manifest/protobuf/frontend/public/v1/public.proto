@@ -11,6 +11,8 @@ service Public {
     rpc GenerateCaptcha(GenerateCaptchaReq) returns (GenerateCaptchaRes) {}
     rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes) {}
     rpc GetSiteSetting(GetSiteSettingReq) returns (GetSiteSettingRes) {}
+    rpc GetAppNoticeList(GetNoticeListReq) returns (GetNoticeListRes) {}
+    rpc GetAppAdList(GetAdListReq) returns (GetAdListRes) {}
 }
 
 // 快速注册请求
@@ -164,4 +166,43 @@ message GetSiteSettingRes {
     string max_withdraw = 9;      // 单笔最大提现金额
     string mobile_logo = 10;      // 手机端logo
     string close_reason = 11;     // 站点关闭理由
+}
+
+// 获取公告列表请求
+message GetNoticeListReq {
+    int32 limit = 1;  // 限制数量，默认3
+}
+
+// 获取公告列表响应
+message GetNoticeListRes {
+    repeated NoticeItem list = 1;  // 公告列表
+}
+
+// 公告项
+message NoticeItem {
+    string title = 1;       // 标题
+    string url = 2;         // 链接
+    string content = 3;     // 内容
+    string created_at = 4;  // 创建时间
+}
+
+// 获取广告列表请求
+message GetAdListReq {
+    int32 mobile = 1;  // 是否手机端 0=PC 1=手机
+}
+
+// 获取广告列表响应
+message GetAdListRes {
+    repeated AdItem list = 1;  // 广告列表
+}
+
+// 广告项
+message AdItem {
+    string name = 1;         // 名称
+    string image = 2;        // 图片地址
+    string url = 3;          // 链接
+    int32 type = 4;          // 类型 1=首页图片弹窗 2=首页悬浮图片 3=首页banner图片
+    int32 before_login = 5;  // 登录前显示 0=登录后 1=登录前
+    int32 position = 6;      // 位置 1=PC 2=WAP
+    int32 sort = 7;          // 排序
 }

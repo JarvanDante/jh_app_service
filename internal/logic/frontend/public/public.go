@@ -1006,3 +1006,123 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 
 	return res, nil
 }
+
+// GetAppNoticeList 获取公告列表
+func (s *sPublic) GetAppNoticeList(ctx context.Context, req *v1.GetNoticeListReq) (res *v1.GetNoticeListRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "public.GetAppNoticeList", trace.WithAttributes(
+		attribute.String("method", "GetAppNoticeList"),
+	))
+	defer span.End()
+
+	// 获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 默认限制3条
+	limit := 3
+	if req.Limit > 0 {
+		limit = int(req.Limit)
+	}
+
+	// 查询公告列表
+	var notices []*entity.Notice
+	err = dao.Notice.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("status", 1).                     // STATUS_ACTIVE = 1
+		Where("type", 1).                       // TYPE_USER = 1
+		Where("start_time <= ?", gtime.Now()).  // 已开始
+		Where("expired_time > ?", gtime.Now()). // 未过期
+		OrderAsc("sort").
+		OrderDesc("created_at").
+		Limit(limit).
+		Scan(&notices)
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "查询公告列表失败: %v", err)
+		return nil, fmt.Errorf("查询公告列表失败")
+	}
+
+	// 构建响应
+	res = &v1.GetNoticeListRes{
+		List: make([]*v1.NoticeItem, 0, len(notices)),
+	}
+
+	for _, notice := range notices {
+		item := &v1.NoticeItem{
+			Title:     notice.Title,
+			Url:       notice.Url,
+			Content:   notice.Content,
+			CreatedAt: notice.CreatedAt.String(),
+		}
+		res.List = append(res.List, item)
+	}
+
+	middleware.LogWithTrace(ctx, "info", "获取公告列表成功: site_id=%d, count=%d", siteId, len(notices))
+
+	return res, nil
+}
+
+// GetAppAdList 获取广告列表
+func (s *sPublic) GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (res *v1.GetAdListRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "public.GetAppAdList", trace.WithAttributes(
+		attribute.String("method", "GetAppAdList"),
+	))
+	defer span.End()
+
+	// 获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		tracing.AddSpanEvent(span, "site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 确定位置：0=PC(1), 1=手机(2)
+	position := 1 // POSITION_PC = 1
+	if req.Mobile == 1 {
+		position = 2 // POSITION_WAP = 2
+	}
+
+	// 查询广告列表
+	var ads []*entity.Ad
+	err = dao.Ad.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("status", 1). // STATUS_ACTIVE = 1
+		Where("position", position).
+		Where("start_time <= ?", gtime.Now()).  // 已开始
+		Where("expired_time > ?", gtime.Now()). // 未过期
+		OrderAsc("sort").
+		OrderDesc("created_at").
+		Scan(&ads)
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "查询广告列表失败: %v", err)
+		return nil, fmt.Errorf("查询广告列表失败")
+	}
+
+	// 构建响应
+	res = &v1.GetAdListRes{
+		List: make([]*v1.AdItem, 0, len(ads)),
+	}
+
+	for _, ad := range ads {
+		item := &v1.AdItem{
+			Name:        ad.Name,
+			Image:       ad.Image,
+			Url:         ad.Url,
+			Type:        int32(ad.Type),
+			BeforeLogin: int32(ad.BeforeLogin),
+			Position:    int32(ad.Position),
+			Sort:        int32(ad.Sort),
+		}
+		res.List = append(res.List, item)
+	}
+
+	middleware.LogWithTrace(ctx, "info", "获取广告列表成功: site_id=%d, mobile=%d, count=%d", siteId, req.Mobile, len(ads))
+
+	return res, nil
+}
