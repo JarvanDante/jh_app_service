@@ -20,7 +20,6 @@ type SiteConfig struct {
 	Meta   MetaConfig   `json:"Meta"`
 	Base   BaseConfig   `json:"Base"`
 	Domain DomainConfig `json:"Domain"`
-	Game   []GameConfig `json:"Game"`
 }
 
 // MetaConfig 元数据配置
@@ -48,19 +47,6 @@ type DomainConfig struct {
 	H5       []string `json:"h5"`
 	Admin    []string `json:"admin"`
 	Callback []string `json:"callback"`
-}
-
-// GameConfig 游戏配置
-type GameConfig struct {
-	GameId    int    `json:"game_id"`
-	Type      int    `json:"type"`
-	Name      string `json:"name"`
-	Platform  string `json:"platform"`
-	ImageCode string `json:"image_code"`
-	DbName    string `json:"db_name"`
-	ApiId     string `json:"api_id"`
-	ApiKey    string `json:"api_key"`
-	ApiUrl    string `json:"api_url"`
 }
 
 // DBConfigManagerV2 数据库配置管理器V2 - 无侵入版本
@@ -212,12 +198,6 @@ func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) (bool, er
 		g.Log().Debugf(m.ctx, "App服务V2站点配置已更新（仅业务配置）: site=%s, version=%d", siteCode, config.Meta.Version)
 	}
 
-	// 同步游戏配置到site_game表（在数据库连接池注册之后）
-	if err := m.syncGameConfig(siteCode, &config); err != nil {
-		g.Log().Errorf(m.ctx, "同步游戏配置失败: site=%s, error=%v", siteCode, err)
-		// 不返回错误，游戏配置同步失败不影响整体流程
-	}
-
 	return true, nil
 }
 
@@ -366,66 +346,4 @@ func (m *DBConfigManagerV2) GetSiteCodeBySiteID(siteID int64) string {
 	}
 
 	return ""
-}
-
-// syncGameConfig 同步游戏配置到site_game表
-func (m *DBConfigManagerV2) syncGameConfig(siteCode string, config *SiteConfig) error {
-	// 获取站点专用数据库连接
-	groupName := fmt.Sprintf("site_%s", siteCode)
-
-	// 检查数据库配置是否存在
-	if gdb.GetConfig(groupName) == nil {
-		g.Log().Debugf(m.ctx, "站点数据库配置不存在，跳过游戏配置同步: %s", groupName)
-		return nil
-	}
-
-	db := g.DB(groupName)
-	if db == nil {
-		g.Log().Warningf(m.ctx, "站点数据库连接不存在，跳过游戏配置同步: %s", groupName)
-		return nil
-	}
-
-	// 使用事务处理同步
-	return db.Transaction(m.ctx, func(ctx context.Context, tx gdb.TX) error {
-		// 1. 删除该站点的所有游戏配置
-		_, err := tx.Model("site_game").Where("site_id", config.Base.SiteId).Delete()
-		if err != nil {
-			return fmt.Errorf("删除旧游戏配置失败: %v", err)
-		}
-
-		// 2. 如果没有游戏配置，直接返回
-		if len(config.Game) == 0 {
-			g.Log().Infof(ctx, "站点 %s 没有游戏配置，已清空site_game表", siteCode)
-			return nil
-		}
-
-		// 3. 批量插入新的游戏配置
-		insertData := make([]g.Map, 0, len(config.Game))
-		for _, game := range config.Game {
-			insertData = append(insertData, g.Map{
-				"site_id":    config.Base.SiteId,
-				"game_id":    game.GameId,
-				"type":       game.Type,
-				"name":       game.Name,
-				"platform":   game.Platform,
-				"image_code": game.ImageCode,
-				"db_name":    game.DbName,
-				"api_id":     game.ApiId,
-				"api_key":    game.ApiKey,
-				"api_url":    game.ApiUrl,
-				"status":     1, // 默认启用
-				"sort":       0,
-				"created_at": time.Now(),
-				"updated_at": time.Now(),
-			})
-		}
-
-		_, err = tx.Model("site_game").Data(insertData).Insert()
-		if err != nil {
-			return fmt.Errorf("插入游戏配置失败: %v", err)
-		}
-
-		g.Log().Infof(ctx, "站点 %s 同步了 %d 个游戏配置到site_game表", siteCode, len(config.Game))
-		return nil
-	})
 }
