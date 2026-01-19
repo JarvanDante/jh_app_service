@@ -21,30 +21,40 @@ type SiteGameDao struct {
 
 // SiteGameColumns defines and stores column names for the table site_game.
 type SiteGameColumns struct {
-	Id          string //
-	SiteId      string // 站点ID
-	Type        string // 游戏类型。1=体育；2=彩票；3=真人；4=电子游戏
-	GameId      string // 游戏ID
-	Name        string // 游戏名称
-	Status      string // 游戏是否打开或者或者关闭。1=打开；0=关闭
-	IsAvailable string // 游戏是否可用。总开关。1=可用；0=不可用
-	Sort        string //
-	CreatedAt   string //
-	UpdatedAt   string //
+	Id        string //
+	SiteId    string // 站点ID
+	GameId    string // 总站里游戏ID
+	Type      string // 游戏类型。1=体育；2=彩票；3=真人；4=电子游戏
+	Name      string // 游戏名称
+	Platform  string // 游戏平台
+	ImageCode string // 游戏图片目录
+	DbName    string // 游戏对应数据表
+	ApiId     string // API_ID
+	ApiKey    string // API_KEY
+	ApiUrl    string // API_URL
+	Status    string // 游戏是否打开或者或者关闭。1=打开；0=关闭
+	Sort      string //
+	CreatedAt string //
+	UpdatedAt string //
 }
 
 // siteGameColumns holds the columns for the table site_game.
 var siteGameColumns = SiteGameColumns{
-	Id:          "id",
-	SiteId:      "site_id",
-	Type:        "type",
-	GameId:      "game_id",
-	Name:        "name",
-	Status:      "status",
-	IsAvailable: "is_available",
-	Sort:        "sort",
-	CreatedAt:   "created_at",
-	UpdatedAt:   "updated_at",
+	Id:        "id",
+	SiteId:    "site_id",
+	GameId:    "game_id",
+	Type:      "type",
+	Name:      "name",
+	Platform:  "platform",
+	ImageCode: "image_code",
+	DbName:    "db_name",
+	ApiId:     "api_id",
+	ApiKey:    "api_key",
+	ApiUrl:    "api_url",
+	Status:    "status",
+	Sort:      "sort",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 // NewSiteGameDao creates and returns a new DAO object for table data access.
