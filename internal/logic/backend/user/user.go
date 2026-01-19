@@ -562,6 +562,9 @@ func (s *sUser) SaveUserGrades(ctx context.Context, req *v1.SaveUserGradesReq) (
 			RebatePercentLive:    gradeInfo.RebatePercentLive,
 			RebatePercentEgame:   gradeInfo.RebatePercentEgame,
 			RebatePercentPoker:   gradeInfo.RebatePercentPoker,
+			PaymentLimit:         gradeInfo.PaymentLimit,
+			BetLimit:             gradeInfo.BetLimit,
+			MoneyLimit:           gradeInfo.MoneyLimit,
 		}
 		grades = append(grades, grade)
 	}
@@ -646,25 +649,56 @@ func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity
 			grade.AutoProviding = autoProviding
 			grade.Status = 1 // 默认状态为正常
 
+			// 记录日志
+			g.Log().Infof(ctx, "保存用户等级: ID=%d, Name=%s, BetLimit=%f, PaymentLimit=%f, MoneyLimit=%f",
+				grade.Id, grade.Name, grade.BetLimit, grade.PaymentLimit, grade.MoneyLimit)
+
 			if grade.Id > 0 {
 				// 更新现有等级
 				grade.UpdatedAt = gtime.Now()
-				_, err := tx.Model(dao.UserGrade.Table()).
+
+				// 构建更新数据
+				updateData := g.Map{
+					"name":                   grade.Name,
+					"points_upgrade":         grade.PointsUpgrade,
+					"bonus_upgrade":          grade.BonusUpgrade,
+					"bonus_birthday":         grade.BonusBirthday,
+					"rebate_percent_sports":  grade.RebatePercentSports,
+					"rebate_percent_lottery": grade.RebatePercentLottery,
+					"rebate_percent_live":    grade.RebatePercentLive,
+					"rebate_percent_egame":   grade.RebatePercentEgame,
+					"rebate_percent_poker":   grade.RebatePercentPoker,
+					"fields_disable":         grade.FieldsDisable,
+					"auto_providing":         grade.AutoProviding,
+					"payment_limit":          grade.PaymentLimit,
+					"bet_limit":              grade.BetLimit,
+					"money_limit":            grade.MoneyLimit,
+					"status":                 grade.Status,
+					"updated_at":             grade.UpdatedAt,
+				}
+
+				result, err := tx.Model(dao.UserGrade.Table()).
 					Where(dao.UserGrade.Columns().Id, grade.Id).
 					Where(dao.UserGrade.Columns().SiteId, siteId).
-					Data(grade).
+					Data(updateData).
 					Update()
 				if err != nil {
+					g.Log().Errorf(ctx, "更新用户等级失败: %v", err)
 					return err
 				}
+
+				rowsAffected, _ := result.RowsAffected()
+				g.Log().Infof(ctx, "更新用户等级成功: ID=%d, 影响行数=%d", grade.Id, rowsAffected)
 			} else {
 				// 创建新等级
 				grade.CreatedAt = gtime.Now()
 				grade.UpdatedAt = gtime.Now()
 				_, err := tx.Model(dao.UserGrade.Table()).Data(grade).Insert()
 				if err != nil {
+					g.Log().Errorf(ctx, "创建用户等级失败: %v", err)
 					return err
 				}
+				g.Log().Infof(ctx, "创建用户等级成功: Name=%s", grade.Name)
 			}
 		}
 		return nil
