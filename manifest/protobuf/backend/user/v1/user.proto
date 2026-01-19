@@ -166,10 +166,12 @@ message UserGradeInfo {
     double rebate_percent_live = 8;         // 真人视讯返水比例
     double rebate_percent_egame = 9;        // 电子游戏返水比例
     double rebate_percent_poker = 10;       // 扑克返水比例
-    int32 user_count = 11;                  // 该等级用户数量
-    string fields_disable = 12;             // 禁用字段配置
-    string auto_providing = 13;             // 自动发放配置
-    repeated string activities = 14;        // 关联活动列表
+    string fields_disable = 11;             // 禁用字段配置
+    string auto_providing = 12;             // 自动发放配置
+    double payment_limit = 13;               // 存款金额
+    double bet_limit = 14;               // 有效投注
+    double money_limit = 15;               // 升级礼金
+    repeated string activities = 16;        // 关联活动列表
 }
 
 // 获取用户等级列表响应

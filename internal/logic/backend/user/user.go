@@ -504,9 +504,6 @@ func (s *sUser) GetUserGrades(ctx context.Context, req *v1.GetUserGradesReq) (*v
 	// 转换数据格式
 	var gradeInfos []*v1.UserGradeInfo
 	for _, grade := range grades {
-		// 获取该等级的用户数量
-		userCount, _ := s.getUserCountByGrade(ctx, int(req.SiteId), int(grade.Id))
-
 		gradeInfo := &v1.UserGradeInfo{
 			Id:                   int32(grade.Id),
 			Name:                 grade.Name,
@@ -518,9 +515,11 @@ func (s *sUser) GetUserGrades(ctx context.Context, req *v1.GetUserGradesReq) (*v
 			RebatePercentLive:    grade.RebatePercentLive,
 			RebatePercentEgame:   grade.RebatePercentEgame,
 			RebatePercentPoker:   grade.RebatePercentPoker,
-			UserCount:            int32(userCount),
 			FieldsDisable:        grade.FieldsDisable,
 			AutoProviding:        grade.AutoProviding,
+			PaymentLimit:         grade.PaymentLimit,
+			BetLimit:             grade.BetLimit,
+			MoneyLimit:           grade.MoneyLimit,
 			Activities:           []string{}, // TODO: 实现活动关联逻辑
 		}
 		gradeInfos = append(gradeInfos, gradeInfo)
@@ -621,7 +620,7 @@ func (s *sUser) getUserGradeList(ctx context.Context, siteId int) ([]*entity.Use
 	var grades []*entity.UserGrade
 
 	// 使用默认数据库连接
-	err := dao.UserGrade.DB().Model(dao.UserGrade.Table()).
+	err := dao.UserGrade.Ctx(ctx).
 		Where(dao.UserGrade.Columns().SiteId, siteId).
 		Where(dao.UserGrade.Columns().Status, 1). // 只获取正常状态的等级
 		OrderAsc(dao.UserGrade.Columns().Id).
