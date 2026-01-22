@@ -85,4 +85,4 @@ redis:
 
 # RabbitMQ 配置
 rabbitmq:
-  url: "amqp://admin:admin123@172.19.0.36:5672/" # RabbitMQ连接地址
+  url: "amqp://admin:admin123@rabbitmq:5672/" # RabbitMQ连接地址

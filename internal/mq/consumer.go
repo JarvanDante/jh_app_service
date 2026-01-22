@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	balanceV1 "jh_app_service/api/grpc/balance/v1"
+	"jh_app_service/internal/registry"
 )
 
 // StartConsumer 启动消费者
@@ -79,11 +80,13 @@ func processMessage(ctx context.Context, delivery amqp.Delivery) {
 
 // callBalanceService 调用balance服务
 func callBalanceService(ctx context.Context, msg *InitBalanceUserMessage) error {
-	// 从配置获取balance服务地址
-	balanceAddr := g.Cfg().MustGet(ctx, "grpc.balanceService").String()
-	if balanceAddr == "" {
-		balanceAddr = "jh_balance_service:8003" // 默认地址
+	// 从Consul获取balance服务地址
+	balanceAddr, err := registry.GetServiceAddr("jh_balance_service")
+	if err != nil {
+		return fmt.Errorf("从Consul获取balance服务地址失败: %v", err)
 	}
+
+	g.Log().Infof(ctx, "balance服务地址: %s", balanceAddr)
 
 	// 创建gRPC连接
 	conn, err := grpc.NewClient(

@@ -172,3 +172,24 @@ func DeregisterService() error {
 	g.Log().Infof(ctx, "service deregistered: %s", serviceID)
 	return nil
 }
+
+// GetServiceAddr 从 Consul 获取服务地址
+func GetServiceAddr(serviceName string) (string, error) {
+	if client == nil {
+		return "", fmt.Errorf("Consul 客户端未初始化")
+	}
+
+	services, _, err := client.Health().Service(serviceName, "", true, nil)
+	if err != nil {
+		return "", fmt.Errorf("从 Consul 获取服务失败: %v", err)
+	}
+
+	if len(services) == 0 {
+		return "", fmt.Errorf("服务 %s 不可用", serviceName)
+	}
+
+	// 简单的负载均衡：返回第一个健康的服务实例
+	service := services[0]
+	addr := fmt.Sprintf("%s:%d", service.Service.Address, service.Service.Port)
+	return addr, nil
+}
