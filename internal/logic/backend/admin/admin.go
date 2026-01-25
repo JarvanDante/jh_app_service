@@ -386,9 +386,11 @@ func (s *sAdmin) GetInfo(ctx context.Context, req *v1.GetInfoReq) (*v1.GetInfoRe
 	// 获取站点代码和名称
 	siteCode := ""
 	siteName := ""
+	siteId := 0
 	if site != nil {
 		siteCode = site.Code
 		siteName = site.Name
+		siteId = int(site.Id)
 	}
 
 	// 查询菜单权限 - 这里需要根据实际的权限系统实现
@@ -404,6 +406,7 @@ func (s *sAdmin) GetInfo(ctx context.Context, req *v1.GetInfoReq) (*v1.GetInfoRe
 		Menus:        menus,
 		SiteCode:     siteCode,
 		SiteName:     siteName,
+		SiteId:       int64(siteId),
 	}
 
 	tracing.AddSpanEvent(span, "get_info_success",

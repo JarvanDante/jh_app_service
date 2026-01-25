@@ -62,6 +62,7 @@ message GetInfoRes {
     repeated MenuInfo menus = 5;      // 菜单权限
     string site_code = 6;             // 站点代码
     string site_name = 7;             // 站点名称
+    int64 site_id = 8;             // 站点ID
 }
 
 // 获取菜单列表请求
