@@ -95,6 +95,7 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 
 	// 构建响应
 	res = &v1.GetUserInfoRes{
+		UserId:            int32(user.Id),
 		Username:          user.Username,
 		Realname:          user.Realname,
 		Email:             user.Email,
