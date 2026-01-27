@@ -52,12 +52,15 @@ snake_to_camel() {
     }'
 }
 
-# 提取自定义方法的函数
+# 提取自定义方法的函数（改进版：跳过标记注释本身）
 extract_custom_methods() {
     local file="$1"
     if [ -f "$file" ]; then
         # 查找 "Add your custom methods" 之后的所有内容
-        awk '/Add your custom methods and functionality below\./{flag=1; next} flag' "$file"
+        # 使用 flag=1; next 跳过标记行本身，避免重复添加
+        awk '/Add your custom methods and functionality below\./{flag=1; next} flag' "$file" | \
+        # 过滤掉可能残留的重复标记注释
+        grep -v "^// Add your custom methods and functionality below\."
     fi
 }
 

@@ -30,3 +30,8 @@ func (d activityDao) Ctx(ctx context.Context) *gdb.Model {
 }
 
 // Add your custom methods and functionality below.
+
+func (d activityDao) Test(ctx context.Context, i int) int {
+	d.Ctx(ctx)
+	return i + 1
+}
