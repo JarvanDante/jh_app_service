@@ -14,6 +14,7 @@ type MqOutbox struct {
 	EventType     string      `json:"eventType"     orm:"event_type"     description:"事件类型，如 user_created / balance_transfer"`
 	AggregateType string      `json:"aggregateType" orm:"aggregate_type" description:"聚合根类型，如 user / balance"`
 	AggregateId   string      `json:"aggregateId"   orm:"aggregate_id"   description:"聚合根ID，如 user_id / trade_no"`
+	SiteCode      string      `json:"siteCode"      orm:"site_code"      description:"站点代码"`
 	Exchange      string      `json:"exchange"      orm:"exchange"       description:"MQ exchange"`
 	RoutingKey    string      `json:"routingKey"    orm:"routing_key"    description:"MQ routing key"`
 	Payload       string      `json:"payload"       orm:"payload"        description:"发送到 MQ 的消息体"`

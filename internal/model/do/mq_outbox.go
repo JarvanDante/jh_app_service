@@ -16,6 +16,7 @@ type MqOutbox struct {
 	EventType     any         // 事件类型，如 user_created / balance_transfer
 	AggregateType any         // 聚合根类型，如 user / balance
 	AggregateId   any         // 聚合根ID，如 user_id / trade_no
+	SiteCode      any         // 站点代码
 	Exchange      any         // MQ exchange
 	RoutingKey    any         // MQ routing key
 	Payload       any         // 发送到 MQ 的消息体

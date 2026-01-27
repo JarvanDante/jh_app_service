@@ -25,6 +25,7 @@ type MqOutboxColumns struct {
 	EventType     string // 事件类型，如 user_created / balance_transfer
 	AggregateType string // 聚合根类型，如 user / balance
 	AggregateId   string // 聚合根ID，如 user_id / trade_no
+	SiteCode      string // 站点代码
 	Exchange      string // MQ exchange
 	RoutingKey    string // MQ routing key
 	Payload       string // 发送到 MQ 的消息体
@@ -42,6 +43,7 @@ var mqOutboxColumns = MqOutboxColumns{
 	EventType:     "event_type",
 	AggregateType: "aggregate_type",
 	AggregateId:   "aggregate_id",
+	SiteCode:      "site_code",
 	Exchange:      "exchange",
 	RoutingKey:    "routing_key",
 	Payload:       "payload",
