@@ -107,11 +107,6 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		LastLoginAddress:  user.LastLoginAddress,
 		ShowBeginnerGuide: int32(user.ShowBeginnerGuide),
 
-		// 余额相关（先写死默认值）
-		Balance:       "0.00",
-		BalanceFrozen: "0.00",
-		Points:        "0.00",
-
 		// 等级相关
 		GradeId:   int32(user.GradeId),
 		GradeName: gradeName,
