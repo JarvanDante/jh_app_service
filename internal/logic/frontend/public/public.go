@@ -141,6 +141,11 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 			return fmt.Errorf("创建Outbox记录失败: %w", err)
 		}
 
+		// 创建同步用户到游戏服务的 Outbox 记录
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToGameOutbox(ctx, tx, int64(siteId), userId, username, siteCode); err != nil {
+			return fmt.Errorf("创建同步用户到游戏服务Outbox记录失败: %w", err)
+		}
+
 		return nil
 	})
 
@@ -181,6 +186,9 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 			}
 		}
 	}(siteCode, userId)
+
+	// 异步同步用户到游戏服务（快速路径）
+	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, username)
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
@@ -954,6 +962,11 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 			return fmt.Errorf("创建Outbox记录失败: %w", err)
 		}
 
+		// 创建同步用户到游戏服务的 Outbox 记录
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToGameOutbox(ctx, tx, int64(siteId), userId, req.Username, siteCode); err != nil {
+			return fmt.Errorf("创建同步用户到游戏服务Outbox记录失败: %w", err)
+		}
+
 		return nil
 	})
 
@@ -1000,6 +1013,9 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 			}
 		}
 	}(siteCode, userId)
+
+	// 异步同步用户到游戏服务（快速路径）
+	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, req.Username)
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)

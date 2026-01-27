@@ -63,6 +63,37 @@ func (s *sMqOutbox) CreateInitBalanceOutbox(ctx context.Context, tx gdb.TX, site
 	return err
 }
 
+// CreateSyncUserToGameOutbox 创建同步用户到游戏服务的 Outbox 记录
+func (s *sMqOutbox) CreateSyncUserToGameOutbox(ctx context.Context, tx gdb.TX, siteID int64, userID int64, username, siteCode string) error {
+	msg := &mq.SyncUserToGameMessage{
+		SiteID:   int32(siteID),
+		SiteCode: siteCode,
+		UserID:   userID,
+		Username: username,
+	}
+
+	payload, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("序列化消息失败: %w", err)
+	}
+
+	outbox := &do.MqOutbox{
+		EventType:     "user_created",
+		AggregateType: "user",
+		AggregateId:   fmt.Sprintf("%d", userID),
+		SiteCode:      siteCode,
+		Exchange:      "user.created",
+		RoutingKey:    "user.sync_to_game",
+		Payload:       string(payload),
+		Status:        OutboxStatusPending,
+		RetryCount:    0,
+		NextRetryAt:   gtime.Now(),
+	}
+
+	_, err = dao.MqOutbox.Ctx(ctx).TX(tx).Insert(outbox)
+	return err
+}
+
 // ProcessPendingMessages 处理待发送的消息（所有站点）
 func (s *sMqOutbox) ProcessPendingMessages(ctx context.Context) error {
 	return s.ProcessPendingMessagesForSite(ctx, "")
@@ -142,17 +173,19 @@ func (s *sMqOutbox) ProcessPendingMessagesForSite(ctx context.Context, siteCode 
 
 // processMessage 处理单条消息
 func (s *sMqOutbox) processMessage(ctx context.Context, msg *entity.MqOutbox) error {
-	// 根据事件类型处理不同的消息
-	switch msg.EventType {
-	case "user_created":
-		return s.processUserCreatedMessage(ctx, msg)
+	// 根据 routing_key 处理不同的消息
+	switch msg.RoutingKey {
+	case "user.init_balance":
+		return s.processInitBalanceMessage(ctx, msg)
+	case "user.sync_to_game":
+		return s.processSyncUserToGameMessage(ctx, msg)
 	default:
-		return fmt.Errorf("未知的事件类型: %s", msg.EventType)
+		return fmt.Errorf("未知的 routing key: %s", msg.RoutingKey)
 	}
 }
 
-// processUserCreatedMessage 处理用户创建事件
-func (s *sMqOutbox) processUserCreatedMessage(ctx context.Context, outboxMsg *entity.MqOutbox) error {
+// processInitBalanceMessage 处理初始化余额消息
+func (s *sMqOutbox) processInitBalanceMessage(ctx context.Context, outboxMsg *entity.MqOutbox) error {
 	// 创建带站点信息的 context
 	// 数据库配置组名格式为 site_{code}
 	dbGroup := fmt.Sprintf("site_%s", outboxMsg.SiteCode)
@@ -186,6 +219,46 @@ func (s *sMqOutbox) processUserCreatedMessage(ctx context.Context, outboxMsg *en
 	} else {
 		g.Log().Infof(msgCtx, "消息发送成功 [ID=%d, EventType=%s, AggregateId=%s, SiteCode=%s]",
 			outboxMsg.Id, outboxMsg.EventType, outboxMsg.AggregateId, outboxMsg.SiteCode)
+	}
+
+	return err
+}
+
+// processSyncUserToGameMessage 处理同步用户到游戏服务消息
+func (s *sMqOutbox) processSyncUserToGameMessage(ctx context.Context, outboxMsg *entity.MqOutbox) error {
+	// 创建带站点信息的 context
+	// 数据库配置组名格式为 site_{code}
+	dbGroup := fmt.Sprintf("site_%s", outboxMsg.SiteCode)
+	msgCtx := context.WithValue(ctx, "dynamic_db_group", dbGroup)
+	msgCtx = context.WithValue(msgCtx, middleware.SiteCodeContextKey, outboxMsg.SiteCode)
+
+	// 解析消息体
+	var msg mq.SyncUserToGameMessage
+	if err := json.Unmarshal([]byte(outboxMsg.Payload), &msg); err != nil {
+		// 解析失败，标记为失败状态（不再重试）
+		s.markAsFailed(msgCtx, outboxMsg.Id, outboxMsg.SiteCode, fmt.Sprintf("解析消息失败: %v", err), false)
+		return fmt.Errorf("解析消息失败: %w", err)
+	}
+
+	// 发送到 RabbitMQ
+	err := mq.PublishSyncUserToGame(context.Background(), &msg)
+	if err != nil {
+		// 发送失败，更新重试信息
+		s.markAsFailed(msgCtx, outboxMsg.Id, outboxMsg.SiteCode, err.Error(), true)
+		return fmt.Errorf("发送MQ消息失败: %w", err)
+	}
+
+	// 发送成功，标记为已发送
+	_, err = dao.MqOutbox.Ctx(msgCtx).Where("id", outboxMsg.Id).Update(do.MqOutbox{
+		Status:    OutboxStatusSent,
+		UpdatedAt: gtime.Now(),
+	})
+
+	if err != nil {
+		g.Log().Errorf(msgCtx, "更新消息状态失败 [ID=%d]: %v", outboxMsg.Id, err)
+	} else {
+		g.Log().Infof(msgCtx, "同步用户到游戏服务消息发送成功 [ID=%d, UserID=%d, SiteCode=%s]",
+			outboxMsg.Id, msg.UserID, outboxMsg.SiteCode)
 	}
 
 	return err

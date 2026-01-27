@@ -69,6 +69,14 @@ type InitBalanceUserMessage struct {
 	Currency string `json:"currency"`
 }
 
+// SyncUserToGameMessage 同步用户到游戏服务消息
+type SyncUserToGameMessage struct {
+	SiteID   int32  `json:"site_id"`
+	SiteCode string `json:"site_code"`
+	UserID   int64  `json:"user_id"`
+	Username string `json:"username"`
+}
+
 // PublishInitBalanceUser 发布初始化余额用户消息
 func PublishInitBalanceUser(ctx context.Context, msg *InitBalanceUserMessage) error {
 	if channel == nil {
@@ -102,6 +110,43 @@ func PublishInitBalanceUser(ctx context.Context, msg *InitBalanceUserMessage) er
 
 	g.Log().Infof(ctx, "发布初始化余额消息: site_id=%d, user_id=%d, username=%s, currency=%s",
 		msg.SiteID, msg.UserID, msg.Username, msg.Currency)
+
+	return nil
+}
+
+// PublishSyncUserToGame 发布同步用户到游戏服务消息
+func PublishSyncUserToGame(ctx context.Context, msg *SyncUserToGameMessage) error {
+	if channel == nil {
+		return fmt.Errorf("RabbitMQ channel未初始化")
+	}
+
+	body, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("序列化消息失败: %v", err)
+	}
+
+	err = channel.PublishWithContext(
+		context.Background(), // ⚠️ 不要用请求 ctx
+		"user.created",       // exchange
+		"user.sync_to_game",  // routing key
+		true,                 // mandatory = true
+		false,                // immediate
+		amqp.Publishing{
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "application/json",
+			Body:         body,
+			Timestamp:    time.Now(),
+			MessageId:    uuid.NewString(),
+			Type:         "SyncUserToGame",
+		},
+	)
+
+	if err != nil {
+		return fmt.Errorf("发布消息失败: %v", err)
+	}
+
+	g.Log().Infof(ctx, "发布同步用户到游戏服务消息: site_id=%d, site_code=%s, user_id=%d, username=%s",
+		msg.SiteID, msg.SiteCode, msg.UserID, msg.Username)
 
 	return nil
 }
