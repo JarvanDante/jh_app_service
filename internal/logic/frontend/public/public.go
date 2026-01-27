@@ -8,9 +8,11 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"jh_app_service/internal/mq"
 	"strings"
 	"time"
 
+	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/grand"
@@ -20,9 +22,9 @@ import (
 
 	v1 "jh_app_service/api/frontend/public/v1"
 	"jh_app_service/internal/dao"
+	logic_mq_outbox "jh_app_service/internal/logic/mq_outbox"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/entity"
-	"jh_app_service/internal/mq"
 	"jh_app_service/internal/registry"
 	"jh_app_service/internal/service/frontend"
 	"jh_app_service/internal/tracing"
@@ -99,44 +101,58 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		Status:       1,
 	}
 
-	// 保存用户并获取ID
-	result, err := dao.User.Ctx(ctx).Insert(user)
+	// 获取站点代码和货币
+	siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
+	if siteCode == "" {
+		g.Log().Error(ctx, "获取站点代码失败")
+		return nil, fmt.Errorf("注册失败")
+	}
+
+	// 从Consul KV获取站点配置的currency
+	dbManager := registry.GetDBConfigManagerV2()
+	consulSiteConfig, err := dbManager.GetSiteConfig(siteCode)
+	if err != nil {
+		g.Log().Errorf(ctx, "获取站点配置失败: %v", err)
+		return nil, fmt.Errorf("注册失败")
+	}
+
+	currency := consulSiteConfig.Base.Currency
+	if currency == "" {
+		currency = "CNY" // 默认人民币
+	}
+
+	// 在事务中保存用户和创建 Outbox 记录
+	var userId int64
+	err = dao.User.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		// 保存用户
+		result, err := dao.User.Ctx(ctx).TX(tx).Insert(user)
+		if err != nil {
+			return fmt.Errorf("插入用户失败: %w", err)
+		}
+
+		// 获取插入的用户ID
+		userId, err = result.LastInsertId()
+		if err != nil {
+			return fmt.Errorf("获取用户ID失败: %w", err)
+		}
+
+		// 创建 MQ Outbox 记录（兜底保障）
+		if err := logic_mq_outbox.MqOutbox().CreateInitBalanceOutbox(ctx, tx, int64(siteId), userId, username, currency, siteCode); err != nil {
+			return fmt.Errorf("创建Outbox记录失败: %w", err)
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		g.Log().Error(ctx, "快速注册失败:", err)
 		return nil, fmt.Errorf("注册失败")
 	}
 
-	// 获取插入的用户ID
-	userId, err := result.LastInsertId()
-	if err != nil {
-		g.Log().Error(ctx, "获取用户ID失败:", err)
-		return nil, fmt.Errorf("注册失败")
-	}
 	user.Id = uint(userId)
 
-	// 异步调用balance服务初始化余额
-	go func() {
-		// 获取站点代码
-		siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
-		if siteCode == "" {
-			g.Log().Error(ctx, "获取站点代码失败，无法初始化余额")
-			return
-		}
-
-		// 从Consul KV获取站点配置的currency
-		dbManager := registry.GetDBConfigManagerV2()
-		siteConfig, err := dbManager.GetSiteConfig(siteCode)
-		if err != nil {
-			g.Log().Errorf(ctx, "获取站点配置失败: %v", err)
-			return
-		}
-
-		currency := siteConfig.Base.Currency
-		if currency == "" {
-			currency = "CNY" // 默认人民币
-		}
-
-		// 发送RabbitMQ消息
+	// 异步调用balance服务初始化余额（快速路径）
+	go func(ctx context.Context) {
 		msg := &mq.InitBalanceUserMessage{
 			SiteID:   int32(siteId),
 			UserID:   int32(userId),
@@ -145,9 +161,19 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		}
 
 		if err := mq.PublishInitBalanceUser(context.Background(), msg); err != nil {
-			g.Log().Errorf(ctx, "发送初始化余额消息失败: %v", err)
+			g.Log().Errorf(ctx, "异步发送初始化余额消息失败（将由Outbox兜底）: %v", err)
+		} else {
+			// 发送成功，标记 Outbox 为已发送，避免重复处理
+			_, err := dao.MqOutbox.Ctx(ctx).
+				Where("aggregate_type", "user").
+				Where("aggregate_id", userId).
+				Where("status", 0).
+				Update(g.Map{"status": 1})
+			if err != nil {
+				g.Log().Errorf(ctx, "更新Outbox状态失败: %v", err)
+			}
 		}
-	}()
+	}(ctx)
 
 	// TODO: 以下操作需要调用其他微服务或异步处理
 	// 2. 代理注册奖金 - 调用 balance_service
@@ -890,18 +916,50 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		Status:       1,
 	}
 
-	// 保存用户
-	result, err := dao.User.Ctx(ctx).Insert(user)
+	// 获取站点代码和货币
+	if siteCode == "" {
+		siteCode = "default"
+	}
+
+	dbManager := registry.GetDBConfigManagerV2()
+	consulSiteConfig, err := dbManager.GetSiteConfig(siteCode)
+	if err != nil {
+		g.Log().Errorf(ctx, "获取站点配置失败: %v", err)
+		return nil, fmt.Errorf("注册失败")
+	}
+
+	currency := consulSiteConfig.Base.Currency
+	if currency == "" {
+		currency = "CNY"
+	}
+
+	// 在事务中保存用户和创建 Outbox 记录
+	var userId int64
+	err = dao.User.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		// 保存用户
+		result, err := dao.User.Ctx(ctx).TX(tx).Insert(user)
+		if err != nil {
+			return fmt.Errorf("插入用户失败: %w", err)
+		}
+
+		userId, err = result.LastInsertId()
+		if err != nil {
+			return fmt.Errorf("获取用户ID失败: %w", err)
+		}
+
+		// 创建 MQ Outbox 记录（兜底保障）
+		if err := logic_mq_outbox.MqOutbox().CreateInitBalanceOutbox(ctx, tx, int64(siteId), userId, req.Username, currency, siteCode); err != nil {
+			return fmt.Errorf("创建Outbox记录失败: %w", err)
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		g.Log().Error(ctx, "注册失败:", err)
 		return nil, fmt.Errorf("注册失败")
 	}
 
-	userId, err := result.LastInsertId()
-	if err != nil {
-		g.Log().Error(ctx, "获取用户ID失败:", err)
-		return nil, fmt.Errorf("注册失败")
-	}
 	user.Id = uint(userId)
 
 	// 更新最后登录信息
@@ -910,20 +968,8 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		"last_login_time": gtime.Now(),
 	})
 
-	// 异步调用balance服务初始化余额
-	go func() {
-		dbManager := registry.GetDBConfigManagerV2()
-		siteConfig, err := dbManager.GetSiteConfig(siteCode)
-		if err != nil {
-			g.Log().Errorf(ctx, "获取站点配置失败: %v", err)
-			return
-		}
-
-		currency := siteConfig.Base.Currency
-		if currency == "" {
-			currency = "CNY"
-		}
-
+	// 异步调用balance服务初始化余额（快速路径）
+	go func(ctx context.Context) {
 		msg := &mq.InitBalanceUserMessage{
 			SiteID:   int32(siteId),
 			UserID:   int32(userId),
@@ -932,9 +978,19 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		}
 
 		if err := mq.PublishInitBalanceUser(context.Background(), msg); err != nil {
-			g.Log().Errorf(ctx, "发送初始化余额消息失败: %v", err)
+			g.Log().Errorf(ctx, "异步发送初始化余额消息失败（将由Outbox兜底）: %v", err)
+		} else {
+			// 发送成功，标记 Outbox 为已发送，避免重复处理
+			_, err := dao.MqOutbox.Ctx(ctx).
+				Where("aggregate_type", "user").
+				Where("aggregate_id", userId).
+				Where("status", 0).
+				Update(g.Map{"status": 1})
+			if err != nil {
+				g.Log().Errorf(ctx, "更新Outbox状态失败: %v", err)
+			}
 		}
-	}()
+	}(ctx)
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
