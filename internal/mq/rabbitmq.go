@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -80,16 +81,18 @@ func PublishInitBalanceUser(ctx context.Context, msg *InitBalanceUserMessage) er
 	}
 
 	err = channel.PublishWithContext(
-		ctx,
-		"",                  // exchange
-		"init_balance_user", // routing key
-		false,               // mandatory
-		false,               // immediate
+		context.Background(), // ⚠️ 不要用请求 ctx
+		"user.created",       // exchange（推荐用 topic）
+		"user.init_balance",  // routing key
+		true,                 // mandatory = true（很重要）
+		false,                // immediate（RabbitMQ 已废弃，保持 false）
 		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
+			DeliveryMode: amqp.Persistent, // 消息持久化
 			ContentType:  "application/json",
 			Body:         body,
 			Timestamp:    time.Now(),
+			MessageId:    uuid.NewString(),  // 强烈建议加
+			Type:         "InitBalanceUser", // 事件类型（可选但很值钱）
 		},
 	)
 
