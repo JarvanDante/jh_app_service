@@ -152,7 +152,7 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	user.Id = uint(userId)
 
 	// 异步调用balance服务初始化余额（快速路径）
-	go func(ctx context.Context) {
+	go func(siteCode string, userId int64) {
 		msg := &mq.InitBalanceUserMessage{
 			SiteID:   int32(siteId),
 			UserID:   int32(userId),
@@ -164,21 +164,23 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 			g.Log().Errorf(ctx, "异步发送初始化余额消息失败（将由Outbox兜底）: %v", err)
 		} else {
 			// 发送成功，标记 Outbox 为已发送，避免重复处理
-			_, err := dao.MqOutbox.Ctx(ctx).
+			// 创建带站点信息的 context
+			dbGroup := fmt.Sprintf("site_%s", siteCode)
+			updateCtx := context.WithValue(context.Background(), "dynamic_db_group", dbGroup)
+			updateCtx = context.WithValue(updateCtx, middleware.SiteCodeContextKey, siteCode)
+
+			_, err := dao.MqOutbox.Ctx(updateCtx).
 				Where("aggregate_type", "user").
 				Where("aggregate_id", userId).
 				Where("status", 0).
-				Update(g.Map{"status": 1})
+				Update(g.Map{"status": 1, "updated_at": gtime.Now()})
 			if err != nil {
-				g.Log().Errorf(ctx, "更新Outbox状态失败: %v", err)
+				g.Log().Errorf(updateCtx, "更新Outbox状态失败: %v", err)
+			} else {
+				g.Log().Infof(updateCtx, "快速路径发送成功，已更新Outbox状态: user_id=%d", userId)
 			}
 		}
-	}(ctx)
-
-	// TODO: 以下操作需要调用其他微服务或异步处理
-	// 2. 代理注册奖金 - 调用 balance_service
-	// 3. 风险预警 - 异步处理
-	// 4. 自定义资源绑定 - 异步处理
+	}(siteCode, userId)
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
@@ -969,7 +971,7 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	})
 
 	// 异步调用balance服务初始化余额（快速路径）
-	go func(ctx context.Context) {
+	go func(siteCode string, userId int64) {
 		msg := &mq.InitBalanceUserMessage{
 			SiteID:   int32(siteId),
 			UserID:   int32(userId),
@@ -981,16 +983,23 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 			g.Log().Errorf(ctx, "异步发送初始化余额消息失败（将由Outbox兜底）: %v", err)
 		} else {
 			// 发送成功，标记 Outbox 为已发送，避免重复处理
-			_, err := dao.MqOutbox.Ctx(ctx).
+			// 创建带站点信息的 context
+			dbGroup := fmt.Sprintf("site_%s", siteCode)
+			updateCtx := context.WithValue(context.Background(), "dynamic_db_group", dbGroup)
+			updateCtx = context.WithValue(updateCtx, middleware.SiteCodeContextKey, siteCode)
+
+			_, err := dao.MqOutbox.Ctx(updateCtx).
 				Where("aggregate_type", "user").
 				Where("aggregate_id", userId).
 				Where("status", 0).
-				Update(g.Map{"status": 1})
+				Update(g.Map{"status": 1, "updated_at": gtime.Now()})
 			if err != nil {
-				g.Log().Errorf(ctx, "更新Outbox状态失败: %v", err)
+				g.Log().Errorf(updateCtx, "更新Outbox状态失败: %v", err)
+			} else {
+				g.Log().Infof(updateCtx, "快速路径发送成功，已更新Outbox状态: user_id=%d", userId)
 			}
 		}
-	}(ctx)
+	}(siteCode, userId)
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
