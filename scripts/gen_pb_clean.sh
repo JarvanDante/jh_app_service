@@ -162,3 +162,39 @@ echo "- Gateway 会自动传递 site_id 到微服务"
 echo "- DAO 会根据 site_id 自动切换到对应数据库"
 echo
 echo "✅ 现在可以运行脚本来统一所有DAO文件结构并保留自定义方法"
+echo
+
+echo "=== 清理不需要的文件 ==="
+
+# 定义需要删除的目录列表
+DIRS_TO_DELETE=(
+    "internal/controller/ad"
+    "internal/controller/admin"
+    "internal/controller/balance"
+    "internal/controller/message"
+    "internal/controller/notice"
+    "internal/controller/option"
+    "internal/controller/public"
+    "internal/controller/role"
+    "internal/controller/site"
+    "internal/controller/upload"
+    "internal/controller/user"
+    # 如果有其他需要删除的目录，在这里添加
+    # "internal/controller/other_dir"
+)
+
+# 批量删除不需要的目录
+deleted_count=0
+for dir in "${DIRS_TO_DELETE[@]}"; do
+    if [ -d "$dir" ]; then
+        echo "删除不需要的目录: $dir"
+        rm -rf "$dir"
+        deleted_count=$((deleted_count + 1))
+    fi
+done
+
+if [ $deleted_count -gt 0 ]; then
+    echo "✅ 清理完成，共删除 $deleted_count 个目录"
+else
+    echo "目录不存在，无需清理"
+fi
