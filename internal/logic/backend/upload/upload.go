@@ -190,8 +190,8 @@ func (s *sUpload) getAllowedFileTypes(uploadCode string) []string {
 func (s *sUpload) getMaxFileSize(uploadCode string) int64 {
 	ctx := context.Background()
 
-	// 默认大小 500KB
-	defaultSize := int64(500)
+	// 默认大小 2MB (2048KB)
+	defaultSize := int64(2048)
 
 	// 从配置文件获取
 	configKey := fmt.Sprintf("upload.%s.maxSize", uploadCode)

@@ -47,7 +47,7 @@ upload:
       - "image/jpeg"
       - "image/gif"
       - "image/png"
-    maxSize: 500 # KB
+    maxSize: 2048 # KB (2MB)
   mobile_logo:
     imgType:
       - "image/svg+xml"
