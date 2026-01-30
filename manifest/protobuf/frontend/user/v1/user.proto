@@ -40,6 +40,7 @@ message GetUserInfoRes {
     int32 bind_safe_question = 14;    // 是否绑定安全问题 0=未绑定 1=已绑定
     int32 bind_pay_password = 15;     // 是否绑定资金密码 0=未绑定 1=已绑定
     int32 bind_bank = 16;             // 是否绑定银行卡 0=未绑定 1=已绑定
+    int32 is_pay_password = 27;       // 是否设置资金密码 0=未设置 1=已设置
     
     // 其他
     int32 unread_message_count = 17;  // 未读消息数量

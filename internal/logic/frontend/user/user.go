@@ -83,6 +83,12 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		bindPayPassword = 1
 	}
 
+	// 检查是否设置资金密码（新增字段）
+	isPayPassword := 0
+	if user.PayPassword != "" {
+		isPayPassword = 1
+	}
+
 	// 检查是否绑定银行卡
 	bindBank := 0
 	var bankCount int
@@ -115,6 +121,7 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		BindSafeQuestion: int32(bindSafeQuestion),
 		BindPayPassword:  int32(bindPayPassword),
 		BindBank:         int32(bindBank),
+		IsPayPassword:    int32(isPayPassword),
 
 		// 其他（先写死默认值）
 		UnreadMessageCount:  0,
