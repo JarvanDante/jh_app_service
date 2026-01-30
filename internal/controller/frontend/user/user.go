@@ -51,3 +51,13 @@ func (c *Controller) BindLoginPassword(ctx context.Context, req *v1.BindLoginPas
 func (c *Controller) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (*v1.GetGradeListRes, error) {
 	return frontend.User().GetGradeList(ctx, req)
 }
+
+// SetPayPassword 设置支付密码
+func (c *Controller) SetPayPassword(ctx context.Context, req *v1.SetPayPasswordReq) (*v1.SetPayPasswordRes, error) {
+	return frontend.User().SetPayPassword(ctx, req)
+}
+
+// VerifyPayPassword 验证支付密码
+func (c *Controller) VerifyPayPassword(ctx context.Context, req *v1.VerifyPayPasswordReq) (*v1.VerifyPayPasswordRes, error) {
+	return frontend.User().VerifyPayPassword(ctx, req)
+}

@@ -12,6 +12,8 @@ service User {
     rpc ChangeLoginPassword(ChangeLoginPasswordReq) returns (ChangeLoginPasswordRes) {}
     rpc BindLoginPassword(BindLoginPasswordReq) returns (BindLoginPasswordRes) {}
     rpc GetGradeList(GetGradeListReq) returns (GetGradeListRes) {}
+    rpc SetPayPassword(SetPayPasswordReq) returns (SetPayPasswordRes) {}
+    rpc VerifyPayPassword(VerifyPayPasswordReq) returns (VerifyPayPasswordRes) {}
 }
 
 // 获取用户信息请求
@@ -147,4 +149,25 @@ message GradeItem {
     string payment_limit = 11;            // 充值金额
     string bet_limit = 12;                // 投注金额
     string money_limit = 13;                // 升级礼金
+}
+
+// 设置支付密码请求
+message SetPayPasswordReq {
+    string pay_password = 1;  // 支付密码（6位数字）
+}
+
+// 设置支付密码响应
+message SetPayPasswordRes {
+    string message = 1;  // 提示消息
+}
+
+// 验证支付密码请求
+message VerifyPayPasswordReq {
+    string pay_password = 1;  // 支付密码
+}
+
+// 验证支付密码响应
+message VerifyPayPasswordRes {
+    bool is_valid = 1;     // 是否正确
+    string message = 2;    // 提示消息
 }

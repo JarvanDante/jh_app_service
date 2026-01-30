@@ -506,3 +506,146 @@ func (s *sUser) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (res 
 
 	return res, nil
 }
+
+// SetPayPassword 设置支付密码
+func (s *sUser) SetPayPassword(ctx context.Context, req *v1.SetPayPasswordReq) (res *v1.SetPayPasswordRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.SetPayPassword", trace.WithAttributes(
+		attribute.String("method", "SetPayPassword"),
+	))
+	defer span.End()
+
+	// 验证参数
+	if req.PayPassword == "" {
+		return nil, fmt.Errorf("请输入支付密码")
+	}
+
+	// 验证密码格式：必须是6位数字
+	if len(req.PayPassword) != 6 {
+		return nil, fmt.Errorf("支付密码必须是6位数字")
+	}
+
+	// 验证是否全是数字
+	for _, c := range req.PayPassword {
+		if c < '0' || c > '9' {
+			return nil, fmt.Errorf("支付密码必须是6位数字")
+		}
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询用户信息
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
+	// 使用bcrypt加密支付密码（与注册密码相同的加密方式）
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.PayPassword), bcrypt.DefaultCost)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "密码加密失败: %v", err)
+		return nil, fmt.Errorf("设置支付密码失败")
+	}
+
+	// 更新支付密码
+	_, err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Update(map[string]interface{}{
+			"pay_password": string(hashedPassword),
+		})
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "设置支付密码失败: %v", err)
+		return nil, fmt.Errorf("设置支付密码失败")
+	}
+
+	middleware.LogWithTrace(ctx, "info", "设置支付密码成功: user_id=%d", userId)
+
+	res = &v1.SetPayPasswordRes{
+		Message: "设置支付密码成功",
+	}
+
+	return res, nil
+}
+
+// VerifyPayPassword 验证支付密码
+func (s *sUser) VerifyPayPassword(ctx context.Context, req *v1.VerifyPayPasswordReq) (res *v1.VerifyPayPasswordRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.VerifyPayPassword", trace.WithAttributes(
+		attribute.String("method", "VerifyPayPassword"),
+	))
+	defer span.End()
+
+	// 验证参数
+	if req.PayPassword == "" {
+		return &v1.VerifyPayPasswordRes{
+			IsValid: false,
+			Message: "请输入支付密码",
+		}, nil
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询用户信息
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
+	// 检查是否设置了支付密码
+	if user.PayPassword == "" {
+		return &v1.VerifyPayPasswordRes{
+			IsValid: false,
+			Message: "未设置支付密码",
+		}, nil
+	}
+
+	// 验证支付密码是否正确
+	err = bcrypt.CompareHashAndPassword([]byte(user.PayPassword), []byte(req.PayPassword))
+	if err != nil {
+		middleware.LogWithTrace(ctx, "info", "支付密码错误: user_id=%d", userId)
+		return &v1.VerifyPayPasswordRes{
+			IsValid: false,
+			Message: "支付密码错误",
+		}, nil
+	}
+
+	middleware.LogWithTrace(ctx, "info", "验证支付密码成功: user_id=%d", userId)
+
+	res = &v1.VerifyPayPasswordRes{
+		IsValid: true,
+		Message: "验证成功",
+	}
+
+	return res, nil
+}
