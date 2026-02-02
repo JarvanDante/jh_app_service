@@ -64,7 +64,22 @@ extract_custom_methods() {
     fi
 }
 
-# 检查是否需要额外的import
+# 提取现有的 import 部分（保留用户自定义的 import）
+extract_imports() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        # 提取 import ( 到 ) 之间的内容，保持原有格式
+        awk '
+        /^import \($/,/^\)$/ {
+            if ($0 !~ /^import \(/ && $0 !~ /^\)$/) {
+                print
+            }
+        }
+        ' "$file"
+    fi
+}
+
+# 检查是否需要额外的import（已废弃，改用 extract_imports）
 check_imports() {
     local custom_content="$1"
     local imports=""
