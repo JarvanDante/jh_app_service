@@ -112,6 +112,7 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		BindPayPassword:  int32(bindPayPassword),
 		// BindBank:         0, // 银行卡信息已移至 balance 服务，字段已从 proto 中移除
 		IsPayPassword: int32(isPayPassword),
+		IsPassword:    int32(user.HasPass),
 
 		// 其他（先写死默认值）
 		UnreadMessageCount:  0,
@@ -635,6 +636,109 @@ func (s *sUser) VerifyPayPassword(ctx context.Context, req *v1.VerifyPayPassword
 	res = &v1.VerifyPayPasswordRes{
 		IsValid: true,
 		Message: "验证成功",
+	}
+
+	return res, nil
+}
+
+// ChangePayPassword 修改支付密码
+func (s *sUser) ChangePayPassword(ctx context.Context, req *v1.ChangePayPasswordReq) (res *v1.ChangePayPasswordRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.ChangePayPassword", trace.WithAttributes(
+		attribute.String("method", "ChangePayPassword"),
+	))
+	defer span.End()
+
+	// 验证参数
+	if req.OldPayPassword == "" {
+		return nil, fmt.Errorf("请输入原支付密码")
+	}
+
+	if req.NewPayPassword == "" {
+		return nil, fmt.Errorf("请输入新支付密码")
+	}
+
+	// 验证新密码格式：必须是6位数字
+	if len(req.NewPayPassword) != 6 {
+		return nil, fmt.Errorf("新支付密码必须是6位数字")
+	}
+
+	// 验证是否全是数字
+	for _, c := range req.NewPayPassword {
+		if c < '0' || c > '9' {
+			return nil, fmt.Errorf("新支付密码必须是6位数字")
+		}
+	}
+
+	// 验证旧密码格式：必须是6位数字
+	if len(req.OldPayPassword) != 6 {
+		return nil, fmt.Errorf("原支付密码必须是6位数字")
+	}
+
+	// 验证新旧密码不能相同
+	if req.OldPayPassword == req.NewPayPassword {
+		return nil, fmt.Errorf("新支付密码与原支付密码不能相同")
+	}
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询用户信息
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
+	// 检查是否设置了支付密码
+	if user.PayPassword == "" {
+		middleware.LogWithTrace(ctx, "error", "未设置支付密码: user_id=%d", userId)
+		return nil, fmt.Errorf("未设置支付密码，请先设置支付密码")
+	}
+
+	// 验证旧支付密码是否正确
+	err = bcrypt.CompareHashAndPassword([]byte(user.PayPassword), []byte(req.OldPayPassword))
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "原支付密码错误: user_id=%d", userId)
+		return nil, fmt.Errorf("原支付密码错误")
+	}
+
+	// 使用bcrypt加密新支付密码（与设置密码相同的加密方式）
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPayPassword), bcrypt.DefaultCost)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "密码加密失败: %v", err)
+		return nil, fmt.Errorf("修改支付密码失败")
+	}
+
+	// 更新支付密码
+	_, err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Update(map[string]interface{}{
+			"pay_password": string(hashedPassword),
+		})
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "修改支付密码失败: %v", err)
+		return nil, fmt.Errorf("修改支付密码失败")
+	}
+
+	middleware.LogWithTrace(ctx, "info", "修改支付密码成功: user_id=%d", userId)
+
+	res = &v1.ChangePayPasswordRes{
+		Message: "修改支付密码成功",
 	}
 
 	return res, nil

@@ -17,6 +17,7 @@ type (
 		GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (*v1.GetGradeListRes, error)
 		SetPayPassword(ctx context.Context, req *v1.SetPayPasswordReq) (*v1.SetPayPasswordRes, error)
 		VerifyPayPassword(ctx context.Context, req *v1.VerifyPayPasswordReq) (*v1.VerifyPayPasswordRes, error)
+		ChangePayPassword(ctx context.Context, req *v1.ChangePayPasswordReq) (*v1.ChangePayPasswordRes, error)
 	}
 )
 

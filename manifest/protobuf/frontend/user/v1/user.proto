@@ -14,6 +14,7 @@ service User {
     rpc GetGradeList(GetGradeListReq) returns (GetGradeListRes) {}
     rpc SetPayPassword(SetPayPasswordReq) returns (SetPayPasswordRes) {}
     rpc VerifyPayPassword(VerifyPayPasswordReq) returns (VerifyPayPasswordRes) {}
+    rpc ChangePayPassword(ChangePayPasswordReq) returns (ChangePayPasswordRes) {}
 }
 
 // 获取用户信息请求
@@ -43,6 +44,7 @@ message GetUserInfoRes {
     int32 bind_pay_password = 15;     // 是否绑定资金密码 0=未绑定 1=已绑定
     // int32 bind_bank = 16;          // 已废弃：银行卡信息已移至 balance 服务
     int32 is_pay_password = 27;       // 是否设置资金密码 0=未设置 1=已设置
+    int32 is_password = 28;           // 是否设置登录密码 0=未设置 1=已设置
     
     // 其他
     int32 unread_message_count = 17;  // 未读消息数量
@@ -170,4 +172,15 @@ message VerifyPayPasswordReq {
 message VerifyPayPasswordRes {
     bool is_valid = 1;     // 是否正确
     string message = 2;    // 提示消息
+}
+
+// 修改支付密码请求
+message ChangePayPasswordReq {
+    string old_pay_password = 1;  // 旧支付密码（6位数字）
+    string new_pay_password = 2;  // 新支付密码（6位数字）
+}
+
+// 修改支付密码响应
+message ChangePayPasswordRes {
+    string message = 1;  // 提示消息
 }
