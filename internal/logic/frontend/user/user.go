@@ -89,16 +89,6 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		isPayPassword = 1
 	}
 
-	// 检查是否绑定银行卡
-	bindBank := 0
-	var bankCount int
-	bankCount, err = dao.UserBank.Ctx(ctx).Where("user_id", userId).
-		Where("site_id", siteId).
-		Count()
-	if err == nil && bankCount > 0 {
-		bindBank = 1
-	}
-
 	// 构建响应
 	res = &v1.GetUserInfoRes{
 		UserId:            int32(user.Id),
@@ -120,8 +110,8 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		// 绑定状态
 		BindSafeQuestion: int32(bindSafeQuestion),
 		BindPayPassword:  int32(bindPayPassword),
-		BindBank:         int32(bindBank),
-		IsPayPassword:    int32(isPayPassword),
+		// BindBank:         0, // 银行卡信息已移至 balance 服务，字段已从 proto 中移除
+		IsPayPassword: int32(isPayPassword),
 
 		// 其他（先写死默认值）
 		UnreadMessageCount:  0,

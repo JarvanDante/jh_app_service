@@ -123,7 +123,7 @@ message GetUserInfoRes {
     int32 bind_pay_password = 18;     // 是否绑定资金密码 0=否 1=是
     int32 unread_message_count = 19;  // 未读消息数量(默认值)
     int32 switch_sign = 20;           // 签到开关 0=关闭 1=开启
-    int32 bind_bank = 21;             // 是否绑定银行卡 0=否 1=是
+    // int32 bind_bank = 21;             // 是否绑定银行卡 0=否 1=是 (已移至balance服务)
     int32 apply_birthday_bonus = 22;  // 是否可申请生日礼金 0=否 1=是
     int32 auto_bind_game_balance = 23;// 自动绑定游戏余额 0=否 1=是
     string total_bet = 24;            // 总投注(默认值)

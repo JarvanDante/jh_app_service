@@ -365,14 +365,29 @@ func (s *sUser) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoRe
 	))
 	defer span.End()
 
-	// 获取站点ID
-	siteId := 1 // 临时硬编码
+	// 从 context 获取站点ID
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("站点ID不存在")
+	}
+
+	// 获取站点代码（用于动态数据库切换）
+	siteCode, err := dao.Site.GetCodeById(ctx, siteId)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "未获取站点code")
+		return nil, fmt.Errorf("获取站点CODE失败: %v", err)
+	}
+
+	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("配置的站点代码: %s, 站点ID: %d", siteCode, siteId))
+	tracing.SetSpanAttributes(span, attribute.Int("site_id", int(siteId)))
 
 	// 查找用户
 	var user entity.User
-	err := dao.User.Ctx(ctx).Where("site_id = ? AND id = ?", siteId, req.Id).Scan(&user)
+	err = dao.User.Ctx(ctx).Where("site_id = ? AND id = ?", siteId, req.Id).Scan(&user)
 
 	if err != nil || user.Id == 0 {
+		middleware.LogWithTrace(ctx, "error", fmt.Sprintf("用户不存在: userId=%d, siteId=%d", req.Id, siteId))
 		return nil, fmt.Errorf("用户不存在")
 	}
 
@@ -406,9 +421,9 @@ func (s *sUser) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoRe
 		basicInfo.Birthday = user.Birthday.Format("2006-01-02")
 	}
 
-	// 获取等级名称
+	// 获取等级名称（使用动态数据库）
 	var grade entity.UserGrade
-	dao.UserGrade.DB().Model(dao.UserGrade.Table()).
+	dao.UserGrade.Ctx(ctx).
 		Where(dao.UserGrade.Columns().SiteId, siteId).
 		Where(dao.UserGrade.Columns().Id, user.GradeId).
 		Scan(&grade)
@@ -430,23 +445,7 @@ func (s *sUser) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoRe
 	}).Scan(&agent)
 	basicInfo.AgentName = agent.Username
 
-	// 获取银行卡信息
-	var banks []entity.UserBank
-	dao.UserBank.Ctx(ctx).Where(do.UserBank{
-		SiteId: siteId,
-		UserId: int(user.Id),
-	}).Scan(&banks)
-
-	var bankList []*v1.BankInfo
-	for _, bank := range banks {
-		bankList = append(bankList, &v1.BankInfo{
-			BankName: bank.BankName,
-			CardNo:   bank.CardNo, // 注意：实际应用中可能需要解密
-		})
-	}
-	basicInfo.Banks = bankList
-
-	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("获取用户基本信息成功，用户ID: %d", req.Id))
+	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("获取用户基本信息成功，用户ID: %d, 用户名: %s, VIP等级: %d", req.Id, user.Username, user.GradeId))
 
 	return &v1.GetUserBasicInfoRes{User: basicInfo}, nil
 }

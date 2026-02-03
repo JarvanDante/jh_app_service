@@ -133,7 +133,6 @@ message UserBasicInfo {
     int32 status = 22;                  // 状态
     string device = 23;                 // 最后登录设备
     int32 is_online = 24;               // 是否在线
-    repeated BankInfo banks = 25;       // 银行卡列表
 }
 
 // 银行卡信息
