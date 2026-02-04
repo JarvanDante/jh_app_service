@@ -48,8 +48,6 @@ func (s *sOption) GetUserGradeList(ctx context.Context, req *v1.UserGradeListReq
 		})
 	}
 
-	middleware.LogWithTrace(ctx, "info", "获取会员等级列表成功 - 总数: %d", len(grades))
-
 	return &v1.UserGradeListResponse{
 		Grades: grades,
 	}, nil
