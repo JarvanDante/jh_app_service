@@ -204,7 +204,7 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 
 		// 获取等级名称
 		var grade entity.UserGrade
-		dao.UserGrade.DB().Model(dao.UserGrade.Table()).
+		dao.UserGrade.Ctx(ctx).
 			Where(dao.UserGrade.Columns().SiteId, siteId).
 			Where(dao.UserGrade.Columns().Id, user.GradeId).
 			Scan(&grade)
@@ -242,8 +242,6 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 		attribute.Int("total_count", total),
 		attribute.Int("returned_count", len(userList)),
 	)
-
-	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("获取用户列表成功，总数: %d，返回: %d", total, len(userList)))
 
 	return &v1.GetUserListRes{
 		List:             userList,

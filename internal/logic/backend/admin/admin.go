@@ -1294,27 +1294,44 @@ func (s *sAdmin) GetAdminLogs(ctx context.Context, req *v1.GetAdminLogsReq) (*v1
 		OrderDesc("created_at").
 		Scan(&rawResults)
 
+	normalizeString := func(value interface{}) string {
+		if value == nil {
+			return ""
+		}
+		text := fmt.Sprintf("%v", value)
+		if text == "<nil>" || text == "NULL" {
+			return ""
+		}
+		return text
+	}
+
+	useRawResults := false
 	if err == nil && len(rawResults) > 0 {
+		for _, result := range rawResults {
+			if normalizeString(result["admin_username"]) != "" ||
+				normalizeString(result["ip"]) != "" ||
+				normalizeString(result["remark"]) != "" {
+				useRawResults = true
+				break
+			}
+		}
+	}
+
+	if err == nil && len(rawResults) > 0 && useRawResults {
 		// 使用数据库格式化的结果
 		listSpan.End()
 
 		var logList []*v1.AdminLogInfo
 		for _, result := range rawResults {
-			createdAtFormatted := result["created_at_formatted"]
-			createdAtStr := ""
-
-			if createdAtFormatted != nil {
-				createdAtStr = fmt.Sprintf("%v", createdAtFormatted)
-				// 检查是否为无效时间
-				if createdAtStr == "0000-00-00 00:00:00" || createdAtStr == "" {
-					createdAtStr = ""
-				}
+			createdAtStr := normalizeString(result["created_at_formatted"])
+			if createdAtStr == "0000-00-00 00:00:00" {
+				createdAtStr = ""
 			}
 
 			logList = append(logList, &v1.AdminLogInfo{
-				Username:  fmt.Sprintf("%v", result["admin_username"]),
-				Ip:        fmt.Sprintf("%v", result["ip"]),
-				Remark:    fmt.Sprintf("%v", result["remark"]),
+				Username:  normalizeString(result["admin_username"]),
+				Ip:        normalizeString(result["ip"]),
+				Remark:    normalizeString(result["remark"]),
 				CreatedAt: createdAtStr,
 			})
 		}

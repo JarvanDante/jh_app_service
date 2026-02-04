@@ -57,17 +57,14 @@ func (interceptor *DBInterceptor) StreamServerInterceptor() grpc.StreamServerInt
 func (interceptor *DBInterceptor) createDynamicDBContext(ctx context.Context) context.Context {
 	// 获取站点代码
 	siteCode := interceptor.getSiteCodeFromContext(ctx)
-	g.Log().Debugf(ctx, "DB拦截器: 获取到站点代码: %s", siteCode)
 
 	if siteCode == "" {
 		// 没有站点信息，返回原始上下文
-		g.Log().Debugf(ctx, "DB拦截器: 没有站点信息，使用默认数据库")
 		return ctx
 	}
 
 	// 将站点代码设置到上下文中，供DAO层使用
 	newCtx := context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
-	g.Log().Debugf(ctx, "DB拦截器: 设置动态数据库组: site_%s", siteCode)
 	return newCtx
 }
 
@@ -76,7 +73,6 @@ func (interceptor *DBInterceptor) getSiteCodeFromContext(ctx context.Context) st
 	// 首先尝试从上下文中获取site_code
 	if siteCode := ctx.Value("site_code"); siteCode != nil {
 		if siteCodeStr, ok := siteCode.(string); ok {
-			g.Log().Debugf(ctx, "DB拦截器: 从上下文获取site_code: %s", siteCodeStr)
 			return siteCodeStr
 		}
 	}
@@ -90,17 +86,13 @@ func (interceptor *DBInterceptor) getSiteCodeFromContext(ctx context.Context) st
 				if siteID, err := strconv.ParseInt(siteIDStr, 10, 64); err == nil && siteID > 0 {
 					// 根据site_id查找对应的site_code
 					siteCode := interceptor.dbManager.GetSiteCodeBySiteID(siteID)
-					g.Log().Debugf(ctx, "DB拦截器: site_id=%d 对应 site_code=%s", siteID, siteCode)
 					return siteCode
 				} else {
 					g.Log().Warningf(ctx, "DB拦截器: site_id转换失败: %s, error: %v", siteIDStr, err)
 				}
 			}
 		} else {
-			g.Log().Debugf(ctx, "DB拦截器: metadata中没有site_id")
 		}
-	} else {
-		g.Log().Debugf(ctx, "DB拦截器: 无法从上下文获取metadata")
 	}
 
 	return ""
