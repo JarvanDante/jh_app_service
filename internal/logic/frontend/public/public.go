@@ -9,6 +9,7 @@ import (
 	"image/color"
 	"image/png"
 	"jh_app_service/internal/mq"
+	"regexp"
 	"strings"
 	"time"
 
@@ -838,6 +839,23 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	// 验证图片验证码
 	if req.Code == "" {
 		return nil, fmt.Errorf("请输入验证码")
+	}
+
+	// 用户名长度校验
+	usernameLen := len(strings.TrimSpace(req.Username))
+	if usernameLen < 6 || usernameLen > 16 {
+		return nil, fmt.Errorf("用户名长度需为6-16位")
+	}
+
+	// 密码长度校验
+	passwordLen := len(req.Password)
+	if passwordLen < 6 || passwordLen > 20 {
+		return nil, fmt.Errorf("密码长度需为6-20位")
+	}
+
+	// 用户名仅允许字母数字
+	if !regexp.MustCompile(`^[A-Za-z0-9]+$`).MatchString(req.Username) {
+		return nil, fmt.Errorf("用户名仅允许字母和数字")
 	}
 
 	clientIp := util.GetClientIP(ctx)
