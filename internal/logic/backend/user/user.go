@@ -132,18 +132,6 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 		return nil, fmt.Errorf("获取用户总数失败: %v", err)
 	}
 
-	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("查询到用户总数: %d", total))
-
-	// 添加调试：检查数据库中是否有任何用户数据
-	allUsersCount, _ := dao.User.Ctx(ctx).Count()
-	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("数据库中所有用户总数: %d", allUsersCount))
-
-	// 检查不同站点ID的用户数量
-	for i := 1; i <= 3; i++ {
-		siteCount, _ := dao.User.Ctx(ctx).Where("site_id = ?", i).Count()
-		middleware.LogWithTrace(ctx, "info", fmt.Sprintf("站点ID %d 的用户数量: %d", i, siteCount))
-	}
-
 	// 数据库查询span - 获取列表数据
 	ctx, listSpan := tracing.StartSpan(ctx, "db.query.user_list", trace.WithAttributes(
 		attribute.String("db.operation", "select"),
