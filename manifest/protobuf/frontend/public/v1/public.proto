@@ -86,6 +86,7 @@ message RegisterReq {
     string birthday = 10;     // 生日
     string agent_salt = 11;   // 代理码
     string domain = 12;       // 注册域名
+    string invite_code = 13;  // 邀请码
 }
 
 // 注册响应

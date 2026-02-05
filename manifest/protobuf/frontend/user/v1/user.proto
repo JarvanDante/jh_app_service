@@ -15,6 +15,10 @@ service User {
     rpc SetPayPassword(SetPayPasswordReq) returns (SetPayPasswordRes) {}
     rpc VerifyPayPassword(VerifyPayPasswordReq) returns (VerifyPayPasswordRes) {}
     rpc ChangePayPassword(ChangePayPasswordReq) returns (ChangePayPasswordRes) {}
+    
+    // 邀请相关接口
+    rpc GetInviteInfo(GetInviteInfoReq) returns (GetInviteInfoRes) {}
+    rpc GetInviteList(GetInviteListReq) returns (GetInviteListRes) {}
 }
 
 // 获取用户信息请求
@@ -183,4 +187,41 @@ message ChangePayPasswordReq {
 // 修改支付密码响应
 message ChangePayPasswordRes {
     string message = 1;  // 提示消息
+}
+
+// 获取邀请信息请求
+message GetInviteInfoReq {
+}
+
+// 获取邀请信息响应
+message GetInviteInfoRes {
+    string invite_code = 1;        // 我的邀请码
+    string invite_url = 2;          // 邀请链接
+    int32 total_invites = 3;        // 总邀请人数
+    int32 today_invites = 4;        // 今日邀请人数
+    string total_reward = 5;        // 总奖励金额
+}
+
+// 获取邀请列表请求
+message GetInviteListReq {
+    int32 page = 1;                 // 页码
+    int32 page_size = 2;            // 每页数量
+}
+
+// 获取邀请列表响应
+message GetInviteListRes {
+    repeated InviteItem list = 1;   // 邀请列表
+    int32 total = 2;                // 总数
+    int32 page = 3;                 // 当前页
+    int32 page_size = 4;            // 每页数量
+}
+
+// 邀请项
+message InviteItem {
+    int32 user_id = 1;              // 用户ID
+    string username = 2;            // 用户名
+    string register_time = 3;       // 注册时间
+    string total_bet = 4;           // 总投注
+    string total_recharge = 5;      // 总充值
+    int32 status = 6;               // 状态：1=正常，0=禁用
 }

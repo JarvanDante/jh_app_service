@@ -15,6 +15,7 @@ type User struct {
 	GradeId           int         `json:"gradeId"           orm:"grade_id"            description:""`
 	LevelId           int         `json:"levelId"           orm:"level_id"            description:""`
 	AgentId           int         `json:"agentId"           orm:"agent_id"            description:""`
+	InviterId         int         `json:"inviterId"         orm:"inviter_id"          description:"邀请人ID"`
 	Username          string      `json:"username"          orm:"username"            description:""`
 	Password          string      `json:"password"          orm:"password"            description:""`
 	PayPassword       string      `json:"payPassword"       orm:"pay_password"        description:""`

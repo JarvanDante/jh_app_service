@@ -61,3 +61,18 @@ func (c *Controller) SetPayPassword(ctx context.Context, req *v1.SetPayPasswordR
 func (c *Controller) VerifyPayPassword(ctx context.Context, req *v1.VerifyPayPasswordReq) (*v1.VerifyPayPasswordRes, error) {
 	return frontend.User().VerifyPayPassword(ctx, req)
 }
+
+// ChangePayPassword 修改支付密码
+func (c *Controller) ChangePayPassword(ctx context.Context, req *v1.ChangePayPasswordReq) (*v1.ChangePayPasswordRes, error) {
+	return frontend.User().ChangePayPassword(ctx, req)
+}
+
+// GetInviteInfo 获取邀请信息
+func (c *Controller) GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (*v1.GetInviteInfoRes, error) {
+	return frontend.User().GetInviteInfo(ctx, req)
+}
+
+// GetInviteList 获取邀请列表
+func (c *Controller) GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (*v1.GetInviteListRes, error) {
+	return frontend.User().GetInviteList(ctx, req)
+}

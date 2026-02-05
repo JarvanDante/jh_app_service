@@ -18,6 +18,8 @@ type (
 		SetPayPassword(ctx context.Context, req *v1.SetPayPasswordReq) (*v1.SetPayPasswordRes, error)
 		VerifyPayPassword(ctx context.Context, req *v1.VerifyPayPasswordReq) (*v1.VerifyPayPasswordRes, error)
 		ChangePayPassword(ctx context.Context, req *v1.ChangePayPasswordReq) (*v1.ChangePayPasswordRes, error)
+		GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (*v1.GetInviteInfoRes, error)
+		GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (*v1.GetInviteListRes, error)
 	}
 )
 

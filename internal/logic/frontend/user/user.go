@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"golang.org/x/crypto/bcrypt"
 
@@ -16,6 +17,7 @@ import (
 	"jh_app_service/internal/model/entity"
 	"jh_app_service/internal/service/frontend"
 	"jh_app_service/internal/tracing"
+	"jh_app_service/internal/util"
 )
 
 type sUser struct{}
@@ -740,6 +742,158 @@ func (s *sUser) ChangePayPassword(ctx context.Context, req *v1.ChangePayPassword
 	res = &v1.ChangePayPasswordRes{
 		Message: "修改支付密码成功",
 	}
+
+	return res, nil
+}
+
+// GetInviteInfo 获取邀请信息
+func (s *sUser) GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (res *v1.GetInviteInfoRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.GetInviteInfo", trace.WithAttributes(
+		attribute.String("method", "GetInviteInfo"),
+	))
+	defer span.End()
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 查询用户信息
+	var user *entity.User
+	err = dao.User.Ctx(ctx).Where("id", userId).
+		Where("site_id", siteId).
+		Scan(&user)
+
+	if err != nil || user == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
+	// 生成邀请码（使用Base62编码，固定长度6位）
+	inviteCode := util.EncodeInviteCode(uint(userId))
+
+	// 生成邀请链接（仅路径，域名由前端拼接）
+	inviteUrl := fmt.Sprintf("/register?invite_code=%s", inviteCode)
+
+	// 统计总邀请人数
+	totalInvites, err := dao.User.Ctx(ctx).Where("inviter_id", userId).
+		Where("site_id", siteId).
+		Count()
+	if err != nil {
+		totalInvites = 0
+	}
+
+	// 统计今日邀请人数
+	todayStart := gtime.Now().StartOfDay()
+	todayInvites, err := dao.User.Ctx(ctx).Where("inviter_id", userId).
+		Where("site_id", siteId).
+		WhereGTE("created_at", todayStart).
+		Count()
+	if err != nil {
+		todayInvites = 0
+	}
+
+	// TODO: 统计总奖励金额（需要根据实际奖励表计算）
+	totalReward := "0.00"
+
+	res = &v1.GetInviteInfoRes{
+		InviteCode:   inviteCode,
+		InviteUrl:    inviteUrl,
+		TotalInvites: int32(totalInvites),
+		TodayInvites: int32(todayInvites),
+		TotalReward:  totalReward,
+	}
+
+	middleware.LogWithTrace(ctx, "info", "获取邀请信息成功: user_id=%d, total=%d", userId, totalInvites)
+
+	return res, nil
+}
+
+// GetInviteList 获取邀请列表
+func (s *sUser) GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (res *v1.GetInviteListRes, err error) {
+	ctx, span := tracing.StartSpan(ctx, "user.GetInviteList", trace.WithAttributes(
+		attribute.String("method", "GetInviteList"),
+	))
+	defer span.End()
+
+	// 从JWT token获取用户ID
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取用户ID")
+		return nil, fmt.Errorf("未登录")
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	// 设置默认分页参数
+	page := req.Page
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := req.PageSize
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+	if pageSize > 100 {
+		pageSize = 100 // 限制最大每页数量
+	}
+
+	// 查询邀请用户列表
+	var users []*entity.User
+	err = dao.User.Ctx(ctx).Where("inviter_id", userId).
+		Where("site_id", siteId).
+		Order("created_at DESC").
+		Limit(int(pageSize)).
+		Offset(int((page - 1) * pageSize)).
+		Scan(&users)
+
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "查询邀请列表失败: %v", err)
+		return nil, fmt.Errorf("查询邀请列表失败")
+	}
+
+	// 统计总数
+	total, err := dao.User.Ctx(ctx).Where("inviter_id", userId).
+		Where("site_id", siteId).
+		Count()
+	if err != nil {
+		total = 0
+	}
+
+	// 构建响应列表
+	list := make([]*v1.InviteItem, 0, len(users))
+	for _, user := range users {
+		item := &v1.InviteItem{
+			UserId:        int32(user.Id),
+			Username:      user.Username,
+			RegisterTime:  user.CreatedAt.Format("2006-01-02 15:04:05"),
+			TotalBet:      "0.00", // TODO: 从游戏服务获取
+			TotalRecharge: "0.00", // TODO: 从余额服务获取
+			Status:        int32(user.Status),
+		}
+		list = append(list, item)
+	}
+
+	res = &v1.GetInviteListRes{
+		List:     list,
+		Total:    int32(total),
+		Page:     page,
+		PageSize: pageSize,
+	}
+
+	middleware.LogWithTrace(ctx, "info", "获取邀请列表成功: user_id=%d, total=%d", userId, total)
 
 	return res, nil
 }

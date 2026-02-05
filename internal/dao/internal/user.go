@@ -26,6 +26,7 @@ type UserColumns struct {
 	GradeId           string //
 	LevelId           string //
 	AgentId           string //
+	InviterId         string // 邀请人ID
 	Username          string //
 	Password          string //
 	PayPassword       string //
@@ -62,6 +63,7 @@ var userColumns = UserColumns{
 	GradeId:           "grade_id",
 	LevelId:           "level_id",
 	AgentId:           "agent_id",
+	InviterId:         "inviter_id",
 	Username:          "username",
 	Password:          "password",
 	PayPassword:       "pay_password",

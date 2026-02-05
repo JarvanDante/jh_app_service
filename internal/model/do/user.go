@@ -17,6 +17,7 @@ type User struct {
 	GradeId           any         //
 	LevelId           any         //
 	AgentId           any         //
+	InviterId         any         // 邀请人ID
 	Username          any         //
 	Password          any         //
 	PayPassword       any         //
