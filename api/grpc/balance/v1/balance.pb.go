@@ -144,6 +144,2967 @@ func (x *InitBalanceUserRes) GetMessage() string {
 	return ""
 }
 
+// 刷新用户余额请求
+type RefreshBalanceReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefreshBalanceReq) Reset() {
+	*x = RefreshBalanceReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefreshBalanceReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshBalanceReq) ProtoMessage() {}
+
+func (x *RefreshBalanceReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshBalanceReq.ProtoReflect.Descriptor instead.
+func (*RefreshBalanceReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{2}
+}
+
+// 刷新用户余额响应
+type RefreshBalanceRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Balance       string                 `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance" dc:"余额"`                                    // 余额
+	BalanceFrozen string                 `protobuf:"bytes,2,opt,name=balance_frozen,json=balanceFrozen,proto3" json:"balance_frozen" dc:"冻结余额"` // 冻结余额
+	Points        int64                  `protobuf:"varint,3,opt,name=points,proto3" json:"points" dc:"积分"`                                     // 积分
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefreshBalanceRes) Reset() {
+	*x = RefreshBalanceRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefreshBalanceRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshBalanceRes) ProtoMessage() {}
+
+func (x *RefreshBalanceRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshBalanceRes.ProtoReflect.Descriptor instead.
+func (*RefreshBalanceRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *RefreshBalanceRes) GetBalance() string {
+	if x != nil {
+		return x.Balance
+	}
+	return ""
+}
+
+func (x *RefreshBalanceRes) GetBalanceFrozen() string {
+	if x != nil {
+		return x.BalanceFrozen
+	}
+	return ""
+}
+
+func (x *RefreshBalanceRes) GetPoints() int64 {
+	if x != nil {
+		return x.Points
+	}
+	return 0
+}
+
+// 调整用户余额请求
+type AdjustBalanceReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                   // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"`                   // 用户ID
+	Amount        float32                `protobuf:"fixed32,3,opt,name=amount,proto3" json:"amount" dc:"金额"`                                  // 金额
+	Type          int32                  `protobuf:"varint,4,opt,name=type,proto3" json:"type" dc:"类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)"` // 类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)
+	GameName      string                 `protobuf:"bytes,5,opt,name=game_name,json=gameName,proto3" json:"game_name" dc:"游戏名称"`              // 游戏名称
+	GameId        string                 `protobuf:"bytes,6,opt,name=game_id,json=gameId,proto3" json:"game_id" dc:"游戏ID"`                    // 游戏ID
+	GameKey       string                 `protobuf:"bytes,7,opt,name=game_key,json=gameKey,proto3" json:"game_key" dc:"游戏key（进入游戏时的key）"`     // 游戏key（进入游戏时的key）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdjustBalanceReq) Reset() {
+	*x = AdjustBalanceReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdjustBalanceReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdjustBalanceReq) ProtoMessage() {}
+
+func (x *AdjustBalanceReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdjustBalanceReq.ProtoReflect.Descriptor instead.
+func (*AdjustBalanceReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AdjustBalanceReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *AdjustBalanceReq) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AdjustBalanceReq) GetAmount() float32 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *AdjustBalanceReq) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *AdjustBalanceReq) GetGameName() string {
+	if x != nil {
+		return x.GameName
+	}
+	return ""
+}
+
+func (x *AdjustBalanceReq) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *AdjustBalanceReq) GetGameKey() string {
+	if x != nil {
+		return x.GameKey
+	}
+	return ""
+}
+
+// 调整用户余额响应
+type AdjustBalanceRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"`              // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`                 // 消息
+	Balance       string                 `protobuf:"bytes,3,opt,name=balance,proto3" json:"balance" dc:"调整后的余额"`             // 调整后的余额
+	OrderNo       string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no" dc:"订单号"` // 订单号
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdjustBalanceRes) Reset() {
+	*x = AdjustBalanceRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdjustBalanceRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdjustBalanceRes) ProtoMessage() {}
+
+func (x *AdjustBalanceRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdjustBalanceRes.ProtoReflect.Descriptor instead.
+func (*AdjustBalanceRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *AdjustBalanceRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *AdjustBalanceRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *AdjustBalanceRes) GetBalance() string {
+	if x != nil {
+		return x.Balance
+	}
+	return ""
+}
+
+func (x *AdjustBalanceRes) GetOrderNo() string {
+	if x != nil {
+		return x.OrderNo
+	}
+	return ""
+}
+
+// 更新转账状态请求
+type UpdateTransferStatusReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderNo       string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no" dc:"订单号"` // 订单号
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateTransferStatusReq) Reset() {
+	*x = UpdateTransferStatusReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTransferStatusReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTransferStatusReq) ProtoMessage() {}
+
+func (x *UpdateTransferStatusReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTransferStatusReq.ProtoReflect.Descriptor instead.
+func (*UpdateTransferStatusReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpdateTransferStatusReq) GetOrderNo() string {
+	if x != nil {
+		return x.OrderNo
+	}
+	return ""
+}
+
+// 更新转账状态响应
+type UpdateTransferStatusRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateTransferStatusRes) Reset() {
+	*x = UpdateTransferStatusRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTransferStatusRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTransferStatusRes) ProtoMessage() {}
+
+func (x *UpdateTransferStatusRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTransferStatusRes.ProtoReflect.Descriptor instead.
+func (*UpdateTransferStatusRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateTransferStatusRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UpdateTransferStatusRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 补偿余额请求
+type CompensateBalanceReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`  // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"`  // 用户ID
+	OrderNo       string                 `protobuf:"bytes,3,opt,name=order_no,json=orderNo,proto3" json:"order_no" dc:"订单号"` // 订单号
+	Amount        float32                `protobuf:"fixed32,4,opt,name=amount,proto3" json:"amount" dc:"需要补偿的金额（负数）"`        // 需要补偿的金额（负数）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompensateBalanceReq) Reset() {
+	*x = CompensateBalanceReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompensateBalanceReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompensateBalanceReq) ProtoMessage() {}
+
+func (x *CompensateBalanceReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompensateBalanceReq.ProtoReflect.Descriptor instead.
+func (*CompensateBalanceReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CompensateBalanceReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *CompensateBalanceReq) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *CompensateBalanceReq) GetOrderNo() string {
+	if x != nil {
+		return x.OrderNo
+	}
+	return ""
+}
+
+func (x *CompensateBalanceReq) GetAmount() float32 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+// 补偿余额响应
+type CompensateBalanceRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompensateBalanceRes) Reset() {
+	*x = CompensateBalanceRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompensateBalanceRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompensateBalanceRes) ProtoMessage() {}
+
+func (x *CompensateBalanceRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompensateBalanceRes.ProtoReflect.Descriptor instead.
+func (*CompensateBalanceRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CompensateBalanceRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CompensateBalanceRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 最后一次进入游戏请求
+type GetLastBalanceLogGameReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLastBalanceLogGameReq) Reset() {
+	*x = GetLastBalanceLogGameReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLastBalanceLogGameReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLastBalanceLogGameReq) ProtoMessage() {}
+
+func (x *GetLastBalanceLogGameReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLastBalanceLogGameReq.ProtoReflect.Descriptor instead.
+func (*GetLastBalanceLogGameReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetLastBalanceLogGameReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *GetLastBalanceLogGameReq) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+// 最后一次进入游戏响应
+type GetLastBalanceLogGameRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameId        int32                  `protobuf:"varint,1,opt,name=game_id,json=gameId,proto3" json:"game_id" dc:"游戏ID"`   // 游戏ID
+	Amount        float32                `protobuf:"fixed32,2,opt,name=amount,proto3" json:"amount" dc:"游戏ID无刚用户余额，游戏ID有则为0"` // 游戏ID无刚用户余额，游戏ID有则为0
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLastBalanceLogGameRes) Reset() {
+	*x = GetLastBalanceLogGameRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLastBalanceLogGameRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLastBalanceLogGameRes) ProtoMessage() {}
+
+func (x *GetLastBalanceLogGameRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLastBalanceLogGameRes.ProtoReflect.Descriptor instead.
+func (*GetLastBalanceLogGameRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetLastBalanceLogGameRes) GetGameId() int32 {
+	if x != nil {
+		return x.GameId
+	}
+	return 0
+}
+
+func (x *GetLastBalanceLogGameRes) GetAmount() float32 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+// 获取支付渠道列表请求
+type GetPaymentListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPaymentListReq) Reset() {
+	*x = GetPaymentListReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPaymentListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPaymentListReq) ProtoMessage() {}
+
+func (x *GetPaymentListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPaymentListReq.ProtoReflect.Descriptor instead.
+func (*GetPaymentListReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{12}
+}
+
+// 支付渠道信息
+type PaymentInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"ID"`                                            // ID
+	SiteId        int32                  `protobuf:"varint,2,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                    // 站点ID
+	PaymentId     int32                  `protobuf:"varint,3,opt,name=payment_id,json=paymentId,proto3" json:"payment_id" dc:"总站支付ID"`         // 总站支付ID
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name" dc:"名称"`                                         // 名称
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code" dc:"代码"`                                         // 代码
+	Gateway       int32                  `protobuf:"varint,6,opt,name=gateway,proto3" json:"gateway" dc:"支付网关：1=在线支付 2=银行"`                    // 支付网关：1=在线支付 2=银行
+	EachMin       float32                `protobuf:"fixed32,7,opt,name=each_min,json=eachMin,proto3" json:"each_min" dc:"单笔最低"`                // 单笔最低
+	EachMax       float32                `protobuf:"fixed32,8,opt,name=each_max,json=eachMax,proto3" json:"each_max" dc:"单笔最高"`                // 单笔最高
+	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort" dc:"排序"`                                        // 排序
+	MoneyList     []string               `protobuf:"bytes,10,rep,name=money_list,json=moneyList,proto3" json:"money_list" dc:"可选金额数组"`         // 可选金额数组
+	IsInput       int32                  `protobuf:"varint,11,opt,name=is_input,json=isInput,proto3" json:"is_input" dc:"是否支持输入金额：0=不支持 1=支持"` // 是否支持输入金额：0=不支持 1=支持
+	Remark        string                 `protobuf:"bytes,12,opt,name=remark,proto3" json:"remark" dc:"描述"`                                    // 描述
+	Logo          string                 `protobuf:"bytes,13,opt,name=logo,proto3" json:"logo" dc:"logo地址"`                                    // logo地址
+	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status" dc:"状态"`                                   // 状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PaymentInfo) Reset() {
+	*x = PaymentInfo{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PaymentInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PaymentInfo) ProtoMessage() {}
+
+func (x *PaymentInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PaymentInfo.ProtoReflect.Descriptor instead.
+func (*PaymentInfo) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *PaymentInfo) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetPaymentId() int32 {
+	if x != nil {
+		return x.PaymentId
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *PaymentInfo) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *PaymentInfo) GetGateway() int32 {
+	if x != nil {
+		return x.Gateway
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetEachMin() float32 {
+	if x != nil {
+		return x.EachMin
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetEachMax() float32 {
+	if x != nil {
+		return x.EachMax
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetSort() int32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetMoneyList() []string {
+	if x != nil {
+		return x.MoneyList
+	}
+	return nil
+}
+
+func (x *PaymentInfo) GetIsInput() int32 {
+	if x != nil {
+		return x.IsInput
+	}
+	return 0
+}
+
+func (x *PaymentInfo) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+func (x *PaymentInfo) GetLogo() string {
+	if x != nil {
+		return x.Logo
+	}
+	return ""
+}
+
+func (x *PaymentInfo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+// 获取支付渠道列表响应
+type GetPaymentListRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*PaymentInfo         `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"支付渠道列表"` // 支付渠道列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPaymentListRes) Reset() {
+	*x = GetPaymentListRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPaymentListRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPaymentListRes) ProtoMessage() {}
+
+func (x *GetPaymentListRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPaymentListRes.ProtoReflect.Descriptor instead.
+func (*GetPaymentListRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetPaymentListRes) GetList() []*PaymentInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+// 获取提现渠道列表请求
+type GetWithdrawListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWithdrawListReq) Reset() {
+	*x = GetWithdrawListReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWithdrawListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWithdrawListReq) ProtoMessage() {}
+
+func (x *GetWithdrawListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWithdrawListReq.ProtoReflect.Descriptor instead.
+func (*GetWithdrawListReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{15}
+}
+
+// 提现渠道信息
+type WithdrawInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"ID"`                                            // ID
+	SiteId        int32                  `protobuf:"varint,2,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                    // 站点ID
+	WithdrawId    int32                  `protobuf:"varint,3,opt,name=withdraw_id,json=withdrawId,proto3" json:"withdraw_id" dc:"总站提现ID"`      // 总站提现ID
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name" dc:"名称"`                                         // 名称
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code" dc:"代码"`                                         // 代码
+	Gateway       int32                  `protobuf:"varint,6,opt,name=gateway,proto3" json:"gateway" dc:"提现网关：1=在线支付 2=银行"`                    // 提现网关：1=在线支付 2=银行
+	EachMin       float32                `protobuf:"fixed32,7,opt,name=each_min,json=eachMin,proto3" json:"each_min" dc:"单笔最低"`                // 单笔最低
+	EachMax       float32                `protobuf:"fixed32,8,opt,name=each_max,json=eachMax,proto3" json:"each_max" dc:"单笔最高"`                // 单笔最高
+	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort" dc:"排序"`                                        // 排序
+	MoneyList     []string               `protobuf:"bytes,10,rep,name=money_list,json=moneyList,proto3" json:"money_list" dc:"可选金额数组"`         // 可选金额数组
+	IsInput       int32                  `protobuf:"varint,11,opt,name=is_input,json=isInput,proto3" json:"is_input" dc:"是否支持输入金额：0=不支持 1=支持"` // 是否支持输入金额：0=不支持 1=支持
+	Remark        string                 `protobuf:"bytes,12,opt,name=remark,proto3" json:"remark" dc:"描述"`                                    // 描述
+	Logo          string                 `protobuf:"bytes,13,opt,name=logo,proto3" json:"logo" dc:"logo地址"`                                    // logo地址
+	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status" dc:"状态"`                                   // 状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawInfo) Reset() {
+	*x = WithdrawInfo{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawInfo) ProtoMessage() {}
+
+func (x *WithdrawInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawInfo.ProtoReflect.Descriptor instead.
+func (*WithdrawInfo) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *WithdrawInfo) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetWithdrawId() int32 {
+	if x != nil {
+		return x.WithdrawId
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *WithdrawInfo) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *WithdrawInfo) GetGateway() int32 {
+	if x != nil {
+		return x.Gateway
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetEachMin() float32 {
+	if x != nil {
+		return x.EachMin
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetEachMax() float32 {
+	if x != nil {
+		return x.EachMax
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetSort() int32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetMoneyList() []string {
+	if x != nil {
+		return x.MoneyList
+	}
+	return nil
+}
+
+func (x *WithdrawInfo) GetIsInput() int32 {
+	if x != nil {
+		return x.IsInput
+	}
+	return 0
+}
+
+func (x *WithdrawInfo) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+func (x *WithdrawInfo) GetLogo() string {
+	if x != nil {
+		return x.Logo
+	}
+	return ""
+}
+
+func (x *WithdrawInfo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+// 获取提现渠道列表响应
+type GetWithdrawListRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*WithdrawInfo        `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"提现渠道列表"` // 提现渠道列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWithdrawListRes) Reset() {
+	*x = GetWithdrawListRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWithdrawListRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWithdrawListRes) ProtoMessage() {}
+
+func (x *GetWithdrawListRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWithdrawListRes.ProtoReflect.Descriptor instead.
+func (*GetWithdrawListRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetWithdrawListRes) GetList() []*WithdrawInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+// 添加银行卡请求
+type AddBankCardReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type" dc:"类型 1=GCASH 2=Maya"`                       // 类型 1=GCASH 2=Maya
+	CardAccount   string                 `protobuf:"bytes,2,opt,name=card_account,json=cardAccount,proto3" json:"card_account" dc:"账户名"`     // 账户名
+	CardNo        string                 `protobuf:"bytes,3,opt,name=card_no,json=cardNo,proto3" json:"card_no" dc:"卡号"`                     // 卡号
+	IsDefault     int32                  `protobuf:"varint,4,opt,name=is_default,json=isDefault,proto3" json:"is_default" dc:"是否默认 0=否 1=是"` // 是否默认 0=否 1=是
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddBankCardReq) Reset() {
+	*x = AddBankCardReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddBankCardReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddBankCardReq) ProtoMessage() {}
+
+func (x *AddBankCardReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddBankCardReq.ProtoReflect.Descriptor instead.
+func (*AddBankCardReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *AddBankCardReq) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *AddBankCardReq) GetCardAccount() string {
+	if x != nil {
+		return x.CardAccount
+	}
+	return ""
+}
+
+func (x *AddBankCardReq) GetCardNo() string {
+	if x != nil {
+		return x.CardNo
+	}
+	return ""
+}
+
+func (x *AddBankCardReq) GetIsDefault() int32 {
+	if x != nil {
+		return x.IsDefault
+	}
+	return 0
+}
+
+// 添加银行卡响应
+type AddBankCardRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddBankCardRes) Reset() {
+	*x = AddBankCardRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddBankCardRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddBankCardRes) ProtoMessage() {}
+
+func (x *AddBankCardRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddBankCardRes.ProtoReflect.Descriptor instead.
+func (*AddBankCardRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *AddBankCardRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *AddBankCardRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 查询银行卡列表请求
+type GetBankCardListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBankCardListReq) Reset() {
+	*x = GetBankCardListReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBankCardListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBankCardListReq) ProtoMessage() {}
+
+func (x *GetBankCardListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBankCardListReq.ProtoReflect.Descriptor instead.
+func (*GetBankCardListReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{20}
+}
+
+// 银行卡信息
+type BankCardInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"ID"`                                          // ID
+	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type" dc:"类型 1=GCASH 2=Maya"`                       // 类型 1=GCASH 2=Maya
+	CardAccount   string                 `protobuf:"bytes,3,opt,name=card_account,json=cardAccount,proto3" json:"card_account" dc:"账户名"`     // 账户名
+	CardNo        string                 `protobuf:"bytes,4,opt,name=card_no,json=cardNo,proto3" json:"card_no" dc:"卡号"`                     // 卡号
+	IsDefault     int32                  `protobuf:"varint,5,opt,name=is_default,json=isDefault,proto3" json:"is_default" dc:"是否默认 0=否 1=是"` // 是否默认 0=否 1=是
+	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at" dc:"创建时间"`          // 创建时间
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BankCardInfo) Reset() {
+	*x = BankCardInfo{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BankCardInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BankCardInfo) ProtoMessage() {}
+
+func (x *BankCardInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BankCardInfo.ProtoReflect.Descriptor instead.
+func (*BankCardInfo) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *BankCardInfo) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BankCardInfo) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *BankCardInfo) GetCardAccount() string {
+	if x != nil {
+		return x.CardAccount
+	}
+	return ""
+}
+
+func (x *BankCardInfo) GetCardNo() string {
+	if x != nil {
+		return x.CardNo
+	}
+	return ""
+}
+
+func (x *BankCardInfo) GetIsDefault() int32 {
+	if x != nil {
+		return x.IsDefault
+	}
+	return 0
+}
+
+func (x *BankCardInfo) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// 查询银行卡列表响应
+type GetBankCardListRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*BankCardInfo        `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"银行卡列表"` // 银行卡列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBankCardListRes) Reset() {
+	*x = GetBankCardListRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBankCardListRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBankCardListRes) ProtoMessage() {}
+
+func (x *GetBankCardListRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBankCardListRes.ProtoReflect.Descriptor instead.
+func (*GetBankCardListRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetBankCardListRes) GetList() []*BankCardInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+// 删除银行卡请求
+type DeleteBankCardReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"银行卡ID"` // 银行卡ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteBankCardReq) Reset() {
+	*x = DeleteBankCardReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteBankCardReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteBankCardReq) ProtoMessage() {}
+
+func (x *DeleteBankCardReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteBankCardReq.ProtoReflect.Descriptor instead.
+func (*DeleteBankCardReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *DeleteBankCardReq) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 删除银行卡响应
+type DeleteBankCardRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteBankCardRes) Reset() {
+	*x = DeleteBankCardRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteBankCardRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteBankCardRes) ProtoMessage() {}
+
+func (x *DeleteBankCardRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteBankCardRes.ProtoReflect.Descriptor instead.
+func (*DeleteBankCardRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *DeleteBankCardRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeleteBankCardRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 设置默认银行卡请求
+type SetDefaultBankCardReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"银行卡ID"` // 银行卡ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetDefaultBankCardReq) Reset() {
+	*x = SetDefaultBankCardReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetDefaultBankCardReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetDefaultBankCardReq) ProtoMessage() {}
+
+func (x *SetDefaultBankCardReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetDefaultBankCardReq.ProtoReflect.Descriptor instead.
+func (*SetDefaultBankCardReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *SetDefaultBankCardReq) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 设置默认银行卡响应
+type SetDefaultBankCardRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetDefaultBankCardRes) Reset() {
+	*x = SetDefaultBankCardRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetDefaultBankCardRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetDefaultBankCardRes) ProtoMessage() {}
+
+func (x *SetDefaultBankCardRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetDefaultBankCardRes.ProtoReflect.Descriptor instead.
+func (*SetDefaultBankCardRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SetDefaultBankCardRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *SetDefaultBankCardRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 获取充值 nonce 请求
+type GetDepositNonceReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDepositNonceReq) Reset() {
+	*x = GetDepositNonceReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDepositNonceReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDepositNonceReq) ProtoMessage() {}
+
+func (x *GetDepositNonceReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDepositNonceReq.ProtoReflect.Descriptor instead.
+func (*GetDepositNonceReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{27}
+}
+
+// 获取充值 nonce 响应
+type GetDepositNonceRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nonce         string                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce" dc:"随机数"`                               // 随机数
+	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp" dc:"时间戳"`                      // 时间戳
+	ExpiresIn     int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"过期时间（秒）"` // 过期时间（秒）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDepositNonceRes) Reset() {
+	*x = GetDepositNonceRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDepositNonceRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDepositNonceRes) ProtoMessage() {}
+
+func (x *GetDepositNonceRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDepositNonceRes.ProtoReflect.Descriptor instead.
+func (*GetDepositNonceRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetDepositNonceRes) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+func (x *GetDepositNonceRes) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *GetDepositNonceRes) GetExpiresIn() int64 {
+	if x != nil {
+		return x.ExpiresIn
+	}
+	return 0
+}
+
+// 获取提现 nonce 请求
+type GetWithdrawNonceReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWithdrawNonceReq) Reset() {
+	*x = GetWithdrawNonceReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWithdrawNonceReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWithdrawNonceReq) ProtoMessage() {}
+
+func (x *GetWithdrawNonceReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWithdrawNonceReq.ProtoReflect.Descriptor instead.
+func (*GetWithdrawNonceReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{29}
+}
+
+// 获取提现 nonce 响应
+type GetWithdrawNonceRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nonce         string                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce" dc:"随机数"`                               // 随机数
+	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp" dc:"时间戳"`                      // 时间戳
+	ExpiresIn     int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"过期时间（秒）"` // 过期时间（秒）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWithdrawNonceRes) Reset() {
+	*x = GetWithdrawNonceRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWithdrawNonceRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWithdrawNonceRes) ProtoMessage() {}
+
+func (x *GetWithdrawNonceRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWithdrawNonceRes.ProtoReflect.Descriptor instead.
+func (*GetWithdrawNonceRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *GetWithdrawNonceRes) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+func (x *GetWithdrawNonceRes) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *GetWithdrawNonceRes) GetExpiresIn() int64 {
+	if x != nil {
+		return x.ExpiresIn
+	}
+	return 0
+}
+
+// 创建充值订单请求
+type CreateDepositOrderReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PaymentId     int32                  `protobuf:"varint,1,opt,name=payment_id,json=paymentId,proto3" json:"payment_id" dc:"支付方式ID"`                       // 支付方式ID
+	Money         float64                `protobuf:"fixed64,2,opt,name=money,proto3" json:"money" dc:"充值金额"`                                                 // 充值金额
+	OrderType     string                 `protobuf:"bytes,3,opt,name=order_type,json=orderType,proto3" json:"order_type" dc:"订单类型: deposit=充值, withdraw=提现"` // 订单类型: deposit=充值, withdraw=提现
+	UserCardNo    string                 `protobuf:"bytes,4,opt,name=user_card_no,json=userCardNo,proto3" json:"user_card_no" dc:"用户银行卡号(可选)"`               // 用户银行卡号(可选)
+	UserCardName  string                 `protobuf:"bytes,5,opt,name=user_card_name,json=userCardName,proto3" json:"user_card_name" dc:"用户银行卡姓名(可选)"`        // 用户银行卡姓名(可选)
+	Nonce         string                 `protobuf:"bytes,6,opt,name=nonce,proto3" json:"nonce" dc:"防重放随机数"`                                                 // 防重放随机数
+	BankCode      string                 `protobuf:"bytes,7,opt,name=bank_code,json=bankCode,proto3" json:"bank_code" dc:"银行代码(可选)"`                         // 银行代码(可选)
+	Mobile        int32                  `protobuf:"varint,8,opt,name=mobile,proto3" json:"mobile" dc:"是否手机端: 1=是, 0=否"`                                     // 是否手机端: 1=是, 0=否
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDepositOrderReq) Reset() {
+	*x = CreateDepositOrderReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDepositOrderReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDepositOrderReq) ProtoMessage() {}
+
+func (x *CreateDepositOrderReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDepositOrderReq.ProtoReflect.Descriptor instead.
+func (*CreateDepositOrderReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *CreateDepositOrderReq) GetPaymentId() int32 {
+	if x != nil {
+		return x.PaymentId
+	}
+	return 0
+}
+
+func (x *CreateDepositOrderReq) GetMoney() float64 {
+	if x != nil {
+		return x.Money
+	}
+	return 0
+}
+
+func (x *CreateDepositOrderReq) GetOrderType() string {
+	if x != nil {
+		return x.OrderType
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderReq) GetUserCardNo() string {
+	if x != nil {
+		return x.UserCardNo
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderReq) GetUserCardName() string {
+	if x != nil {
+		return x.UserCardName
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderReq) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderReq) GetBankCode() string {
+	if x != nil {
+		return x.BankCode
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderReq) GetMobile() int32 {
+	if x != nil {
+		return x.Mobile
+	}
+	return 0
+}
+
+// 创建充值订单响应
+type CreateDepositOrderRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderSn       string                 `protobuf:"bytes,1,opt,name=order_sn,json=orderSn,proto3" json:"order_sn" dc:"系统订单号"`                    // 系统订单号
+	SysTradeNo    string                 `protobuf:"bytes,2,opt,name=sys_trade_no,json=sysTradeNo,proto3" json:"sys_trade_no" dc:"平台交易流水号"`       // 平台交易流水号
+	ChannelCardNo string                 `protobuf:"bytes,3,opt,name=channel_card_no,json=channelCardNo,proto3" json:"channel_card_no" dc:"收款卡号"` // 收款卡号
+	ChannelName   string                 `protobuf:"bytes,4,opt,name=channel_name,json=channelName,proto3" json:"channel_name" dc:"渠道名称"`         // 渠道名称
+	ImageUrl      string                 `protobuf:"bytes,5,opt,name=image_url,json=imageUrl,proto3" json:"image_url" dc:"支付引导图"`                 // 支付引导图
+	Result        string                 `protobuf:"bytes,6,opt,name=result,proto3" json:"result" dc:"返回信息"`                                      // 返回信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDepositOrderRes) Reset() {
+	*x = CreateDepositOrderRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDepositOrderRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDepositOrderRes) ProtoMessage() {}
+
+func (x *CreateDepositOrderRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDepositOrderRes.ProtoReflect.Descriptor instead.
+func (*CreateDepositOrderRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *CreateDepositOrderRes) GetOrderSn() string {
+	if x != nil {
+		return x.OrderSn
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderRes) GetSysTradeNo() string {
+	if x != nil {
+		return x.SysTradeNo
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderRes) GetChannelCardNo() string {
+	if x != nil {
+		return x.ChannelCardNo
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderRes) GetChannelName() string {
+	if x != nil {
+		return x.ChannelName
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderRes) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
+func (x *CreateDepositOrderRes) GetResult() string {
+	if x != nil {
+		return x.Result
+	}
+	return ""
+}
+
+// 获取账户明细请求
+type GetBalanceLogReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Start         string                 `protobuf:"bytes,1,opt,name=start,proto3" json:"start" dc:"开始时间 格式: 2024-01-01 00:00:00"`     // 开始时间 格式: 2024-01-01 00:00:00
+	End           string                 `protobuf:"bytes,2,opt,name=end,proto3" json:"end" dc:"结束时间 格式: 2024-01-01 23:59:59"`         // 结束时间 格式: 2024-01-01 23:59:59
+	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type" dc:"类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账"`  // 类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status" dc:"状态0=初始化，1=待处理；2=处理中；3=成功；4=失败"` // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
+	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page" dc:"页码"`                                // 页码
+	Size          int32                  `protobuf:"varint,6,opt,name=size,proto3" json:"size" dc:"每页数量"`                              // 每页数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBalanceLogReq) Reset() {
+	*x = GetBalanceLogReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBalanceLogReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBalanceLogReq) ProtoMessage() {}
+
+func (x *GetBalanceLogReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBalanceLogReq.ProtoReflect.Descriptor instead.
+func (*GetBalanceLogReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *GetBalanceLogReq) GetStart() string {
+	if x != nil {
+		return x.Start
+	}
+	return ""
+}
+
+func (x *GetBalanceLogReq) GetEnd() string {
+	if x != nil {
+		return x.End
+	}
+	return ""
+}
+
+func (x *GetBalanceLogReq) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *GetBalanceLogReq) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *GetBalanceLogReq) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetBalanceLogReq) GetSize() int32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+// 账户明细项
+type BalanceLogItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Channel       string                 `protobuf:"bytes,1,opt,name=channel,proto3" json:"channel" dc:"渠道名称"`                                    // 渠道名称
+	ChangeType    int32                  `protobuf:"varint,2,opt,name=change_type,json=changeType,proto3" json:"change_type" dc:"交易类型 1=转入 2=转出"` // 交易类型 1=转入 2=转出
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no" dc:"订单号"`                      // 订单号
+	Money         float64                `protobuf:"fixed64,4,opt,name=money,proto3" json:"money" dc:"金额"`                                        // 金额
+	Remark        string                 `protobuf:"bytes,5,opt,name=remark,proto3" json:"remark" dc:"备注"`                                        // 备注
+	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type" dc:"类型 1=充值 2=提款 3=红利 4=返水 5=转账"`                  // 类型 1=充值 2=提款 3=红利 4=返水 5=转账
+	Symbol        string                 `protobuf:"bytes,7,opt,name=symbol,proto3" json:"symbol" dc:"符号 + 或 -"`                                  // 符号 + 或 -
+	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status" dc:"状态0=初始化，1=待处理；2=处理中；3=成功；4=失败"`            // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
+	Time          string                 `protobuf:"bytes,9,opt,name=time,proto3" json:"time" dc:"时间"`                                            // 时间
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BalanceLogItem) Reset() {
+	*x = BalanceLogItem{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BalanceLogItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BalanceLogItem) ProtoMessage() {}
+
+func (x *BalanceLogItem) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BalanceLogItem.ProtoReflect.Descriptor instead.
+func (*BalanceLogItem) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *BalanceLogItem) GetChannel() string {
+	if x != nil {
+		return x.Channel
+	}
+	return ""
+}
+
+func (x *BalanceLogItem) GetChangeType() int32 {
+	if x != nil {
+		return x.ChangeType
+	}
+	return 0
+}
+
+func (x *BalanceLogItem) GetTradeNo() string {
+	if x != nil {
+		return x.TradeNo
+	}
+	return ""
+}
+
+func (x *BalanceLogItem) GetMoney() float64 {
+	if x != nil {
+		return x.Money
+	}
+	return 0
+}
+
+func (x *BalanceLogItem) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+func (x *BalanceLogItem) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *BalanceLogItem) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *BalanceLogItem) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *BalanceLogItem) GetTime() string {
+	if x != nil {
+		return x.Time
+	}
+	return ""
+}
+
+// 获取账户明细响应
+type GetBalanceLogRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TotalRecharge float64                `protobuf:"fixed64,1,opt,name=total_recharge,json=totalRecharge,proto3" json:"total_recharge" dc:"充值总计"` // 充值总计
+	TotalWithdraw float64                `protobuf:"fixed64,2,opt,name=total_withdraw,json=totalWithdraw,proto3" json:"total_withdraw" dc:"提现总计"` // 提现总计
+	TotalBonus    float64                `protobuf:"fixed64,3,opt,name=total_bonus,json=totalBonus,proto3" json:"total_bonus" dc:"红利总计"`          // 红利总计
+	TotalRebate   float64                `protobuf:"fixed64,4,opt,name=total_rebate,json=totalRebate,proto3" json:"total_rebate" dc:"返水总计"`       // 返水总计
+	List          []*BalanceLogItem      `protobuf:"bytes,5,rep,name=list,proto3" json:"list" dc:"明细列表"`                                          // 明细列表
+	Count         int32                  `protobuf:"varint,6,opt,name=count,proto3" json:"count" dc:"总数"`                                         // 总数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBalanceLogRes) Reset() {
+	*x = GetBalanceLogRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBalanceLogRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBalanceLogRes) ProtoMessage() {}
+
+func (x *GetBalanceLogRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBalanceLogRes.ProtoReflect.Descriptor instead.
+func (*GetBalanceLogRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *GetBalanceLogRes) GetTotalRecharge() float64 {
+	if x != nil {
+		return x.TotalRecharge
+	}
+	return 0
+}
+
+func (x *GetBalanceLogRes) GetTotalWithdraw() float64 {
+	if x != nil {
+		return x.TotalWithdraw
+	}
+	return 0
+}
+
+func (x *GetBalanceLogRes) GetTotalBonus() float64 {
+	if x != nil {
+		return x.TotalBonus
+	}
+	return 0
+}
+
+func (x *GetBalanceLogRes) GetTotalRebate() float64 {
+	if x != nil {
+		return x.TotalRebate
+	}
+	return 0
+}
+
+func (x *GetBalanceLogRes) GetList() []*BalanceLogItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *GetBalanceLogRes) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+// 获取用户流水要求列表请求
+type GetUserFlowRequirementsReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        int32                  `protobuf:"varint,1,opt,name=status,proto3" json:"status" dc:"-1=全部"` // -1=全部
+	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page"`
+	Size          int32                  `protobuf:"varint,3,opt,name=size,proto3" json:"size"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserFlowRequirementsReq) Reset() {
+	*x = GetUserFlowRequirementsReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserFlowRequirementsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserFlowRequirementsReq) ProtoMessage() {}
+
+func (x *GetUserFlowRequirementsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserFlowRequirementsReq.ProtoReflect.Descriptor instead.
+func (*GetUserFlowRequirementsReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GetUserFlowRequirementsReq) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *GetUserFlowRequirementsReq) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetUserFlowRequirementsReq) GetSize() int32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+// 用户流水要求信息
+type UserFlowRequirementInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
+	SourceType    int32                  `protobuf:"varint,2,opt,name=source_type,json=sourceType,proto3" json:"source_type"`
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no"`
+	Amount        float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount"`
+	BonusAmount   float64                `protobuf:"fixed64,5,opt,name=bonus_amount,json=bonusAmount,proto3" json:"bonus_amount"`
+	FlowMultiple  float64                `protobuf:"fixed64,6,opt,name=flow_multiple,json=flowMultiple,proto3" json:"flow_multiple"`
+	RequiredFlow  float64                `protobuf:"fixed64,7,opt,name=required_flow,json=requiredFlow,proto3" json:"required_flow"`
+	CompletedFlow float64                `protobuf:"fixed64,8,opt,name=completed_flow,json=completedFlow,proto3" json:"completed_flow"`
+	RemainingFlow float64                `protobuf:"fixed64,9,opt,name=remaining_flow,json=remainingFlow,proto3" json:"remaining_flow"`
+	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status"`
+	Progress      float64                `protobuf:"fixed64,11,opt,name=progress,proto3" json:"progress"`
+	StartTime     string                 `protobuf:"bytes,12,opt,name=start_time,json=startTime,proto3" json:"start_time"`
+	ExpireTime    string                 `protobuf:"bytes,13,opt,name=expire_time,json=expireTime,proto3" json:"expire_time"`
+	CompleteTime  string                 `protobuf:"bytes,14,opt,name=complete_time,json=completeTime,proto3" json:"complete_time"`
+	Remark        string                 `protobuf:"bytes,15,opt,name=remark,proto3" json:"remark"`
+	CreatedAt     string                 `protobuf:"bytes,16,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserFlowRequirementInfo) Reset() {
+	*x = UserFlowRequirementInfo{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserFlowRequirementInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserFlowRequirementInfo) ProtoMessage() {}
+
+func (x *UserFlowRequirementInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserFlowRequirementInfo.ProtoReflect.Descriptor instead.
+func (*UserFlowRequirementInfo) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *UserFlowRequirementInfo) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetSourceType() int32 {
+	if x != nil {
+		return x.SourceType
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetTradeNo() string {
+	if x != nil {
+		return x.TradeNo
+	}
+	return ""
+}
+
+func (x *UserFlowRequirementInfo) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetBonusAmount() float64 {
+	if x != nil {
+		return x.BonusAmount
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetFlowMultiple() float64 {
+	if x != nil {
+		return x.FlowMultiple
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetRequiredFlow() float64 {
+	if x != nil {
+		return x.RequiredFlow
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetCompletedFlow() float64 {
+	if x != nil {
+		return x.CompletedFlow
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetRemainingFlow() float64 {
+	if x != nil {
+		return x.RemainingFlow
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetProgress() float64 {
+	if x != nil {
+		return x.Progress
+	}
+	return 0
+}
+
+func (x *UserFlowRequirementInfo) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *UserFlowRequirementInfo) GetExpireTime() string {
+	if x != nil {
+		return x.ExpireTime
+	}
+	return ""
+}
+
+func (x *UserFlowRequirementInfo) GetCompleteTime() string {
+	if x != nil {
+		return x.CompleteTime
+	}
+	return ""
+}
+
+func (x *UserFlowRequirementInfo) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+func (x *UserFlowRequirementInfo) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// 获取用户流水要求列表响应
+type GetUserFlowRequirementsRes struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	List          []*UserFlowRequirementInfo `protobuf:"bytes,1,rep,name=list,proto3" json:"list"`
+	Count         int32                      `protobuf:"varint,2,opt,name=count,proto3" json:"count"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserFlowRequirementsRes) Reset() {
+	*x = GetUserFlowRequirementsRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserFlowRequirementsRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserFlowRequirementsRes) ProtoMessage() {}
+
+func (x *GetUserFlowRequirementsRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserFlowRequirementsRes.ProtoReflect.Descriptor instead.
+func (*GetUserFlowRequirementsRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetUserFlowRequirementsRes) GetList() []*UserFlowRequirementInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *GetUserFlowRequirementsRes) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+// 充值异步回调请求
+type DepositCallbackReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TradeStatus   string                 `protobuf:"bytes,1,opt,name=trade_status,json=tradeStatus,proto3" json:"trade_status" dc:"交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;"` // 交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;
+	OrderSn       string                 `protobuf:"bytes,2,opt,name=order_sn,json=orderSn,proto3" json:"order_sn" dc:"订单号"`                                                         // 订单号
+	ActualAmount  float64                `protobuf:"fixed64,3,opt,name=actual_amount,json=actualAmount,proto3" json:"actual_amount" dc:"实际支付金额"`                                     // 实际支付金额
+	Sign          string                 `protobuf:"bytes,4,opt,name=sign,proto3" json:"sign" dc:"签名（可选，用于验证）"`                                                                      // 签名（可选，用于验证）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DepositCallbackReq) Reset() {
+	*x = DepositCallbackReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DepositCallbackReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DepositCallbackReq) ProtoMessage() {}
+
+func (x *DepositCallbackReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DepositCallbackReq.ProtoReflect.Descriptor instead.
+func (*DepositCallbackReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *DepositCallbackReq) GetTradeStatus() string {
+	if x != nil {
+		return x.TradeStatus
+	}
+	return ""
+}
+
+func (x *DepositCallbackReq) GetOrderSn() string {
+	if x != nil {
+		return x.OrderSn
+	}
+	return ""
+}
+
+func (x *DepositCallbackReq) GetActualAmount() float64 {
+	if x != nil {
+		return x.ActualAmount
+	}
+	return 0
+}
+
+func (x *DepositCallbackReq) GetSign() string {
+	if x != nil {
+		return x.Sign
+	}
+	return ""
+}
+
+// 充值异步回调响应
+type DepositCallbackRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DepositCallbackRes) Reset() {
+	*x = DepositCallbackRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DepositCallbackRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DepositCallbackRes) ProtoMessage() {}
+
+func (x *DepositCallbackRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DepositCallbackRes.ProtoReflect.Descriptor instead.
+func (*DepositCallbackRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *DepositCallbackRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DepositCallbackRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 申请提现请求
+type WithdrawReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Money         float64                `protobuf:"fixed64,1,opt,name=money,proto3" json:"money" dc:"提现金额"`                              // 提现金额
+	WithdrawId    int32                  `protobuf:"varint,2,opt,name=withdraw_id,json=withdrawId,proto3" json:"withdraw_id" dc:"提现渠道ID"` // 提现渠道ID
+	Nonce         string                 `protobuf:"bytes,3,opt,name=nonce,proto3" json:"nonce" dc:"防重放随机数"`                              // 防重放随机数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawReq) Reset() {
+	*x = WithdrawReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawReq) ProtoMessage() {}
+
+func (x *WithdrawReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawReq.ProtoReflect.Descriptor instead.
+func (*WithdrawReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *WithdrawReq) GetMoney() float64 {
+	if x != nil {
+		return x.Money
+	}
+	return 0
+}
+
+func (x *WithdrawReq) GetWithdrawId() int32 {
+	if x != nil {
+		return x.WithdrawId
+	}
+	return 0
+}
+
+func (x *WithdrawReq) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+// 申请提现响应
+type WithdrawRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"`              // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`                 // 消息
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no" dc:"订单号"` // 订单号
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawRes) Reset() {
+	*x = WithdrawRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawRes) ProtoMessage() {}
+
+func (x *WithdrawRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawRes.ProtoReflect.Descriptor instead.
+func (*WithdrawRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *WithdrawRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *WithdrawRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *WithdrawRes) GetTradeNo() string {
+	if x != nil {
+		return x.TradeNo
+	}
+	return ""
+}
+
+// 发放邀请红利请求
+type GrantInviteBonusReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
+	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount" dc:"红利金额"`              // 红利金额
+	Remark        string                 `protobuf:"bytes,4,opt,name=remark,proto3" json:"remark" dc:"备注"`                  // 备注
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrantInviteBonusReq) Reset() {
+	*x = GrantInviteBonusReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrantInviteBonusReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantInviteBonusReq) ProtoMessage() {}
+
+func (x *GrantInviteBonusReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrantInviteBonusReq.ProtoReflect.Descriptor instead.
+func (*GrantInviteBonusReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *GrantInviteBonusReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *GrantInviteBonusReq) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *GrantInviteBonusReq) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *GrantInviteBonusReq) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+// 发放邀请红利响应
+type GrantInviteBonusRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"`              // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`                 // 消息
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no" dc:"流水号"` // 流水号
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrantInviteBonusRes) Reset() {
+	*x = GrantInviteBonusRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrantInviteBonusRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantInviteBonusRes) ProtoMessage() {}
+
+func (x *GrantInviteBonusRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrantInviteBonusRes.ProtoReflect.Descriptor instead.
+func (*GrantInviteBonusRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *GrantInviteBonusRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GrantInviteBonusRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GrantInviteBonusRes) GetTradeNo() string {
+	if x != nil {
+		return x.TradeNo
+	}
+	return ""
+}
+
+// 获取邀请红利统计请求
+type GetInviteBonusSummaryReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInviteBonusSummaryReq) Reset() {
+	*x = GetInviteBonusSummaryReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInviteBonusSummaryReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInviteBonusSummaryReq) ProtoMessage() {}
+
+func (x *GetInviteBonusSummaryReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInviteBonusSummaryReq.ProtoReflect.Descriptor instead.
+func (*GetInviteBonusSummaryReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *GetInviteBonusSummaryReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *GetInviteBonusSummaryReq) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+// 获取邀请红利统计响应
+type GetInviteBonusSummaryRes struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TodayAmount     float64                `protobuf:"fixed64,1,opt,name=today_amount,json=todayAmount,proto3" json:"today_amount" dc:"今日邀请红利"`             // 今日邀请红利
+	YesterdayAmount float64                `protobuf:"fixed64,2,opt,name=yesterday_amount,json=yesterdayAmount,proto3" json:"yesterday_amount" dc:"昨日邀请红利"` // 昨日邀请红利
+	TotalAmount     float64                `protobuf:"fixed64,3,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount" dc:"总邀请红利"`              // 总邀请红利
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetInviteBonusSummaryRes) Reset() {
+	*x = GetInviteBonusSummaryRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInviteBonusSummaryRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInviteBonusSummaryRes) ProtoMessage() {}
+
+func (x *GetInviteBonusSummaryRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInviteBonusSummaryRes.ProtoReflect.Descriptor instead.
+func (*GetInviteBonusSummaryRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *GetInviteBonusSummaryRes) GetTodayAmount() float64 {
+	if x != nil {
+		return x.TodayAmount
+	}
+	return 0
+}
+
+func (x *GetInviteBonusSummaryRes) GetYesterdayAmount() float64 {
+	if x != nil {
+		return x.YesterdayAmount
+	}
+	return 0
+}
+
+func (x *GetInviteBonusSummaryRes) GetTotalAmount() float64 {
+	if x != nil {
+		return x.TotalAmount
+	}
+	return 0
+}
+
 var File_grpc_balance_v1_balance_proto protoreflect.FileDescriptor
 
 const file_grpc_balance_v1_balance_proto_rawDesc = "" +
@@ -156,9 +3117,259 @@ const file_grpc_balance_v1_balance_proto_rawDesc = "" +
 	"\bcurrency\x18\x04 \x01(\tR\bcurrency\"H\n" +
 	"\x12InitBalanceUserRes\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2j\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x13\n" +
+	"\x11RefreshBalanceReq\"l\n" +
+	"\x11RefreshBalanceRes\x12\x18\n" +
+	"\abalance\x18\x01 \x01(\tR\abalance\x12%\n" +
+	"\x0ebalance_frozen\x18\x02 \x01(\tR\rbalanceFrozen\x12\x16\n" +
+	"\x06points\x18\x03 \x01(\x03R\x06points\"\xc1\x01\n" +
+	"\x10AdjustBalanceReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x05R\x06userId\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x02R\x06amount\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\x05R\x04type\x12\x1b\n" +
+	"\tgame_name\x18\x05 \x01(\tR\bgameName\x12\x17\n" +
+	"\agame_id\x18\x06 \x01(\tR\x06gameId\x12\x19\n" +
+	"\bgame_key\x18\a \x01(\tR\agameKey\"{\n" +
+	"\x10AdjustBalanceRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\abalance\x18\x03 \x01(\tR\abalance\x12\x19\n" +
+	"\border_no\x18\x04 \x01(\tR\aorderNo\"4\n" +
+	"\x17UpdateTransferStatusReq\x12\x19\n" +
+	"\border_no\x18\x01 \x01(\tR\aorderNo\"M\n" +
+	"\x17UpdateTransferStatusRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"{\n" +
+	"\x14CompensateBalanceReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x05R\x06userId\x12\x19\n" +
+	"\border_no\x18\x03 \x01(\tR\aorderNo\x12\x16\n" +
+	"\x06amount\x18\x04 \x01(\x02R\x06amount\"J\n" +
+	"\x14CompensateBalanceRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"L\n" +
+	"\x18GetLastBalanceLogGameReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x05R\x06userId\"K\n" +
+	"\x18GetLastBalanceLogGameRes\x12\x17\n" +
+	"\agame_id\x18\x01 \x01(\x05R\x06gameId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x02R\x06amount\"\x13\n" +
+	"\x11GetPaymentListReq\"\xdf\x02\n" +
+	"\vPaymentInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
+	"\asite_id\x18\x02 \x01(\x05R\x06siteId\x12\x1d\n" +
+	"\n" +
+	"payment_id\x18\x03 \x01(\x05R\tpaymentId\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x12\n" +
+	"\x04code\x18\x05 \x01(\tR\x04code\x12\x18\n" +
+	"\agateway\x18\x06 \x01(\x05R\agateway\x12\x19\n" +
+	"\beach_min\x18\a \x01(\x02R\aeachMin\x12\x19\n" +
+	"\beach_max\x18\b \x01(\x02R\aeachMax\x12\x12\n" +
+	"\x04sort\x18\t \x01(\x05R\x04sort\x12\x1d\n" +
+	"\n" +
+	"money_list\x18\n" +
+	" \x03(\tR\tmoneyList\x12\x19\n" +
+	"\bis_input\x18\v \x01(\x05R\aisInput\x12\x16\n" +
+	"\x06remark\x18\f \x01(\tR\x06remark\x12\x12\n" +
+	"\x04logo\x18\r \x01(\tR\x04logo\x12\x16\n" +
+	"\x06status\x18\x0e \x01(\x05R\x06status\"F\n" +
+	"\x11GetPaymentListRes\x121\n" +
+	"\x04list\x18\x01 \x03(\v2\x1d.frontend_balance.PaymentInfoR\x04list\"\x14\n" +
+	"\x12GetWithdrawListReq\"\xe2\x02\n" +
+	"\fWithdrawInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
+	"\asite_id\x18\x02 \x01(\x05R\x06siteId\x12\x1f\n" +
+	"\vwithdraw_id\x18\x03 \x01(\x05R\n" +
+	"withdrawId\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x12\n" +
+	"\x04code\x18\x05 \x01(\tR\x04code\x12\x18\n" +
+	"\agateway\x18\x06 \x01(\x05R\agateway\x12\x19\n" +
+	"\beach_min\x18\a \x01(\x02R\aeachMin\x12\x19\n" +
+	"\beach_max\x18\b \x01(\x02R\aeachMax\x12\x12\n" +
+	"\x04sort\x18\t \x01(\x05R\x04sort\x12\x1d\n" +
+	"\n" +
+	"money_list\x18\n" +
+	" \x03(\tR\tmoneyList\x12\x19\n" +
+	"\bis_input\x18\v \x01(\x05R\aisInput\x12\x16\n" +
+	"\x06remark\x18\f \x01(\tR\x06remark\x12\x12\n" +
+	"\x04logo\x18\r \x01(\tR\x04logo\x12\x16\n" +
+	"\x06status\x18\x0e \x01(\x05R\x06status\"H\n" +
+	"\x12GetWithdrawListRes\x122\n" +
+	"\x04list\x18\x01 \x03(\v2\x1e.frontend_balance.WithdrawInfoR\x04list\"\x7f\n" +
+	"\x0eAddBankCardReq\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\x05R\x04type\x12!\n" +
+	"\fcard_account\x18\x02 \x01(\tR\vcardAccount\x12\x17\n" +
+	"\acard_no\x18\x03 \x01(\tR\x06cardNo\x12\x1d\n" +
+	"\n" +
+	"is_default\x18\x04 \x01(\x05R\tisDefault\"D\n" +
+	"\x0eAddBankCardRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x14\n" +
+	"\x12GetBankCardListReq\"\xac\x01\n" +
+	"\fBankCardInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\x05R\x04type\x12!\n" +
+	"\fcard_account\x18\x03 \x01(\tR\vcardAccount\x12\x17\n" +
+	"\acard_no\x18\x04 \x01(\tR\x06cardNo\x12\x1d\n" +
+	"\n" +
+	"is_default\x18\x05 \x01(\x05R\tisDefault\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\"H\n" +
+	"\x12GetBankCardListRes\x122\n" +
+	"\x04list\x18\x01 \x03(\v2\x1e.frontend_balance.BankCardInfoR\x04list\"#\n" +
+	"\x11DeleteBankCardReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"G\n" +
+	"\x11DeleteBankCardRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"'\n" +
+	"\x15SetDefaultBankCardReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"K\n" +
+	"\x15SetDefaultBankCardRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x14\n" +
+	"\x12GetDepositNonceReq\"g\n" +
+	"\x12GetDepositNonceRes\x12\x14\n" +
+	"\x05nonce\x18\x01 \x01(\tR\x05nonce\x12\x1c\n" +
+	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x1d\n" +
+	"\n" +
+	"expires_in\x18\x03 \x01(\x03R\texpiresIn\"\x15\n" +
+	"\x13GetWithdrawNonceReq\"h\n" +
+	"\x13GetWithdrawNonceRes\x12\x14\n" +
+	"\x05nonce\x18\x01 \x01(\tR\x05nonce\x12\x1c\n" +
+	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x1d\n" +
+	"\n" +
+	"expires_in\x18\x03 \x01(\x03R\texpiresIn\"\xfe\x01\n" +
+	"\x15CreateDepositOrderReq\x12\x1d\n" +
+	"\n" +
+	"payment_id\x18\x01 \x01(\x05R\tpaymentId\x12\x14\n" +
+	"\x05money\x18\x02 \x01(\x01R\x05money\x12\x1d\n" +
+	"\n" +
+	"order_type\x18\x03 \x01(\tR\torderType\x12 \n" +
+	"\fuser_card_no\x18\x04 \x01(\tR\n" +
+	"userCardNo\x12$\n" +
+	"\x0euser_card_name\x18\x05 \x01(\tR\fuserCardName\x12\x14\n" +
+	"\x05nonce\x18\x06 \x01(\tR\x05nonce\x12\x1b\n" +
+	"\tbank_code\x18\a \x01(\tR\bbankCode\x12\x16\n" +
+	"\x06mobile\x18\b \x01(\x05R\x06mobile\"\xd4\x01\n" +
+	"\x15CreateDepositOrderRes\x12\x19\n" +
+	"\border_sn\x18\x01 \x01(\tR\aorderSn\x12 \n" +
+	"\fsys_trade_no\x18\x02 \x01(\tR\n" +
+	"sysTradeNo\x12&\n" +
+	"\x0fchannel_card_no\x18\x03 \x01(\tR\rchannelCardNo\x12!\n" +
+	"\fchannel_name\x18\x04 \x01(\tR\vchannelName\x12\x1b\n" +
+	"\timage_url\x18\x05 \x01(\tR\bimageUrl\x12\x16\n" +
+	"\x06result\x18\x06 \x01(\tR\x06result\"\x8e\x01\n" +
+	"\x10GetBalanceLogReq\x12\x14\n" +
+	"\x05start\x18\x01 \x01(\tR\x05start\x12\x10\n" +
+	"\x03end\x18\x02 \x01(\tR\x03end\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\x05R\x04type\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x12\n" +
+	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x12\n" +
+	"\x04size\x18\x06 \x01(\x05R\x04size\"\xec\x01\n" +
+	"\x0eBalanceLogItem\x12\x18\n" +
+	"\achannel\x18\x01 \x01(\tR\achannel\x12\x1f\n" +
+	"\vchange_type\x18\x02 \x01(\x05R\n" +
+	"changeType\x12\x19\n" +
+	"\btrade_no\x18\x03 \x01(\tR\atradeNo\x12\x14\n" +
+	"\x05money\x18\x04 \x01(\x01R\x05money\x12\x16\n" +
+	"\x06remark\x18\x05 \x01(\tR\x06remark\x12\x12\n" +
+	"\x04type\x18\x06 \x01(\x05R\x04type\x12\x16\n" +
+	"\x06symbol\x18\a \x01(\tR\x06symbol\x12\x16\n" +
+	"\x06status\x18\b \x01(\x05R\x06status\x12\x12\n" +
+	"\x04time\x18\t \x01(\tR\x04time\"\xf0\x01\n" +
+	"\x10GetBalanceLogRes\x12%\n" +
+	"\x0etotal_recharge\x18\x01 \x01(\x01R\rtotalRecharge\x12%\n" +
+	"\x0etotal_withdraw\x18\x02 \x01(\x01R\rtotalWithdraw\x12\x1f\n" +
+	"\vtotal_bonus\x18\x03 \x01(\x01R\n" +
+	"totalBonus\x12!\n" +
+	"\ftotal_rebate\x18\x04 \x01(\x01R\vtotalRebate\x124\n" +
+	"\x04list\x18\x05 \x03(\v2 .frontend_balance.BalanceLogItemR\x04list\x12\x14\n" +
+	"\x05count\x18\x06 \x01(\x05R\x05count\"\\\n" +
+	"\x1aGetUserFlowRequirementsReq\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\x05R\x06status\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x12\n" +
+	"\x04size\x18\x03 \x01(\x05R\x04size\"\x88\x04\n" +
+	"\x17UserFlowRequirementInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1f\n" +
+	"\vsource_type\x18\x02 \x01(\x05R\n" +
+	"sourceType\x12\x19\n" +
+	"\btrade_no\x18\x03 \x01(\tR\atradeNo\x12\x16\n" +
+	"\x06amount\x18\x04 \x01(\x01R\x06amount\x12!\n" +
+	"\fbonus_amount\x18\x05 \x01(\x01R\vbonusAmount\x12#\n" +
+	"\rflow_multiple\x18\x06 \x01(\x01R\fflowMultiple\x12#\n" +
+	"\rrequired_flow\x18\a \x01(\x01R\frequiredFlow\x12%\n" +
+	"\x0ecompleted_flow\x18\b \x01(\x01R\rcompletedFlow\x12%\n" +
+	"\x0eremaining_flow\x18\t \x01(\x01R\rremainingFlow\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\x05R\x06status\x12\x1a\n" +
+	"\bprogress\x18\v \x01(\x01R\bprogress\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\f \x01(\tR\tstartTime\x12\x1f\n" +
+	"\vexpire_time\x18\r \x01(\tR\n" +
+	"expireTime\x12#\n" +
+	"\rcomplete_time\x18\x0e \x01(\tR\fcompleteTime\x12\x16\n" +
+	"\x06remark\x18\x0f \x01(\tR\x06remark\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x10 \x01(\tR\tcreatedAt\"q\n" +
+	"\x1aGetUserFlowRequirementsRes\x12=\n" +
+	"\x04list\x18\x01 \x03(\v2).frontend_balance.UserFlowRequirementInfoR\x04list\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"\x8b\x01\n" +
+	"\x12DepositCallbackReq\x12!\n" +
+	"\ftrade_status\x18\x01 \x01(\tR\vtradeStatus\x12\x19\n" +
+	"\border_sn\x18\x02 \x01(\tR\aorderSn\x12#\n" +
+	"\ractual_amount\x18\x03 \x01(\x01R\factualAmount\x12\x12\n" +
+	"\x04sign\x18\x04 \x01(\tR\x04sign\"H\n" +
+	"\x12DepositCallbackRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"Z\n" +
+	"\vWithdrawReq\x12\x14\n" +
+	"\x05money\x18\x01 \x01(\x01R\x05money\x12\x1f\n" +
+	"\vwithdraw_id\x18\x02 \x01(\x05R\n" +
+	"withdrawId\x12\x14\n" +
+	"\x05nonce\x18\x03 \x01(\tR\x05nonce\"\\\n" +
+	"\vWithdrawRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
+	"\btrade_no\x18\x03 \x01(\tR\atradeNo\"w\n" +
+	"\x13GrantInviteBonusReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x05R\x06userId\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06remark\x18\x04 \x01(\tR\x06remark\"d\n" +
+	"\x13GrantInviteBonusRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
+	"\btrade_no\x18\x03 \x01(\tR\atradeNo\"L\n" +
+	"\x18GetInviteBonusSummaryReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x05R\x06userId\"\x8b\x01\n" +
+	"\x18GetInviteBonusSummaryRes\x12!\n" +
+	"\ftoday_amount\x18\x01 \x01(\x01R\vtodayAmount\x12)\n" +
+	"\x10yesterday_amount\x18\x02 \x01(\x01R\x0fyesterdayAmount\x12!\n" +
+	"\ftotal_amount\x18\x03 \x01(\x01R\vtotalAmount2\xb1\x10\n" +
 	"\aBalance\x12_\n" +
-	"\x0fInitBalanceUser\x12$.frontend_balance.InitBalanceUserReq\x1a$.frontend_balance.InitBalanceUserRes\"\x00B$Z\"jh_app_service/api/grpc/balance/v1b\x06proto3"
+	"\x0fInitBalanceUser\x12$.frontend_balance.InitBalanceUserReq\x1a$.frontend_balance.InitBalanceUserRes\"\x00\x12\\\n" +
+	"\x0eRefreshBalance\x12#.frontend_balance.RefreshBalanceReq\x1a#.frontend_balance.RefreshBalanceRes\"\x00\x12Y\n" +
+	"\rAdjustBalance\x12\".frontend_balance.AdjustBalanceReq\x1a\".frontend_balance.AdjustBalanceRes\"\x00\x12n\n" +
+	"\x14UpdateTransferStatus\x12).frontend_balance.UpdateTransferStatusReq\x1a).frontend_balance.UpdateTransferStatusRes\"\x00\x12e\n" +
+	"\x11CompensateBalance\x12&.frontend_balance.CompensateBalanceReq\x1a&.frontend_balance.CompensateBalanceRes\"\x00\x12q\n" +
+	"\x15GetLastBalanceLogGame\x12*.frontend_balance.GetLastBalanceLogGameReq\x1a*.frontend_balance.GetLastBalanceLogGameRes\"\x00\x12\\\n" +
+	"\x0eGetPaymentList\x12#.frontend_balance.GetPaymentListReq\x1a#.frontend_balance.GetPaymentListRes\"\x00\x12_\n" +
+	"\x0fGetWithdrawList\x12$.frontend_balance.GetWithdrawListReq\x1a$.frontend_balance.GetWithdrawListRes\"\x00\x12S\n" +
+	"\vAddBankCard\x12 .frontend_balance.AddBankCardReq\x1a .frontend_balance.AddBankCardRes\"\x00\x12_\n" +
+	"\x0fGetBankCardList\x12$.frontend_balance.GetBankCardListReq\x1a$.frontend_balance.GetBankCardListRes\"\x00\x12\\\n" +
+	"\x0eDeleteBankCard\x12#.frontend_balance.DeleteBankCardReq\x1a#.frontend_balance.DeleteBankCardRes\"\x00\x12h\n" +
+	"\x12SetDefaultBankCard\x12'.frontend_balance.SetDefaultBankCardReq\x1a'.frontend_balance.SetDefaultBankCardRes\"\x00\x12_\n" +
+	"\x0fGetDepositNonce\x12$.frontend_balance.GetDepositNonceReq\x1a$.frontend_balance.GetDepositNonceRes\"\x00\x12b\n" +
+	"\x10GetWithdrawNonce\x12%.frontend_balance.GetWithdrawNonceReq\x1a%.frontend_balance.GetWithdrawNonceRes\"\x00\x12h\n" +
+	"\x12CreateDepositOrder\x12'.frontend_balance.CreateDepositOrderReq\x1a'.frontend_balance.CreateDepositOrderRes\"\x00\x12Y\n" +
+	"\rGetBalanceLog\x12\".frontend_balance.GetBalanceLogReq\x1a\".frontend_balance.GetBalanceLogRes\"\x00\x12w\n" +
+	"\x17GetUserFlowRequirements\x12,.frontend_balance.GetUserFlowRequirementsReq\x1a,.frontend_balance.GetUserFlowRequirementsRes\"\x00\x12_\n" +
+	"\x0fDepositCallback\x12$.frontend_balance.DepositCallbackReq\x1a$.frontend_balance.DepositCallbackRes\"\x00\x12J\n" +
+	"\bWithdraw\x12\x1d.frontend_balance.WithdrawReq\x1a\x1d.frontend_balance.WithdrawRes\"\x00\x12b\n" +
+	"\x10GrantInviteBonus\x12%.frontend_balance.GrantInviteBonusReq\x1a%.frontend_balance.GrantInviteBonusRes\"\x00\x12q\n" +
+	"\x15GetInviteBonusSummary\x12*.frontend_balance.GetInviteBonusSummaryReq\x1a*.frontend_balance.GetInviteBonusSummaryRes\"\x00B$Z\"jh_app_service/api/grpc/balance/v1b\x06proto3"
 
 var (
 	file_grpc_balance_v1_balance_proto_rawDescOnce sync.Once
@@ -172,19 +3383,109 @@ func file_grpc_balance_v1_balance_proto_rawDescGZIP() []byte {
 	return file_grpc_balance_v1_balance_proto_rawDescData
 }
 
-var file_grpc_balance_v1_balance_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_grpc_balance_v1_balance_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_grpc_balance_v1_balance_proto_goTypes = []any{
-	(*InitBalanceUserReq)(nil), // 0: frontend_balance.InitBalanceUserReq
-	(*InitBalanceUserRes)(nil), // 1: frontend_balance.InitBalanceUserRes
+	(*InitBalanceUserReq)(nil),         // 0: frontend_balance.InitBalanceUserReq
+	(*InitBalanceUserRes)(nil),         // 1: frontend_balance.InitBalanceUserRes
+	(*RefreshBalanceReq)(nil),          // 2: frontend_balance.RefreshBalanceReq
+	(*RefreshBalanceRes)(nil),          // 3: frontend_balance.RefreshBalanceRes
+	(*AdjustBalanceReq)(nil),           // 4: frontend_balance.AdjustBalanceReq
+	(*AdjustBalanceRes)(nil),           // 5: frontend_balance.AdjustBalanceRes
+	(*UpdateTransferStatusReq)(nil),    // 6: frontend_balance.UpdateTransferStatusReq
+	(*UpdateTransferStatusRes)(nil),    // 7: frontend_balance.UpdateTransferStatusRes
+	(*CompensateBalanceReq)(nil),       // 8: frontend_balance.CompensateBalanceReq
+	(*CompensateBalanceRes)(nil),       // 9: frontend_balance.CompensateBalanceRes
+	(*GetLastBalanceLogGameReq)(nil),   // 10: frontend_balance.GetLastBalanceLogGameReq
+	(*GetLastBalanceLogGameRes)(nil),   // 11: frontend_balance.GetLastBalanceLogGameRes
+	(*GetPaymentListReq)(nil),          // 12: frontend_balance.GetPaymentListReq
+	(*PaymentInfo)(nil),                // 13: frontend_balance.PaymentInfo
+	(*GetPaymentListRes)(nil),          // 14: frontend_balance.GetPaymentListRes
+	(*GetWithdrawListReq)(nil),         // 15: frontend_balance.GetWithdrawListReq
+	(*WithdrawInfo)(nil),               // 16: frontend_balance.WithdrawInfo
+	(*GetWithdrawListRes)(nil),         // 17: frontend_balance.GetWithdrawListRes
+	(*AddBankCardReq)(nil),             // 18: frontend_balance.AddBankCardReq
+	(*AddBankCardRes)(nil),             // 19: frontend_balance.AddBankCardRes
+	(*GetBankCardListReq)(nil),         // 20: frontend_balance.GetBankCardListReq
+	(*BankCardInfo)(nil),               // 21: frontend_balance.BankCardInfo
+	(*GetBankCardListRes)(nil),         // 22: frontend_balance.GetBankCardListRes
+	(*DeleteBankCardReq)(nil),          // 23: frontend_balance.DeleteBankCardReq
+	(*DeleteBankCardRes)(nil),          // 24: frontend_balance.DeleteBankCardRes
+	(*SetDefaultBankCardReq)(nil),      // 25: frontend_balance.SetDefaultBankCardReq
+	(*SetDefaultBankCardRes)(nil),      // 26: frontend_balance.SetDefaultBankCardRes
+	(*GetDepositNonceReq)(nil),         // 27: frontend_balance.GetDepositNonceReq
+	(*GetDepositNonceRes)(nil),         // 28: frontend_balance.GetDepositNonceRes
+	(*GetWithdrawNonceReq)(nil),        // 29: frontend_balance.GetWithdrawNonceReq
+	(*GetWithdrawNonceRes)(nil),        // 30: frontend_balance.GetWithdrawNonceRes
+	(*CreateDepositOrderReq)(nil),      // 31: frontend_balance.CreateDepositOrderReq
+	(*CreateDepositOrderRes)(nil),      // 32: frontend_balance.CreateDepositOrderRes
+	(*GetBalanceLogReq)(nil),           // 33: frontend_balance.GetBalanceLogReq
+	(*BalanceLogItem)(nil),             // 34: frontend_balance.BalanceLogItem
+	(*GetBalanceLogRes)(nil),           // 35: frontend_balance.GetBalanceLogRes
+	(*GetUserFlowRequirementsReq)(nil), // 36: frontend_balance.GetUserFlowRequirementsReq
+	(*UserFlowRequirementInfo)(nil),    // 37: frontend_balance.UserFlowRequirementInfo
+	(*GetUserFlowRequirementsRes)(nil), // 38: frontend_balance.GetUserFlowRequirementsRes
+	(*DepositCallbackReq)(nil),         // 39: frontend_balance.DepositCallbackReq
+	(*DepositCallbackRes)(nil),         // 40: frontend_balance.DepositCallbackRes
+	(*WithdrawReq)(nil),                // 41: frontend_balance.WithdrawReq
+	(*WithdrawRes)(nil),                // 42: frontend_balance.WithdrawRes
+	(*GrantInviteBonusReq)(nil),        // 43: frontend_balance.GrantInviteBonusReq
+	(*GrantInviteBonusRes)(nil),        // 44: frontend_balance.GrantInviteBonusRes
+	(*GetInviteBonusSummaryReq)(nil),   // 45: frontend_balance.GetInviteBonusSummaryReq
+	(*GetInviteBonusSummaryRes)(nil),   // 46: frontend_balance.GetInviteBonusSummaryRes
 }
 var file_grpc_balance_v1_balance_proto_depIdxs = []int32{
-	0, // 0: frontend_balance.Balance.InitBalanceUser:input_type -> frontend_balance.InitBalanceUserReq
-	1, // 1: frontend_balance.Balance.InitBalanceUser:output_type -> frontend_balance.InitBalanceUserRes
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	13, // 0: frontend_balance.GetPaymentListRes.list:type_name -> frontend_balance.PaymentInfo
+	16, // 1: frontend_balance.GetWithdrawListRes.list:type_name -> frontend_balance.WithdrawInfo
+	21, // 2: frontend_balance.GetBankCardListRes.list:type_name -> frontend_balance.BankCardInfo
+	34, // 3: frontend_balance.GetBalanceLogRes.list:type_name -> frontend_balance.BalanceLogItem
+	37, // 4: frontend_balance.GetUserFlowRequirementsRes.list:type_name -> frontend_balance.UserFlowRequirementInfo
+	0,  // 5: frontend_balance.Balance.InitBalanceUser:input_type -> frontend_balance.InitBalanceUserReq
+	2,  // 6: frontend_balance.Balance.RefreshBalance:input_type -> frontend_balance.RefreshBalanceReq
+	4,  // 7: frontend_balance.Balance.AdjustBalance:input_type -> frontend_balance.AdjustBalanceReq
+	6,  // 8: frontend_balance.Balance.UpdateTransferStatus:input_type -> frontend_balance.UpdateTransferStatusReq
+	8,  // 9: frontend_balance.Balance.CompensateBalance:input_type -> frontend_balance.CompensateBalanceReq
+	10, // 10: frontend_balance.Balance.GetLastBalanceLogGame:input_type -> frontend_balance.GetLastBalanceLogGameReq
+	12, // 11: frontend_balance.Balance.GetPaymentList:input_type -> frontend_balance.GetPaymentListReq
+	15, // 12: frontend_balance.Balance.GetWithdrawList:input_type -> frontend_balance.GetWithdrawListReq
+	18, // 13: frontend_balance.Balance.AddBankCard:input_type -> frontend_balance.AddBankCardReq
+	20, // 14: frontend_balance.Balance.GetBankCardList:input_type -> frontend_balance.GetBankCardListReq
+	23, // 15: frontend_balance.Balance.DeleteBankCard:input_type -> frontend_balance.DeleteBankCardReq
+	25, // 16: frontend_balance.Balance.SetDefaultBankCard:input_type -> frontend_balance.SetDefaultBankCardReq
+	27, // 17: frontend_balance.Balance.GetDepositNonce:input_type -> frontend_balance.GetDepositNonceReq
+	29, // 18: frontend_balance.Balance.GetWithdrawNonce:input_type -> frontend_balance.GetWithdrawNonceReq
+	31, // 19: frontend_balance.Balance.CreateDepositOrder:input_type -> frontend_balance.CreateDepositOrderReq
+	33, // 20: frontend_balance.Balance.GetBalanceLog:input_type -> frontend_balance.GetBalanceLogReq
+	36, // 21: frontend_balance.Balance.GetUserFlowRequirements:input_type -> frontend_balance.GetUserFlowRequirementsReq
+	39, // 22: frontend_balance.Balance.DepositCallback:input_type -> frontend_balance.DepositCallbackReq
+	41, // 23: frontend_balance.Balance.Withdraw:input_type -> frontend_balance.WithdrawReq
+	43, // 24: frontend_balance.Balance.GrantInviteBonus:input_type -> frontend_balance.GrantInviteBonusReq
+	45, // 25: frontend_balance.Balance.GetInviteBonusSummary:input_type -> frontend_balance.GetInviteBonusSummaryReq
+	1,  // 26: frontend_balance.Balance.InitBalanceUser:output_type -> frontend_balance.InitBalanceUserRes
+	3,  // 27: frontend_balance.Balance.RefreshBalance:output_type -> frontend_balance.RefreshBalanceRes
+	5,  // 28: frontend_balance.Balance.AdjustBalance:output_type -> frontend_balance.AdjustBalanceRes
+	7,  // 29: frontend_balance.Balance.UpdateTransferStatus:output_type -> frontend_balance.UpdateTransferStatusRes
+	9,  // 30: frontend_balance.Balance.CompensateBalance:output_type -> frontend_balance.CompensateBalanceRes
+	11, // 31: frontend_balance.Balance.GetLastBalanceLogGame:output_type -> frontend_balance.GetLastBalanceLogGameRes
+	14, // 32: frontend_balance.Balance.GetPaymentList:output_type -> frontend_balance.GetPaymentListRes
+	17, // 33: frontend_balance.Balance.GetWithdrawList:output_type -> frontend_balance.GetWithdrawListRes
+	19, // 34: frontend_balance.Balance.AddBankCard:output_type -> frontend_balance.AddBankCardRes
+	22, // 35: frontend_balance.Balance.GetBankCardList:output_type -> frontend_balance.GetBankCardListRes
+	24, // 36: frontend_balance.Balance.DeleteBankCard:output_type -> frontend_balance.DeleteBankCardRes
+	26, // 37: frontend_balance.Balance.SetDefaultBankCard:output_type -> frontend_balance.SetDefaultBankCardRes
+	28, // 38: frontend_balance.Balance.GetDepositNonce:output_type -> frontend_balance.GetDepositNonceRes
+	30, // 39: frontend_balance.Balance.GetWithdrawNonce:output_type -> frontend_balance.GetWithdrawNonceRes
+	32, // 40: frontend_balance.Balance.CreateDepositOrder:output_type -> frontend_balance.CreateDepositOrderRes
+	35, // 41: frontend_balance.Balance.GetBalanceLog:output_type -> frontend_balance.GetBalanceLogRes
+	38, // 42: frontend_balance.Balance.GetUserFlowRequirements:output_type -> frontend_balance.GetUserFlowRequirementsRes
+	40, // 43: frontend_balance.Balance.DepositCallback:output_type -> frontend_balance.DepositCallbackRes
+	42, // 44: frontend_balance.Balance.Withdraw:output_type -> frontend_balance.WithdrawRes
+	44, // 45: frontend_balance.Balance.GrantInviteBonus:output_type -> frontend_balance.GrantInviteBonusRes
+	46, // 46: frontend_balance.Balance.GetInviteBonusSummary:output_type -> frontend_balance.GetInviteBonusSummaryRes
+	26, // [26:47] is the sub-list for method output_type
+	5,  // [5:26] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_grpc_balance_v1_balance_proto_init() }
@@ -198,7 +3499,7 @@ func file_grpc_balance_v1_balance_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_grpc_balance_v1_balance_proto_rawDesc), len(file_grpc_balance_v1_balance_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -7,6 +7,7 @@ import (
 
 type (
 	IUser interface {
+		IncreasePayTimes(ctx context.Context, req *v1.IncreasePayTimesReq) (*v1.IncreasePayTimesRes, error)
 		GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.GetUserListRes, error)
 		UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*v1.UpdateUserRes, error)
 		GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoReq) (*v1.GetUserBasicInfoRes, error)

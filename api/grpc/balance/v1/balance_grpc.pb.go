@@ -20,7 +20,27 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Balance_InitBalanceUser_FullMethodName = "/frontend_balance.Balance/InitBalanceUser"
+	Balance_InitBalanceUser_FullMethodName         = "/frontend_balance.Balance/InitBalanceUser"
+	Balance_RefreshBalance_FullMethodName          = "/frontend_balance.Balance/RefreshBalance"
+	Balance_AdjustBalance_FullMethodName           = "/frontend_balance.Balance/AdjustBalance"
+	Balance_UpdateTransferStatus_FullMethodName    = "/frontend_balance.Balance/UpdateTransferStatus"
+	Balance_CompensateBalance_FullMethodName       = "/frontend_balance.Balance/CompensateBalance"
+	Balance_GetLastBalanceLogGame_FullMethodName   = "/frontend_balance.Balance/GetLastBalanceLogGame"
+	Balance_GetPaymentList_FullMethodName          = "/frontend_balance.Balance/GetPaymentList"
+	Balance_GetWithdrawList_FullMethodName         = "/frontend_balance.Balance/GetWithdrawList"
+	Balance_AddBankCard_FullMethodName             = "/frontend_balance.Balance/AddBankCard"
+	Balance_GetBankCardList_FullMethodName         = "/frontend_balance.Balance/GetBankCardList"
+	Balance_DeleteBankCard_FullMethodName          = "/frontend_balance.Balance/DeleteBankCard"
+	Balance_SetDefaultBankCard_FullMethodName      = "/frontend_balance.Balance/SetDefaultBankCard"
+	Balance_GetDepositNonce_FullMethodName         = "/frontend_balance.Balance/GetDepositNonce"
+	Balance_GetWithdrawNonce_FullMethodName        = "/frontend_balance.Balance/GetWithdrawNonce"
+	Balance_CreateDepositOrder_FullMethodName      = "/frontend_balance.Balance/CreateDepositOrder"
+	Balance_GetBalanceLog_FullMethodName           = "/frontend_balance.Balance/GetBalanceLog"
+	Balance_GetUserFlowRequirements_FullMethodName = "/frontend_balance.Balance/GetUserFlowRequirements"
+	Balance_DepositCallback_FullMethodName         = "/frontend_balance.Balance/DepositCallback"
+	Balance_Withdraw_FullMethodName                = "/frontend_balance.Balance/Withdraw"
+	Balance_GrantInviteBonus_FullMethodName        = "/frontend_balance.Balance/GrantInviteBonus"
+	Balance_GetInviteBonusSummary_FullMethodName   = "/frontend_balance.Balance/GetInviteBonusSummary"
 )
 
 // BalanceClient is the client API for Balance service.
@@ -29,6 +49,46 @@ const (
 type BalanceClient interface {
 	// 初始化用户余额
 	InitBalanceUser(ctx context.Context, in *InitBalanceUserReq, opts ...grpc.CallOption) (*InitBalanceUserRes, error)
+	// 刷新用户余额
+	RefreshBalance(ctx context.Context, in *RefreshBalanceReq, opts ...grpc.CallOption) (*RefreshBalanceRes, error)
+	// 调整用户余额（加款/扣款）
+	AdjustBalance(ctx context.Context, in *AdjustBalanceReq, opts ...grpc.CallOption) (*AdjustBalanceRes, error)
+	// 更新转账状态（游戏转账成功后调用）
+	UpdateTransferStatus(ctx context.Context, in *UpdateTransferStatusReq, opts ...grpc.CallOption) (*UpdateTransferStatusRes, error)
+	// 补偿余额（游戏转账失败后调用）
+	CompensateBalance(ctx context.Context, in *CompensateBalanceReq, opts ...grpc.CallOption) (*CompensateBalanceRes, error)
+	// 最后一次进入游戏
+	GetLastBalanceLogGame(ctx context.Context, in *GetLastBalanceLogGameReq, opts ...grpc.CallOption) (*GetLastBalanceLogGameRes, error)
+	// 获取支付渠道列表
+	GetPaymentList(ctx context.Context, in *GetPaymentListReq, opts ...grpc.CallOption) (*GetPaymentListRes, error)
+	// 获取提现渠道列表
+	GetWithdrawList(ctx context.Context, in *GetWithdrawListReq, opts ...grpc.CallOption) (*GetWithdrawListRes, error)
+	// 添加银行卡
+	AddBankCard(ctx context.Context, in *AddBankCardReq, opts ...grpc.CallOption) (*AddBankCardRes, error)
+	// 查询银行卡列表
+	GetBankCardList(ctx context.Context, in *GetBankCardListReq, opts ...grpc.CallOption) (*GetBankCardListRes, error)
+	// 删除银行卡
+	DeleteBankCard(ctx context.Context, in *DeleteBankCardReq, opts ...grpc.CallOption) (*DeleteBankCardRes, error)
+	// 设置默认银行卡
+	SetDefaultBankCard(ctx context.Context, in *SetDefaultBankCardReq, opts ...grpc.CallOption) (*SetDefaultBankCardRes, error)
+	// 获取充值 nonce
+	GetDepositNonce(ctx context.Context, in *GetDepositNonceReq, opts ...grpc.CallOption) (*GetDepositNonceRes, error)
+	// 获取提现 nonce
+	GetWithdrawNonce(ctx context.Context, in *GetWithdrawNonceReq, opts ...grpc.CallOption) (*GetWithdrawNonceRes, error)
+	// 创建充值订单
+	CreateDepositOrder(ctx context.Context, in *CreateDepositOrderReq, opts ...grpc.CallOption) (*CreateDepositOrderRes, error)
+	// 获取账户明细
+	GetBalanceLog(ctx context.Context, in *GetBalanceLogReq, opts ...grpc.CallOption) (*GetBalanceLogRes, error)
+	// 获取用户流水要求列表
+	GetUserFlowRequirements(ctx context.Context, in *GetUserFlowRequirementsReq, opts ...grpc.CallOption) (*GetUserFlowRequirementsRes, error)
+	// 充值异步回调
+	DepositCallback(ctx context.Context, in *DepositCallbackReq, opts ...grpc.CallOption) (*DepositCallbackRes, error)
+	// 申请提现
+	Withdraw(ctx context.Context, in *WithdrawReq, opts ...grpc.CallOption) (*WithdrawRes, error)
+	// 发放邀请红利
+	GrantInviteBonus(ctx context.Context, in *GrantInviteBonusReq, opts ...grpc.CallOption) (*GrantInviteBonusRes, error)
+	// 获取邀请红利统计
+	GetInviteBonusSummary(ctx context.Context, in *GetInviteBonusSummaryReq, opts ...grpc.CallOption) (*GetInviteBonusSummaryRes, error)
 }
 
 type balanceClient struct {
@@ -49,12 +109,252 @@ func (c *balanceClient) InitBalanceUser(ctx context.Context, in *InitBalanceUser
 	return out, nil
 }
 
+func (c *balanceClient) RefreshBalance(ctx context.Context, in *RefreshBalanceReq, opts ...grpc.CallOption) (*RefreshBalanceRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefreshBalanceRes)
+	err := c.cc.Invoke(ctx, Balance_RefreshBalance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) AdjustBalance(ctx context.Context, in *AdjustBalanceReq, opts ...grpc.CallOption) (*AdjustBalanceRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdjustBalanceRes)
+	err := c.cc.Invoke(ctx, Balance_AdjustBalance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) UpdateTransferStatus(ctx context.Context, in *UpdateTransferStatusReq, opts ...grpc.CallOption) (*UpdateTransferStatusRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTransferStatusRes)
+	err := c.cc.Invoke(ctx, Balance_UpdateTransferStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) CompensateBalance(ctx context.Context, in *CompensateBalanceReq, opts ...grpc.CallOption) (*CompensateBalanceRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CompensateBalanceRes)
+	err := c.cc.Invoke(ctx, Balance_CompensateBalance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetLastBalanceLogGame(ctx context.Context, in *GetLastBalanceLogGameReq, opts ...grpc.CallOption) (*GetLastBalanceLogGameRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLastBalanceLogGameRes)
+	err := c.cc.Invoke(ctx, Balance_GetLastBalanceLogGame_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetPaymentList(ctx context.Context, in *GetPaymentListReq, opts ...grpc.CallOption) (*GetPaymentListRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPaymentListRes)
+	err := c.cc.Invoke(ctx, Balance_GetPaymentList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetWithdrawList(ctx context.Context, in *GetWithdrawListReq, opts ...grpc.CallOption) (*GetWithdrawListRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWithdrawListRes)
+	err := c.cc.Invoke(ctx, Balance_GetWithdrawList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) AddBankCard(ctx context.Context, in *AddBankCardReq, opts ...grpc.CallOption) (*AddBankCardRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddBankCardRes)
+	err := c.cc.Invoke(ctx, Balance_AddBankCard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetBankCardList(ctx context.Context, in *GetBankCardListReq, opts ...grpc.CallOption) (*GetBankCardListRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBankCardListRes)
+	err := c.cc.Invoke(ctx, Balance_GetBankCardList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) DeleteBankCard(ctx context.Context, in *DeleteBankCardReq, opts ...grpc.CallOption) (*DeleteBankCardRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteBankCardRes)
+	err := c.cc.Invoke(ctx, Balance_DeleteBankCard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) SetDefaultBankCard(ctx context.Context, in *SetDefaultBankCardReq, opts ...grpc.CallOption) (*SetDefaultBankCardRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetDefaultBankCardRes)
+	err := c.cc.Invoke(ctx, Balance_SetDefaultBankCard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetDepositNonce(ctx context.Context, in *GetDepositNonceReq, opts ...grpc.CallOption) (*GetDepositNonceRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDepositNonceRes)
+	err := c.cc.Invoke(ctx, Balance_GetDepositNonce_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetWithdrawNonce(ctx context.Context, in *GetWithdrawNonceReq, opts ...grpc.CallOption) (*GetWithdrawNonceRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWithdrawNonceRes)
+	err := c.cc.Invoke(ctx, Balance_GetWithdrawNonce_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) CreateDepositOrder(ctx context.Context, in *CreateDepositOrderReq, opts ...grpc.CallOption) (*CreateDepositOrderRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDepositOrderRes)
+	err := c.cc.Invoke(ctx, Balance_CreateDepositOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetBalanceLog(ctx context.Context, in *GetBalanceLogReq, opts ...grpc.CallOption) (*GetBalanceLogRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBalanceLogRes)
+	err := c.cc.Invoke(ctx, Balance_GetBalanceLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetUserFlowRequirements(ctx context.Context, in *GetUserFlowRequirementsReq, opts ...grpc.CallOption) (*GetUserFlowRequirementsRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserFlowRequirementsRes)
+	err := c.cc.Invoke(ctx, Balance_GetUserFlowRequirements_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) DepositCallback(ctx context.Context, in *DepositCallbackReq, opts ...grpc.CallOption) (*DepositCallbackRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DepositCallbackRes)
+	err := c.cc.Invoke(ctx, Balance_DepositCallback_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) Withdraw(ctx context.Context, in *WithdrawReq, opts ...grpc.CallOption) (*WithdrawRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WithdrawRes)
+	err := c.cc.Invoke(ctx, Balance_Withdraw_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GrantInviteBonus(ctx context.Context, in *GrantInviteBonusReq, opts ...grpc.CallOption) (*GrantInviteBonusRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GrantInviteBonusRes)
+	err := c.cc.Invoke(ctx, Balance_GrantInviteBonus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *balanceClient) GetInviteBonusSummary(ctx context.Context, in *GetInviteBonusSummaryReq, opts ...grpc.CallOption) (*GetInviteBonusSummaryRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetInviteBonusSummaryRes)
+	err := c.cc.Invoke(ctx, Balance_GetInviteBonusSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BalanceServer is the server API for Balance service.
 // All implementations must embed UnimplementedBalanceServer
 // for forward compatibility.
 type BalanceServer interface {
 	// 初始化用户余额
 	InitBalanceUser(context.Context, *InitBalanceUserReq) (*InitBalanceUserRes, error)
+	// 刷新用户余额
+	RefreshBalance(context.Context, *RefreshBalanceReq) (*RefreshBalanceRes, error)
+	// 调整用户余额（加款/扣款）
+	AdjustBalance(context.Context, *AdjustBalanceReq) (*AdjustBalanceRes, error)
+	// 更新转账状态（游戏转账成功后调用）
+	UpdateTransferStatus(context.Context, *UpdateTransferStatusReq) (*UpdateTransferStatusRes, error)
+	// 补偿余额（游戏转账失败后调用）
+	CompensateBalance(context.Context, *CompensateBalanceReq) (*CompensateBalanceRes, error)
+	// 最后一次进入游戏
+	GetLastBalanceLogGame(context.Context, *GetLastBalanceLogGameReq) (*GetLastBalanceLogGameRes, error)
+	// 获取支付渠道列表
+	GetPaymentList(context.Context, *GetPaymentListReq) (*GetPaymentListRes, error)
+	// 获取提现渠道列表
+	GetWithdrawList(context.Context, *GetWithdrawListReq) (*GetWithdrawListRes, error)
+	// 添加银行卡
+	AddBankCard(context.Context, *AddBankCardReq) (*AddBankCardRes, error)
+	// 查询银行卡列表
+	GetBankCardList(context.Context, *GetBankCardListReq) (*GetBankCardListRes, error)
+	// 删除银行卡
+	DeleteBankCard(context.Context, *DeleteBankCardReq) (*DeleteBankCardRes, error)
+	// 设置默认银行卡
+	SetDefaultBankCard(context.Context, *SetDefaultBankCardReq) (*SetDefaultBankCardRes, error)
+	// 获取充值 nonce
+	GetDepositNonce(context.Context, *GetDepositNonceReq) (*GetDepositNonceRes, error)
+	// 获取提现 nonce
+	GetWithdrawNonce(context.Context, *GetWithdrawNonceReq) (*GetWithdrawNonceRes, error)
+	// 创建充值订单
+	CreateDepositOrder(context.Context, *CreateDepositOrderReq) (*CreateDepositOrderRes, error)
+	// 获取账户明细
+	GetBalanceLog(context.Context, *GetBalanceLogReq) (*GetBalanceLogRes, error)
+	// 获取用户流水要求列表
+	GetUserFlowRequirements(context.Context, *GetUserFlowRequirementsReq) (*GetUserFlowRequirementsRes, error)
+	// 充值异步回调
+	DepositCallback(context.Context, *DepositCallbackReq) (*DepositCallbackRes, error)
+	// 申请提现
+	Withdraw(context.Context, *WithdrawReq) (*WithdrawRes, error)
+	// 发放邀请红利
+	GrantInviteBonus(context.Context, *GrantInviteBonusReq) (*GrantInviteBonusRes, error)
+	// 获取邀请红利统计
+	GetInviteBonusSummary(context.Context, *GetInviteBonusSummaryReq) (*GetInviteBonusSummaryRes, error)
 	mustEmbedUnimplementedBalanceServer()
 }
 
@@ -67,6 +367,66 @@ type UnimplementedBalanceServer struct{}
 
 func (UnimplementedBalanceServer) InitBalanceUser(context.Context, *InitBalanceUserReq) (*InitBalanceUserRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method InitBalanceUser not implemented")
+}
+func (UnimplementedBalanceServer) RefreshBalance(context.Context, *RefreshBalanceReq) (*RefreshBalanceRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method RefreshBalance not implemented")
+}
+func (UnimplementedBalanceServer) AdjustBalance(context.Context, *AdjustBalanceReq) (*AdjustBalanceRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdjustBalance not implemented")
+}
+func (UnimplementedBalanceServer) UpdateTransferStatus(context.Context, *UpdateTransferStatusReq) (*UpdateTransferStatusRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateTransferStatus not implemented")
+}
+func (UnimplementedBalanceServer) CompensateBalance(context.Context, *CompensateBalanceReq) (*CompensateBalanceRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompensateBalance not implemented")
+}
+func (UnimplementedBalanceServer) GetLastBalanceLogGame(context.Context, *GetLastBalanceLogGameReq) (*GetLastBalanceLogGameRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLastBalanceLogGame not implemented")
+}
+func (UnimplementedBalanceServer) GetPaymentList(context.Context, *GetPaymentListReq) (*GetPaymentListRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPaymentList not implemented")
+}
+func (UnimplementedBalanceServer) GetWithdrawList(context.Context, *GetWithdrawListReq) (*GetWithdrawListRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWithdrawList not implemented")
+}
+func (UnimplementedBalanceServer) AddBankCard(context.Context, *AddBankCardReq) (*AddBankCardRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method AddBankCard not implemented")
+}
+func (UnimplementedBalanceServer) GetBankCardList(context.Context, *GetBankCardListReq) (*GetBankCardListRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBankCardList not implemented")
+}
+func (UnimplementedBalanceServer) DeleteBankCard(context.Context, *DeleteBankCardReq) (*DeleteBankCardRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteBankCard not implemented")
+}
+func (UnimplementedBalanceServer) SetDefaultBankCard(context.Context, *SetDefaultBankCardReq) (*SetDefaultBankCardRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetDefaultBankCard not implemented")
+}
+func (UnimplementedBalanceServer) GetDepositNonce(context.Context, *GetDepositNonceReq) (*GetDepositNonceRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDepositNonce not implemented")
+}
+func (UnimplementedBalanceServer) GetWithdrawNonce(context.Context, *GetWithdrawNonceReq) (*GetWithdrawNonceRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWithdrawNonce not implemented")
+}
+func (UnimplementedBalanceServer) CreateDepositOrder(context.Context, *CreateDepositOrderReq) (*CreateDepositOrderRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDepositOrder not implemented")
+}
+func (UnimplementedBalanceServer) GetBalanceLog(context.Context, *GetBalanceLogReq) (*GetBalanceLogRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBalanceLog not implemented")
+}
+func (UnimplementedBalanceServer) GetUserFlowRequirements(context.Context, *GetUserFlowRequirementsReq) (*GetUserFlowRequirementsRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUserFlowRequirements not implemented")
+}
+func (UnimplementedBalanceServer) DepositCallback(context.Context, *DepositCallbackReq) (*DepositCallbackRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method DepositCallback not implemented")
+}
+func (UnimplementedBalanceServer) Withdraw(context.Context, *WithdrawReq) (*WithdrawRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method Withdraw not implemented")
+}
+func (UnimplementedBalanceServer) GrantInviteBonus(context.Context, *GrantInviteBonusReq) (*GrantInviteBonusRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GrantInviteBonus not implemented")
+}
+func (UnimplementedBalanceServer) GetInviteBonusSummary(context.Context, *GetInviteBonusSummaryReq) (*GetInviteBonusSummaryRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetInviteBonusSummary not implemented")
 }
 func (UnimplementedBalanceServer) mustEmbedUnimplementedBalanceServer() {}
 func (UnimplementedBalanceServer) testEmbeddedByValue()                 {}
@@ -107,6 +467,366 @@ func _Balance_InitBalanceUser_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Balance_RefreshBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshBalanceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).RefreshBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_RefreshBalance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).RefreshBalance(ctx, req.(*RefreshBalanceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_AdjustBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdjustBalanceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).AdjustBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_AdjustBalance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).AdjustBalance(ctx, req.(*AdjustBalanceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_UpdateTransferStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTransferStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).UpdateTransferStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_UpdateTransferStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).UpdateTransferStatus(ctx, req.(*UpdateTransferStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_CompensateBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompensateBalanceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).CompensateBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_CompensateBalance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).CompensateBalance(ctx, req.(*CompensateBalanceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetLastBalanceLogGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLastBalanceLogGameReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetLastBalanceLogGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetLastBalanceLogGame_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetLastBalanceLogGame(ctx, req.(*GetLastBalanceLogGameReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetPaymentList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPaymentListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetPaymentList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetPaymentList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetPaymentList(ctx, req.(*GetPaymentListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetWithdrawList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWithdrawListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetWithdrawList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetWithdrawList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetWithdrawList(ctx, req.(*GetWithdrawListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_AddBankCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddBankCardReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).AddBankCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_AddBankCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).AddBankCard(ctx, req.(*AddBankCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetBankCardList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBankCardListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetBankCardList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetBankCardList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetBankCardList(ctx, req.(*GetBankCardListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_DeleteBankCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteBankCardReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).DeleteBankCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_DeleteBankCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).DeleteBankCard(ctx, req.(*DeleteBankCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_SetDefaultBankCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetDefaultBankCardReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).SetDefaultBankCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_SetDefaultBankCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).SetDefaultBankCard(ctx, req.(*SetDefaultBankCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetDepositNonce_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDepositNonceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetDepositNonce(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetDepositNonce_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetDepositNonce(ctx, req.(*GetDepositNonceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetWithdrawNonce_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWithdrawNonceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetWithdrawNonce(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetWithdrawNonce_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetWithdrawNonce(ctx, req.(*GetWithdrawNonceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_CreateDepositOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDepositOrderReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).CreateDepositOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_CreateDepositOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).CreateDepositOrder(ctx, req.(*CreateDepositOrderReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetBalanceLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBalanceLogReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetBalanceLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetBalanceLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetBalanceLog(ctx, req.(*GetBalanceLogReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetUserFlowRequirements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserFlowRequirementsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetUserFlowRequirements(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetUserFlowRequirements_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetUserFlowRequirements(ctx, req.(*GetUserFlowRequirementsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_DepositCallback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DepositCallbackReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).DepositCallback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_DepositCallback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).DepositCallback(ctx, req.(*DepositCallbackReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_Withdraw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WithdrawReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).Withdraw(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_Withdraw_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).Withdraw(ctx, req.(*WithdrawReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GrantInviteBonus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantInviteBonusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GrantInviteBonus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GrantInviteBonus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GrantInviteBonus(ctx, req.(*GrantInviteBonusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Balance_GetInviteBonusSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInviteBonusSummaryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BalanceServer).GetInviteBonusSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Balance_GetInviteBonusSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BalanceServer).GetInviteBonusSummary(ctx, req.(*GetInviteBonusSummaryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Balance_ServiceDesc is the grpc.ServiceDesc for Balance service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -117,6 +837,86 @@ var Balance_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InitBalanceUser",
 			Handler:    _Balance_InitBalanceUser_Handler,
+		},
+		{
+			MethodName: "RefreshBalance",
+			Handler:    _Balance_RefreshBalance_Handler,
+		},
+		{
+			MethodName: "AdjustBalance",
+			Handler:    _Balance_AdjustBalance_Handler,
+		},
+		{
+			MethodName: "UpdateTransferStatus",
+			Handler:    _Balance_UpdateTransferStatus_Handler,
+		},
+		{
+			MethodName: "CompensateBalance",
+			Handler:    _Balance_CompensateBalance_Handler,
+		},
+		{
+			MethodName: "GetLastBalanceLogGame",
+			Handler:    _Balance_GetLastBalanceLogGame_Handler,
+		},
+		{
+			MethodName: "GetPaymentList",
+			Handler:    _Balance_GetPaymentList_Handler,
+		},
+		{
+			MethodName: "GetWithdrawList",
+			Handler:    _Balance_GetWithdrawList_Handler,
+		},
+		{
+			MethodName: "AddBankCard",
+			Handler:    _Balance_AddBankCard_Handler,
+		},
+		{
+			MethodName: "GetBankCardList",
+			Handler:    _Balance_GetBankCardList_Handler,
+		},
+		{
+			MethodName: "DeleteBankCard",
+			Handler:    _Balance_DeleteBankCard_Handler,
+		},
+		{
+			MethodName: "SetDefaultBankCard",
+			Handler:    _Balance_SetDefaultBankCard_Handler,
+		},
+		{
+			MethodName: "GetDepositNonce",
+			Handler:    _Balance_GetDepositNonce_Handler,
+		},
+		{
+			MethodName: "GetWithdrawNonce",
+			Handler:    _Balance_GetWithdrawNonce_Handler,
+		},
+		{
+			MethodName: "CreateDepositOrder",
+			Handler:    _Balance_CreateDepositOrder_Handler,
+		},
+		{
+			MethodName: "GetBalanceLog",
+			Handler:    _Balance_GetBalanceLog_Handler,
+		},
+		{
+			MethodName: "GetUserFlowRequirements",
+			Handler:    _Balance_GetUserFlowRequirements_Handler,
+		},
+		{
+			MethodName: "DepositCallback",
+			Handler:    _Balance_DepositCallback_Handler,
+		},
+		{
+			MethodName: "Withdraw",
+			Handler:    _Balance_Withdraw_Handler,
+		},
+		{
+			MethodName: "GrantInviteBonus",
+			Handler:    _Balance_GrantInviteBonus_Handler,
+		},
+		{
+			MethodName: "GetInviteBonusSummary",
+			Handler:    _Balance_GetInviteBonusSummary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

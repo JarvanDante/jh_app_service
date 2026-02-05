@@ -7,7 +7,48 @@ option go_package = "jh_app_service/api/grpc/balance/v1";
 service Balance {
     // 初始化用户余额
     rpc InitBalanceUser(InitBalanceUserReq) returns (InitBalanceUserRes) {}
+    // 刷新用户余额
+    rpc RefreshBalance(RefreshBalanceReq) returns (RefreshBalanceRes) {}
+    // 调整用户余额（加款/扣款）
+    rpc AdjustBalance(AdjustBalanceReq) returns (AdjustBalanceRes) {}
+    // 更新转账状态（游戏转账成功后调用）
+    rpc UpdateTransferStatus(UpdateTransferStatusReq) returns (UpdateTransferStatusRes) {}
+    // 补偿余额（游戏转账失败后调用）
+    rpc CompensateBalance(CompensateBalanceReq) returns (CompensateBalanceRes) {}
+    // 最后一次进入游戏
+    rpc GetLastBalanceLogGame(GetLastBalanceLogGameReq) returns (GetLastBalanceLogGameRes) {}
+    // 获取支付渠道列表
+    rpc GetPaymentList(GetPaymentListReq) returns (GetPaymentListRes) {}
+    // 获取提现渠道列表
+    rpc GetWithdrawList(GetWithdrawListReq) returns (GetWithdrawListRes) {}
+    // 添加银行卡
+    rpc AddBankCard(AddBankCardReq) returns (AddBankCardRes) {}
+    // 查询银行卡列表
+    rpc GetBankCardList(GetBankCardListReq) returns (GetBankCardListRes) {}
+    // 删除银行卡
+    rpc DeleteBankCard(DeleteBankCardReq) returns (DeleteBankCardRes) {}
+    // 设置默认银行卡
+    rpc SetDefaultBankCard(SetDefaultBankCardReq) returns (SetDefaultBankCardRes) {}
+    // 获取充值 nonce
+    rpc GetDepositNonce(GetDepositNonceReq) returns (GetDepositNonceRes) {}
+    // 获取提现 nonce
+    rpc GetWithdrawNonce(GetWithdrawNonceReq) returns (GetWithdrawNonceRes) {}
+    // 创建充值订单
+    rpc CreateDepositOrder(CreateDepositOrderReq) returns (CreateDepositOrderRes) {}
+    // 获取账户明细
+    rpc GetBalanceLog(GetBalanceLogReq) returns (GetBalanceLogRes) {}
+    // 获取用户流水要求列表
+    rpc GetUserFlowRequirements(GetUserFlowRequirementsReq) returns (GetUserFlowRequirementsRes) {}
+    // 充值异步回调
+    rpc DepositCallback(DepositCallbackReq) returns (DepositCallbackRes) {}
+    // 申请提现
+    rpc Withdraw(WithdrawReq) returns (WithdrawRes) {}
+    // 发放邀请红利
+    rpc GrantInviteBonus(GrantInviteBonusReq) returns (GrantInviteBonusRes) {}
+    // 获取邀请红利统计
+    rpc GetInviteBonusSummary(GetInviteBonusSummaryReq) returns (GetInviteBonusSummaryRes) {}
 }
+
 
 // 初始化用户余额请求
 message InitBalanceUserReq {
@@ -21,4 +62,346 @@ message InitBalanceUserReq {
 message InitBalanceUserRes {
     bool success = 1;       // 是否成功
     string message = 2;     // 消息
+}
+
+// 刷新用户余额请求
+message RefreshBalanceReq {
+}
+
+// 刷新用户余额响应
+message RefreshBalanceRes {
+    string balance = 1;         // 余额
+    string balance_frozen = 2;  // 冻结余额
+    int64 points = 3;           // 积分
+}
+
+// 调整用户余额请求
+message AdjustBalanceReq {
+    int32 site_id = 1;          // 站点ID
+    int32 user_id = 2;          // 用户ID
+    float amount = 3;           // 金额
+    int32 type = 4;             // 类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)
+    string game_name = 5;       // 游戏名称
+    string game_id = 6;         // 游戏ID
+    string game_key = 7;        // 游戏key（进入游戏时的key）
+}
+
+// 调整用户余额响应
+message AdjustBalanceRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+    string balance = 3;         // 调整后的余额
+    string order_no = 4;        // 订单号
+}
+
+// 更新转账状态请求
+message UpdateTransferStatusReq {
+    string order_no = 1;        // 订单号
+}
+
+// 更新转账状态响应
+message UpdateTransferStatusRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+}
+
+// 补偿余额请求
+message CompensateBalanceReq {
+    int32 site_id = 1;          // 站点ID
+    int32 user_id = 2;          // 用户ID
+    string order_no = 3;        // 订单号
+    float amount = 4;           // 需要补偿的金额（负数）
+}
+
+// 补偿余额响应
+message CompensateBalanceRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+}
+
+//最后一次进入游戏请求
+message GetLastBalanceLogGameReq{
+    int32 site_id = 1;          // 站点ID
+    int32 user_id = 2;          // 用户ID
+}
+//最后一次进入游戏响应
+message GetLastBalanceLogGameRes{
+    int32 game_id = 1;          // 游戏ID
+    float amount = 2;           // 游戏ID无刚用户余额，游戏ID有则为0
+}
+
+// 获取支付渠道列表请求
+message GetPaymentListReq {
+}
+
+// 支付渠道信息
+message PaymentInfo {
+    int32 id = 1;               // ID
+    int32 site_id = 2;          // 站点ID
+    int32 payment_id = 3;       // 总站支付ID
+    string name = 4;            // 名称
+    string code = 5;            // 代码
+    int32 gateway = 6;          // 支付网关：1=在线支付 2=银行
+    float each_min = 7;         // 单笔最低
+    float each_max = 8;         // 单笔最高
+    int32 sort = 9;             // 排序
+    repeated string money_list = 10;  // 可选金额数组
+    int32 is_input = 11;        // 是否支持输入金额：0=不支持 1=支持
+    string remark = 12;         // 描述
+    string logo = 13;           // logo地址
+    int32 status = 14;          // 状态
+}
+
+// 获取支付渠道列表响应
+message GetPaymentListRes {
+    repeated PaymentInfo list = 1;  // 支付渠道列表
+}
+
+// 获取提现渠道列表请求
+message GetWithdrawListReq {
+}
+
+// 提现渠道信息
+message WithdrawInfo {
+    int32 id = 1;               // ID
+    int32 site_id = 2;          // 站点ID
+    int32 withdraw_id = 3;      // 总站提现ID
+    string name = 4;            // 名称
+    string code = 5;            // 代码
+    int32 gateway = 6;          // 提现网关：1=在线支付 2=银行
+    float each_min = 7;         // 单笔最低
+    float each_max = 8;         // 单笔最高
+    int32 sort = 9;             // 排序
+    repeated string money_list = 10;  // 可选金额数组
+    int32 is_input = 11;        // 是否支持输入金额：0=不支持 1=支持
+    string remark = 12;         // 描述
+    string logo = 13;           // logo地址
+    int32 status = 14;          // 状态
+}
+
+// 获取提现渠道列表响应
+message GetWithdrawListRes {
+    repeated WithdrawInfo list = 1;  // 提现渠道列表
+}
+
+// 添加银行卡请求
+message AddBankCardReq {
+    int32 type = 1;             // 类型 1=GCASH 2=Maya
+    string card_account = 2;    // 账户名
+    string card_no = 3;         // 卡号
+    int32 is_default = 4;       // 是否默认 0=否 1=是
+}
+
+// 添加银行卡响应
+message AddBankCardRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+}
+
+// 查询银行卡列表请求
+message GetBankCardListReq {
+}
+
+// 银行卡信息
+message BankCardInfo {
+    int32 id = 1;               // ID
+    int32 type = 2;             // 类型 1=GCASH 2=Maya
+    string card_account = 3;    // 账户名
+    string card_no = 4;         // 卡号
+    int32 is_default = 5;       // 是否默认 0=否 1=是
+    string created_at = 6;      // 创建时间
+}
+
+// 查询银行卡列表响应
+message GetBankCardListRes {
+    repeated BankCardInfo list = 1;  // 银行卡列表
+}
+
+// 删除银行卡请求
+message DeleteBankCardReq {
+    int32 id = 1;               // 银行卡ID
+}
+
+// 删除银行卡响应
+message DeleteBankCardRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+}
+
+// 设置默认银行卡请求
+message SetDefaultBankCardReq {
+    int32 id = 1;               // 银行卡ID
+}
+
+// 设置默认银行卡响应
+message SetDefaultBankCardRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+}
+
+// 获取充值 nonce 请求
+message GetDepositNonceReq {
+}
+
+// 获取充值 nonce 响应
+message GetDepositNonceRes {
+    string nonce = 1;           // 随机数
+    int64 timestamp = 2;        // 时间戳
+    int64 expires_in = 3;       // 过期时间（秒）
+}
+
+// 获取提现 nonce 请求
+message GetWithdrawNonceReq {
+}
+
+// 获取提现 nonce 响应
+message GetWithdrawNonceRes {
+    string nonce = 1;           // 随机数
+    int64 timestamp = 2;        // 时间戳
+    int64 expires_in = 3;       // 过期时间（秒）
+}
+
+
+// 创建充值订单请求
+message CreateDepositOrderReq {
+    int32 payment_id = 1;       // 支付方式ID
+    double money = 2;           // 充值金额
+    string order_type = 3;      // 订单类型: deposit=充值, withdraw=提现
+    string user_card_no = 4;    // 用户银行卡号(可选)
+    string user_card_name = 5;  // 用户银行卡姓名(可选)
+    string nonce = 6;           // 防重放随机数
+    string bank_code = 7;       // 银行代码(可选)
+    int32 mobile = 8;           // 是否手机端: 1=是, 0=否
+}
+
+// 创建充值订单响应
+message CreateDepositOrderRes {
+    string order_sn = 1;        // 系统订单号
+    string sys_trade_no = 2;    // 平台交易流水号
+    string channel_card_no = 3; // 收款卡号
+    string channel_name = 4;    // 渠道名称
+    string image_url = 5;       // 支付引导图
+    string result = 6;          // 返回信息
+}
+
+// 获取账户明细请求
+message GetBalanceLogReq {
+    string start = 1;           // 开始时间 格式: 2024-01-01 00:00:00
+    string end = 2;             // 结束时间 格式: 2024-01-01 23:59:59
+    int32 type = 3;             // 类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账
+    int32 status = 4;           // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
+    int32 page = 5;             // 页码
+    int32 size = 6;             // 每页数量
+}
+
+// 账户明细项
+message BalanceLogItem {
+    string channel = 1;         // 渠道名称
+    int32 change_type = 2;      // 交易类型 1=转入 2=转出
+    string trade_no = 3;        // 订单号
+    double money = 4;           // 金额
+    string remark = 5;          // 备注
+    int32 type = 6;             // 类型 1=充值 2=提款 3=红利 4=返水 5=转账
+    string symbol = 7;          // 符号 + 或 -
+    int32 status = 8;           // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
+    string time = 9;            // 时间
+}
+
+// 获取账户明细响应
+message GetBalanceLogRes {
+    double total_recharge = 1;  // 充值总计
+    double total_withdraw = 2;  // 提现总计
+    double total_bonus = 3;     // 红利总计
+    double total_rebate = 4;    // 返水总计
+    repeated BalanceLogItem list = 5;  // 明细列表
+    int32 count = 6;            // 总数
+}
+
+// 获取用户流水要求列表请求
+message GetUserFlowRequirementsReq {
+    int32 status = 1;   // -1=全部
+    int32 page = 2;
+    int32 size = 3;
+}
+
+// 用户流水要求信息
+message UserFlowRequirementInfo {
+    int64 id = 1;
+    int32 source_type = 2;
+    string trade_no = 3;
+    double amount = 4;
+    double bonus_amount = 5;
+    double flow_multiple = 6;
+    double required_flow = 7;
+    double completed_flow = 8;
+    double remaining_flow = 9;
+    int32 status = 10;
+    double progress = 11;
+    string start_time = 12;
+    string expire_time = 13;
+    string complete_time = 14;
+    string remark = 15;
+    string created_at = 16;
+}
+
+// 获取用户流水要求列表响应
+message GetUserFlowRequirementsRes {
+    repeated UserFlowRequirementInfo list = 1;
+    int32 count = 2;
+}
+
+// 充值异步回调请求
+message DepositCallbackReq {
+    string trade_status = 1;    // 交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;
+    string order_sn = 2;        // 订单号
+    double actual_amount = 3;   // 实际支付金额
+    string sign = 4;            // 签名（可选，用于验证）
+}
+
+// 充值异步回调响应
+message DepositCallbackRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+}
+
+// 申请提现请求
+message WithdrawReq {
+    double money = 1;           // 提现金额
+    int32 withdraw_id = 2;      // 提现渠道ID
+    string nonce = 3;           // 防重放随机数
+}
+
+// 申请提现响应
+message WithdrawRes {
+    bool success = 1;           // 是否成功
+    string message = 2;         // 消息
+    string trade_no = 3;        // 订单号
+}
+
+// 发放邀请红利请求
+message GrantInviteBonusReq {
+    int32 site_id = 1;      // 站点ID
+    int32 user_id = 2;      // 用户ID
+    double amount = 3;      // 红利金额
+    string remark = 4;      // 备注
+}
+
+// 发放邀请红利响应
+message GrantInviteBonusRes {
+    bool success = 1;       // 是否成功
+    string message = 2;     // 消息
+    string trade_no = 3;    // 流水号
+}
+
+// 获取邀请红利统计请求
+message GetInviteBonusSummaryReq {
+    int32 site_id = 1;      // 站点ID
+    int32 user_id = 2;      // 用户ID
+}
+
+// 获取邀请红利统计响应
+message GetInviteBonusSummaryRes {
+    double today_amount = 1;      // 今日邀请红利
+    double yesterday_amount = 2;  // 昨日邀请红利
+    double total_amount = 3;      // 总邀请红利
 }

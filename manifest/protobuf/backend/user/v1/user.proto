@@ -8,6 +8,7 @@ service User {
     rpc GetUserList(GetUserListReq) returns (GetUserListRes) {}
     rpc UpdateUser(UpdateUserReq) returns (UpdateUserRes) {}
     rpc GetUserBasicInfo(GetUserBasicInfoReq) returns (GetUserBasicInfoRes) {}
+    rpc IncreasePayTimes(IncreasePayTimesReq) returns (IncreasePayTimesRes) {}
     
     // 用户等级相关接口
     rpc GetUserGrades(GetUserGradesReq) returns (GetUserGradesRes) {}
@@ -239,4 +240,18 @@ message UserLoginLogInfo {
 message GetUserLoginLogsRes {
     repeated UserLoginLogInfo list = 1; // 登录日志列表
     int32 count = 2;                    // 总数量
+}
+// 增加用户充值次数请求
+message IncreasePayTimesReq {
+    int32 site_id = 1;   // 站点ID
+    int32 user_id = 2;   // 用户ID
+}
+
+// 增加用户充值次数响应
+message IncreasePayTimesRes {
+    bool success = 1;        // 是否成功
+    string message = 2;      // 消息
+    int32 old_pay_times = 3; // 原充值次数
+    int32 new_pay_times = 4; // 新充值次数
+    int32 inviter_id = 5;    // 邀请人ID
 }

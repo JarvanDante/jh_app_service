@@ -887,6 +887,66 @@ func (s *sUser) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLoginLogsRe
 	}, nil
 }
 
+// IncreasePayTimes 增加用户充值次数
+func (s *sUser) IncreasePayTimes(ctx context.Context, req *v1.IncreasePayTimesReq) (*v1.IncreasePayTimesRes, error) {
+	if req == nil || req.UserId <= 0 {
+		return &v1.IncreasePayTimesRes{Success: false, Message: "用户ID不能为空"}, nil
+	}
+
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists || siteId == 0 {
+		if req.SiteId <= 0 {
+			return &v1.IncreasePayTimesRes{Success: false, Message: "站点ID不存在"}, nil
+		}
+		siteId = uint(req.SiteId)
+	}
+
+	var (
+		oldPayTimes int
+		newPayTimes int
+		inviterId   int
+	)
+
+	err := dao.User.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		var user entity.User
+		if err := dao.User.Ctx(ctx).TX(tx).
+			Where("site_id", siteId).
+			Where("id", req.UserId).
+			LockUpdate().
+			Scan(&user); err != nil {
+			return err
+		}
+		if user.Id == 0 {
+			return fmt.Errorf("用户不存在")
+		}
+
+		oldPayTimes = user.PayTimes
+		newPayTimes = oldPayTimes + 1
+		inviterId = user.InviterId
+
+		_, err := dao.User.Ctx(ctx).TX(tx).
+			Where("id", user.Id).
+			Update(g.Map{
+				"pay_times":  newPayTimes,
+				"updated_at": gtime.Now(),
+			})
+		return err
+	})
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", fmt.Sprintf("更新用户充值次数失败: user_id=%d, err=%v", req.UserId, err))
+		return &v1.IncreasePayTimesRes{Success: false, Message: "更新充值次数失败"}, nil
+	}
+
+	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("更新用户充值次数成功: user_id=%d, old=%d, new=%d", req.UserId, oldPayTimes, newPayTimes))
+	return &v1.IncreasePayTimesRes{
+		Success:     true,
+		Message:     "更新充值次数成功",
+		OldPayTimes: int32(oldPayTimes),
+		NewPayTimes: int32(newPayTimes),
+		InviterId:   int32(inviterId),
+	}, nil
+}
+
 // getDeviceName 获取设备名称
 func (s *sUser) getDeviceName(device int) string {
 	switch device {

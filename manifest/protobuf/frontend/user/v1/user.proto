@@ -200,6 +200,10 @@ message GetInviteInfoRes {
     int32 total_invites = 3;        // 总邀请人数
     int32 today_invites = 4;        // 今日邀请人数
     string total_reward = 5;        // 总奖励金额
+    string today_income = 6;        // 今日邀请收入
+    string yesterday_income = 7;   // 昨日邀请收入
+    int32 registers = 8;            // 注册人数
+    int32 valid_referral = 9;       // 有效邀请人数
 }
 
 // 获取邀请列表请求

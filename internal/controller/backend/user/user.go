@@ -31,6 +31,11 @@ func (*Controller) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInf
 	return backend.User().GetUserBasicInfo(ctx, req)
 }
 
+// IncreasePayTimes 增加用户充值次数
+func (*Controller) IncreasePayTimes(ctx context.Context, req *v1.IncreasePayTimesReq) (res *v1.IncreasePayTimesRes, err error) {
+	return backend.User().IncreasePayTimes(ctx, req)
+}
+
 // GetUserGrades 获取用户等级列表
 func (*Controller) GetUserGrades(ctx context.Context, req *v1.GetUserGradesReq) (res *v1.GetUserGradesRes, err error) {
 	return backend.User().GetUserGrades(ctx, req)

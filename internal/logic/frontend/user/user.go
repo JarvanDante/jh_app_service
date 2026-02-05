@@ -11,10 +11,15 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	v1 "jh_app_service/api/frontend/user/v1"
+	balancev1 "jh_app_service/api/grpc/balance/v1"
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/entity"
+	"jh_app_service/internal/registry"
 	"jh_app_service/internal/service/frontend"
 	"jh_app_service/internal/tracing"
 	"jh_app_service/internal/util"
@@ -780,8 +785,8 @@ func (s *sUser) GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (re
 	// 生成邀请码（使用Base62编码，固定长度6位）
 	inviteCode := util.EncodeInviteCode(uint(userId))
 
-	// 生成邀请链接（仅路径，域名由前端拼接）
-	inviteUrl := fmt.Sprintf("/register?invite_code=%s", inviteCode)
+	// 生成邀请链接（仅路径，域名由前端拼接，参数名用 i 更短）
+	inviteUrl := fmt.Sprintf("/register?i=%s", inviteCode)
 
 	// 统计总邀请人数
 	totalInvites, err := dao.User.Ctx(ctx).Where("inviter_id", userId).
@@ -801,15 +806,35 @@ func (s *sUser) GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (re
 		todayInvites = 0
 	}
 
-	// TODO: 统计总奖励金额（需要根据实际奖励表计算）
-	totalReward := "0.00"
+	// 统计有效邀请人数（有充值）
+	validReferral, err := dao.User.Ctx(ctx).Where("inviter_id", userId).
+		Where("site_id", siteId).
+		Where("pay_times > ?", 0).
+		Count()
+	if err != nil {
+		validReferral = 0
+	}
+
+	// 统计邀请红利收入（今日/昨日/总）
+	todayIncome := 0.0
+	yesterdayIncome := 0.0
+	totalRewardAmount := 0.0
+	todayIncome, yesterdayIncome, totalRewardAmount = s.getInviteBonusSummary(ctx, int64(siteId), int64(userId))
+
+	totalReward := fmt.Sprintf("%.2f", totalRewardAmount)
+	todayIncomeStr := fmt.Sprintf("%.2f", todayIncome)
+	yesterdayIncomeStr := fmt.Sprintf("%.2f", yesterdayIncome)
 
 	res = &v1.GetInviteInfoRes{
-		InviteCode:   inviteCode,
-		InviteUrl:    inviteUrl,
-		TotalInvites: int32(totalInvites),
-		TodayInvites: int32(todayInvites),
-		TotalReward:  totalReward,
+		InviteCode:      inviteCode,
+		InviteUrl:       inviteUrl,
+		TotalInvites:    int32(totalInvites),
+		TodayInvites:    int32(todayInvites),
+		TotalReward:     totalReward,
+		TodayIncome:     todayIncomeStr,
+		YesterdayIncome: yesterdayIncomeStr,
+		Registers:       int32(totalInvites),
+		ValidReferral:   int32(validReferral),
 	}
 
 	middleware.LogWithTrace(ctx, "info", "获取邀请信息成功: user_id=%d, total=%d", userId, totalInvites)
@@ -896,4 +921,41 @@ func (s *sUser) GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (re
 	middleware.LogWithTrace(ctx, "info", "获取邀请列表成功: user_id=%d, total=%d", userId, total)
 
 	return res, nil
+}
+
+// getInviteBonusSummary 获取邀请红利统计
+func (s *sUser) getInviteBonusSummary(ctx context.Context, siteId, userId int64) (float64, float64, float64) {
+	balanceAddr, err := registry.GetServiceAddr("jh_balance_service")
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "获取balance服务地址失败: %v", err)
+		return 0, 0, 0
+	}
+
+	conn, err := grpc.NewClient(
+		balanceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "连接balance服务失败: %v", err)
+		return 0, 0, 0
+	}
+	defer conn.Close()
+
+	client := balancev1.NewBalanceClient(conn)
+
+	md := metadata.New(map[string]string{
+		"site_id": gconv.String(siteId),
+	})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	resp, err := client.GetInviteBonusSummary(ctx, &balancev1.GetInviteBonusSummaryReq{
+		SiteId: int32(siteId),
+		UserId: int32(userId),
+	})
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "查询邀请红利统计失败: %v", err)
+		return 0, 0, 0
+	}
+
+	return resp.TodayAmount, resp.YesterdayAmount, resp.TotalAmount
 }
