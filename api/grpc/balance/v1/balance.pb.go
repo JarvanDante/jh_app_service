@@ -3105,6 +3105,112 @@ func (x *GetInviteBonusSummaryRes) GetTotalAmount() float64 {
 	return 0
 }
 
+// 统计有效邀请人数请求
+type GetValidReferralCountReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                // 站点ID
+	UserIds       []int32                `protobuf:"varint,2,rep,packed,name=user_ids,json=userIds,proto3" json:"user_ids" dc:"被邀请用户ID列表"` // 被邀请用户ID列表
+	MinTotal      float64                `protobuf:"fixed64,3,opt,name=min_total,json=minTotal,proto3" json:"min_total" dc:"有效充值门槛"`       // 有效充值门槛
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetValidReferralCountReq) Reset() {
+	*x = GetValidReferralCountReq{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetValidReferralCountReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetValidReferralCountReq) ProtoMessage() {}
+
+func (x *GetValidReferralCountReq) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetValidReferralCountReq.ProtoReflect.Descriptor instead.
+func (*GetValidReferralCountReq) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *GetValidReferralCountReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *GetValidReferralCountReq) GetUserIds() []int32 {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *GetValidReferralCountReq) GetMinTotal() float64 {
+	if x != nil {
+		return x.MinTotal
+	}
+	return 0
+}
+
+// 统计有效邀请人数响应
+type GetValidReferralCountRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count" dc:"有效邀请人数"` // 有效邀请人数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetValidReferralCountRes) Reset() {
+	*x = GetValidReferralCountRes{}
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetValidReferralCountRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetValidReferralCountRes) ProtoMessage() {}
+
+func (x *GetValidReferralCountRes) ProtoReflect() protoreflect.Message {
+	mi := &file_grpc_balance_v1_balance_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetValidReferralCountRes.ProtoReflect.Descriptor instead.
+func (*GetValidReferralCountRes) Descriptor() ([]byte, []int) {
+	return file_grpc_balance_v1_balance_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *GetValidReferralCountRes) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 var File_grpc_balance_v1_balance_proto protoreflect.FileDescriptor
 
 const file_grpc_balance_v1_balance_proto_rawDesc = "" +
@@ -3347,7 +3453,13 @@ const file_grpc_balance_v1_balance_proto_rawDesc = "" +
 	"\x18GetInviteBonusSummaryRes\x12!\n" +
 	"\ftoday_amount\x18\x01 \x01(\x01R\vtodayAmount\x12)\n" +
 	"\x10yesterday_amount\x18\x02 \x01(\x01R\x0fyesterdayAmount\x12!\n" +
-	"\ftotal_amount\x18\x03 \x01(\x01R\vtotalAmount2\xb1\x10\n" +
+	"\ftotal_amount\x18\x03 \x01(\x01R\vtotalAmount\"k\n" +
+	"\x18GetValidReferralCountReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x19\n" +
+	"\buser_ids\x18\x02 \x03(\x05R\auserIds\x12\x1b\n" +
+	"\tmin_total\x18\x03 \x01(\x01R\bminTotal\"0\n" +
+	"\x18GetValidReferralCountRes\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count2\xa4\x11\n" +
 	"\aBalance\x12_\n" +
 	"\x0fInitBalanceUser\x12$.frontend_balance.InitBalanceUserReq\x1a$.frontend_balance.InitBalanceUserRes\"\x00\x12\\\n" +
 	"\x0eRefreshBalance\x12#.frontend_balance.RefreshBalanceReq\x1a#.frontend_balance.RefreshBalanceRes\"\x00\x12Y\n" +
@@ -3369,7 +3481,8 @@ const file_grpc_balance_v1_balance_proto_rawDesc = "" +
 	"\x0fDepositCallback\x12$.frontend_balance.DepositCallbackReq\x1a$.frontend_balance.DepositCallbackRes\"\x00\x12J\n" +
 	"\bWithdraw\x12\x1d.frontend_balance.WithdrawReq\x1a\x1d.frontend_balance.WithdrawRes\"\x00\x12b\n" +
 	"\x10GrantInviteBonus\x12%.frontend_balance.GrantInviteBonusReq\x1a%.frontend_balance.GrantInviteBonusRes\"\x00\x12q\n" +
-	"\x15GetInviteBonusSummary\x12*.frontend_balance.GetInviteBonusSummaryReq\x1a*.frontend_balance.GetInviteBonusSummaryRes\"\x00B$Z\"jh_app_service/api/grpc/balance/v1b\x06proto3"
+	"\x15GetInviteBonusSummary\x12*.frontend_balance.GetInviteBonusSummaryReq\x1a*.frontend_balance.GetInviteBonusSummaryRes\"\x00\x12q\n" +
+	"\x15GetValidReferralCount\x12*.frontend_balance.GetValidReferralCountReq\x1a*.frontend_balance.GetValidReferralCountRes\"\x00B$Z\"jh_app_service/api/grpc/balance/v1b\x06proto3"
 
 var (
 	file_grpc_balance_v1_balance_proto_rawDescOnce sync.Once
@@ -3383,7 +3496,7 @@ func file_grpc_balance_v1_balance_proto_rawDescGZIP() []byte {
 	return file_grpc_balance_v1_balance_proto_rawDescData
 }
 
-var file_grpc_balance_v1_balance_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_grpc_balance_v1_balance_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_grpc_balance_v1_balance_proto_goTypes = []any{
 	(*InitBalanceUserReq)(nil),         // 0: frontend_balance.InitBalanceUserReq
 	(*InitBalanceUserRes)(nil),         // 1: frontend_balance.InitBalanceUserRes
@@ -3432,6 +3545,8 @@ var file_grpc_balance_v1_balance_proto_goTypes = []any{
 	(*GrantInviteBonusRes)(nil),        // 44: frontend_balance.GrantInviteBonusRes
 	(*GetInviteBonusSummaryReq)(nil),   // 45: frontend_balance.GetInviteBonusSummaryReq
 	(*GetInviteBonusSummaryRes)(nil),   // 46: frontend_balance.GetInviteBonusSummaryRes
+	(*GetValidReferralCountReq)(nil),   // 47: frontend_balance.GetValidReferralCountReq
+	(*GetValidReferralCountRes)(nil),   // 48: frontend_balance.GetValidReferralCountRes
 }
 var file_grpc_balance_v1_balance_proto_depIdxs = []int32{
 	13, // 0: frontend_balance.GetPaymentListRes.list:type_name -> frontend_balance.PaymentInfo
@@ -3460,29 +3575,31 @@ var file_grpc_balance_v1_balance_proto_depIdxs = []int32{
 	41, // 23: frontend_balance.Balance.Withdraw:input_type -> frontend_balance.WithdrawReq
 	43, // 24: frontend_balance.Balance.GrantInviteBonus:input_type -> frontend_balance.GrantInviteBonusReq
 	45, // 25: frontend_balance.Balance.GetInviteBonusSummary:input_type -> frontend_balance.GetInviteBonusSummaryReq
-	1,  // 26: frontend_balance.Balance.InitBalanceUser:output_type -> frontend_balance.InitBalanceUserRes
-	3,  // 27: frontend_balance.Balance.RefreshBalance:output_type -> frontend_balance.RefreshBalanceRes
-	5,  // 28: frontend_balance.Balance.AdjustBalance:output_type -> frontend_balance.AdjustBalanceRes
-	7,  // 29: frontend_balance.Balance.UpdateTransferStatus:output_type -> frontend_balance.UpdateTransferStatusRes
-	9,  // 30: frontend_balance.Balance.CompensateBalance:output_type -> frontend_balance.CompensateBalanceRes
-	11, // 31: frontend_balance.Balance.GetLastBalanceLogGame:output_type -> frontend_balance.GetLastBalanceLogGameRes
-	14, // 32: frontend_balance.Balance.GetPaymentList:output_type -> frontend_balance.GetPaymentListRes
-	17, // 33: frontend_balance.Balance.GetWithdrawList:output_type -> frontend_balance.GetWithdrawListRes
-	19, // 34: frontend_balance.Balance.AddBankCard:output_type -> frontend_balance.AddBankCardRes
-	22, // 35: frontend_balance.Balance.GetBankCardList:output_type -> frontend_balance.GetBankCardListRes
-	24, // 36: frontend_balance.Balance.DeleteBankCard:output_type -> frontend_balance.DeleteBankCardRes
-	26, // 37: frontend_balance.Balance.SetDefaultBankCard:output_type -> frontend_balance.SetDefaultBankCardRes
-	28, // 38: frontend_balance.Balance.GetDepositNonce:output_type -> frontend_balance.GetDepositNonceRes
-	30, // 39: frontend_balance.Balance.GetWithdrawNonce:output_type -> frontend_balance.GetWithdrawNonceRes
-	32, // 40: frontend_balance.Balance.CreateDepositOrder:output_type -> frontend_balance.CreateDepositOrderRes
-	35, // 41: frontend_balance.Balance.GetBalanceLog:output_type -> frontend_balance.GetBalanceLogRes
-	38, // 42: frontend_balance.Balance.GetUserFlowRequirements:output_type -> frontend_balance.GetUserFlowRequirementsRes
-	40, // 43: frontend_balance.Balance.DepositCallback:output_type -> frontend_balance.DepositCallbackRes
-	42, // 44: frontend_balance.Balance.Withdraw:output_type -> frontend_balance.WithdrawRes
-	44, // 45: frontend_balance.Balance.GrantInviteBonus:output_type -> frontend_balance.GrantInviteBonusRes
-	46, // 46: frontend_balance.Balance.GetInviteBonusSummary:output_type -> frontend_balance.GetInviteBonusSummaryRes
-	26, // [26:47] is the sub-list for method output_type
-	5,  // [5:26] is the sub-list for method input_type
+	47, // 26: frontend_balance.Balance.GetValidReferralCount:input_type -> frontend_balance.GetValidReferralCountReq
+	1,  // 27: frontend_balance.Balance.InitBalanceUser:output_type -> frontend_balance.InitBalanceUserRes
+	3,  // 28: frontend_balance.Balance.RefreshBalance:output_type -> frontend_balance.RefreshBalanceRes
+	5,  // 29: frontend_balance.Balance.AdjustBalance:output_type -> frontend_balance.AdjustBalanceRes
+	7,  // 30: frontend_balance.Balance.UpdateTransferStatus:output_type -> frontend_balance.UpdateTransferStatusRes
+	9,  // 31: frontend_balance.Balance.CompensateBalance:output_type -> frontend_balance.CompensateBalanceRes
+	11, // 32: frontend_balance.Balance.GetLastBalanceLogGame:output_type -> frontend_balance.GetLastBalanceLogGameRes
+	14, // 33: frontend_balance.Balance.GetPaymentList:output_type -> frontend_balance.GetPaymentListRes
+	17, // 34: frontend_balance.Balance.GetWithdrawList:output_type -> frontend_balance.GetWithdrawListRes
+	19, // 35: frontend_balance.Balance.AddBankCard:output_type -> frontend_balance.AddBankCardRes
+	22, // 36: frontend_balance.Balance.GetBankCardList:output_type -> frontend_balance.GetBankCardListRes
+	24, // 37: frontend_balance.Balance.DeleteBankCard:output_type -> frontend_balance.DeleteBankCardRes
+	26, // 38: frontend_balance.Balance.SetDefaultBankCard:output_type -> frontend_balance.SetDefaultBankCardRes
+	28, // 39: frontend_balance.Balance.GetDepositNonce:output_type -> frontend_balance.GetDepositNonceRes
+	30, // 40: frontend_balance.Balance.GetWithdrawNonce:output_type -> frontend_balance.GetWithdrawNonceRes
+	32, // 41: frontend_balance.Balance.CreateDepositOrder:output_type -> frontend_balance.CreateDepositOrderRes
+	35, // 42: frontend_balance.Balance.GetBalanceLog:output_type -> frontend_balance.GetBalanceLogRes
+	38, // 43: frontend_balance.Balance.GetUserFlowRequirements:output_type -> frontend_balance.GetUserFlowRequirementsRes
+	40, // 44: frontend_balance.Balance.DepositCallback:output_type -> frontend_balance.DepositCallbackRes
+	42, // 45: frontend_balance.Balance.Withdraw:output_type -> frontend_balance.WithdrawRes
+	44, // 46: frontend_balance.Balance.GrantInviteBonus:output_type -> frontend_balance.GrantInviteBonusRes
+	46, // 47: frontend_balance.Balance.GetInviteBonusSummary:output_type -> frontend_balance.GetInviteBonusSummaryRes
+	48, // 48: frontend_balance.Balance.GetValidReferralCount:output_type -> frontend_balance.GetValidReferralCountRes
+	27, // [27:49] is the sub-list for method output_type
+	5,  // [5:27] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -3499,7 +3616,7 @@ func file_grpc_balance_v1_balance_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_grpc_balance_v1_balance_proto_rawDesc), len(file_grpc_balance_v1_balance_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   47,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -47,6 +47,8 @@ service Balance {
     rpc GrantInviteBonus(GrantInviteBonusReq) returns (GrantInviteBonusRes) {}
     // 获取邀请红利统计
     rpc GetInviteBonusSummary(GetInviteBonusSummaryReq) returns (GetInviteBonusSummaryRes) {}
+    // 统计有效邀请人数（按充值总额）
+    rpc GetValidReferralCount(GetValidReferralCountReq) returns (GetValidReferralCountRes) {}
 }
 
 
@@ -405,3 +407,16 @@ message GetInviteBonusSummaryRes {
     double yesterday_amount = 2;  // 昨日邀请红利
     double total_amount = 3;      // 总邀请红利
 }
+
+// 统计有效邀请人数请求
+message GetValidReferralCountReq {
+    int32 site_id = 1;          // 站点ID
+    repeated int32 user_ids = 2; // 被邀请用户ID列表
+    double min_total = 3;       // 有效充值门槛
+}
+
+// 统计有效邀请人数响应
+message GetValidReferralCountRes {
+    int32 count = 1;            // 有效邀请人数
+}
+

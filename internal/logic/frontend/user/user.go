@@ -806,13 +806,22 @@ func (s *sUser) GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (re
 		todayInvites = 0
 	}
 
-	// 统计有效邀请人数（有充值）
-	validReferral, err := dao.User.Ctx(ctx).Where("inviter_id", userId).
-		Where("site_id", siteId).
-		Where("pay_times > ?", 0).
-		Count()
-	if err != nil {
-		validReferral = 0
+	// 统计有效邀请人数（充值总额>=100）
+	var validReferral int
+	if totalInvites > 0 {
+		var inviteUsers []entity.User
+		err = dao.User.Ctx(ctx).
+			Where("inviter_id", userId).
+			Where("site_id", siteId).
+			Fields("id").
+			Scan(&inviteUsers)
+		if err == nil && len(inviteUsers) > 0 {
+			ids := make([]int32, 0, len(inviteUsers))
+			for _, u := range inviteUsers {
+				ids = append(ids, int32(u.Id))
+			}
+			validReferral = s.getValidReferralCount(ctx, int64(siteId), ids, 0)
+		}
 	}
 
 	// 统计邀请红利收入（今日/昨日/总）
@@ -921,6 +930,48 @@ func (s *sUser) GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (re
 	middleware.LogWithTrace(ctx, "info", "获取邀请列表成功: user_id=%d, total=%d", userId, total)
 
 	return res, nil
+}
+
+// getValidReferralCount 统计有效邀请人数（按充值总额）
+func (s *sUser) getValidReferralCount(ctx context.Context, siteId int64, userIds []int32, minTotal float64) int {
+	if len(userIds) == 0 {
+		return 0
+	}
+
+	balanceAddr, err := registry.GetServiceAddr("jh_balance_service")
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "获取balance服务地址失败: %v", err)
+		return 0
+	}
+
+	conn, err := grpc.NewClient(
+		balanceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "连接balance服务失败: %v", err)
+		return 0
+	}
+	defer conn.Close()
+
+	client := balancev1.NewBalanceClient(conn)
+
+	md := metadata.New(map[string]string{
+		"site_id": gconv.String(siteId),
+	})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	resp, err := client.GetValidReferralCount(ctx, &balancev1.GetValidReferralCountReq{
+		SiteId:   int32(siteId),
+		UserIds:  userIds,
+		MinTotal: minTotal,
+	})
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "查询有效邀请人数失败: %v", err)
+		return 0
+	}
+
+	return int(resp.Count)
 }
 
 // getInviteBonusSummary 获取邀请红利统计
