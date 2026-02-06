@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // activityInviteBonusDao is the data access object for the table activity_invite_bonus.
@@ -16,7 +19,14 @@ type activityInviteBonusDao struct {
 
 var (
 	// ActivityInviteBonus is a globally accessible object for table activity_invite_bonus operations.
-	ActivityInviteBonus = activityInviteBonusDao{internal.NewActivityInviteBonusDao()}
+	ActivityInviteBonus = activityInviteBonusDao{internal.NewActivityInviteBonusDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d activityInviteBonusDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.ActivityInviteBonusDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.
