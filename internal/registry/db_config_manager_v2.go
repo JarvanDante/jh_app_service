@@ -57,6 +57,7 @@ type ActivityConfig struct {
 	Name         string `json:"name"`
 	Code         string `json:"code"`
 	ActivityType string `json:"activity_type"`
+	Uri          string `json:"uri"`
 	Table        string `json:"table"`
 	FixedParams  string `json:"fixed_params"`
 	StartTime    string `json:"start_time"`
@@ -378,6 +379,9 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 			}
 			if hasField("activity_type") {
 				data["activity_type"] = activity.ActivityType
+			}
+			if hasField("uri") {
+				data["uri"] = activity.Uri
 			}
 			if hasField("table") {
 				data["table"] = activity.Table
