@@ -9,6 +9,7 @@ option go_package = "jh_app_service/api/backend/site/v1";
 service Site {
     rpc GetBasicSetting(GetBasicSettingReq) returns (GetBasicSettingRes) {}
     rpc UpdateBasicSetting(UpdateBasicSettingReq) returns (UpdateBasicSettingRes) {}
+    rpc GetInviteBonusConfig(GetInviteBonusConfigReq) returns (GetInviteBonusConfigRes) {}
 }
 
 message GetBasicSettingReq {
@@ -53,4 +54,21 @@ message UpdateBasicSettingReq {
 
 message UpdateBasicSettingRes {
     string message = 1;                     // 响应消息
+}
+
+message GetInviteBonusConfigReq {
+    int32 site_id = 1;                      // 站点ID，可选
+    string code = 2;                        // 活动全局唯一编码（默认 INVITE）
+}
+
+message GetInviteBonusConfigRes {
+    int32 activity_id = 1;                  // 活动ID
+    string code = 2;                        // 活动编码
+    int32 status = 3;                       // 活动状态
+    string table = 4;                       // 活动参数表
+    int32 trigger_event = 5;                // 发放触发
+    int32 reward_type = 6;                  // 奖励类型
+    double min_recharge_amount = 7;         // 触发最小充值金额
+    double inviter_reward_amount = 8;       // 邀请人奖励金额
+    string fixed_params = 9;                // 固定参数(JSON)
 }

@@ -3,14 +3,17 @@ package site
 import (
 	"context"
 	"fmt"
-	"jh_app_service/api/backend/site/v1"
-	"jh_app_service/internal/service/backend"
+	"strings"
 
-	"github.com/gogf/gf/v2/frame/g"
+	"jh_app_service/api/backend/site/v1"
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/do"
 	"jh_app_service/internal/model/entity"
+	"jh_app_service/internal/registry"
+	"jh_app_service/internal/service/backend"
+
+	"github.com/gogf/gf/v2/frame/g"
 )
 
 type (
@@ -241,6 +244,72 @@ func (s *sSite) UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSetti
 	middleware.LogWithTrace(ctx, "info", "更新站点基本设置成功 - SiteId: %d", siteId)
 	return &v1.UpdateBasicSettingRes{
 		Message: "设置成功",
+	}, nil
+}
+
+// GetInviteBonusConfig 获取邀请活动配置
+func (s *sSite) GetInviteBonusConfig(ctx context.Context, req *v1.GetInviteBonusConfigReq) (*v1.GetInviteBonusConfigRes, error) {
+	siteId := req.SiteId
+	if siteId <= 0 {
+		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
+			siteId = int32(sid)
+		}
+	}
+	if siteId <= 0 {
+		return nil, fmt.Errorf("站点ID不能为空")
+	}
+
+	code := strings.TrimSpace(req.Code)
+	if code == "" {
+		code = "INVITE"
+	}
+
+	siteCode := registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
+	if siteCode == "" {
+		return nil, fmt.Errorf("站点代码不存在: site_id=%d", siteId)
+	}
+
+	// 确保使用站点数据库
+	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
+
+	// 查询活动定义
+	var activity *entity.SiteActivity
+	if err := dao.SiteActivity.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("code", code).
+		Scan(&activity); err != nil {
+		return nil, fmt.Errorf("查询活动失败: %v", err)
+	}
+	if activity == nil || activity.ActivityId == 0 {
+		return nil, fmt.Errorf("活动不存在: code=%s", code)
+	}
+
+	if activity.Table == "" {
+		return nil, fmt.Errorf("活动参数表为空: code=%s", code)
+	}
+
+	// 查询活动参数
+	var config *entity.ActivityInviteBonus
+	if err := dao.ActivityInviteBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activity.ActivityId).
+		Scan(&config); err != nil {
+		return nil, fmt.Errorf("查询活动参数失败: %v", err)
+	}
+	if config == nil || config.Id == 0 {
+		return nil, fmt.Errorf("活动参数不存在: activity_id=%d", activity.ActivityId)
+	}
+
+	return &v1.GetInviteBonusConfigRes{
+		ActivityId:          int32(activity.ActivityId),
+		Code:                activity.Code,
+		Status:              int32(activity.Status),
+		Table:               activity.Table,
+		TriggerEvent:        int32(config.TriggerEvent),
+		RewardType:          int32(config.RewardType),
+		MinRechargeAmount:   config.MinRechargeAmount,
+		InviterRewardAmount: config.InviterRewardAmount,
+		FixedParams:         activity.FixedParams,
 	}, nil
 }
 

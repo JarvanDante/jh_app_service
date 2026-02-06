@@ -22,8 +22,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Site_GetBasicSetting_FullMethodName    = "/site.Site/GetBasicSetting"
-	Site_UpdateBasicSetting_FullMethodName = "/site.Site/UpdateBasicSetting"
+	Site_GetBasicSetting_FullMethodName      = "/site.Site/GetBasicSetting"
+	Site_UpdateBasicSetting_FullMethodName   = "/site.Site/UpdateBasicSetting"
+	Site_GetInviteBonusConfig_FullMethodName = "/site.Site/GetInviteBonusConfig"
 )
 
 // SiteClient is the client API for Site service.
@@ -32,6 +33,7 @@ const (
 type SiteClient interface {
 	GetBasicSetting(ctx context.Context, in *GetBasicSettingReq, opts ...grpc.CallOption) (*GetBasicSettingRes, error)
 	UpdateBasicSetting(ctx context.Context, in *UpdateBasicSettingReq, opts ...grpc.CallOption) (*UpdateBasicSettingRes, error)
+	GetInviteBonusConfig(ctx context.Context, in *GetInviteBonusConfigReq, opts ...grpc.CallOption) (*GetInviteBonusConfigRes, error)
 }
 
 type siteClient struct {
@@ -62,12 +64,23 @@ func (c *siteClient) UpdateBasicSetting(ctx context.Context, in *UpdateBasicSett
 	return out, nil
 }
 
+func (c *siteClient) GetInviteBonusConfig(ctx context.Context, in *GetInviteBonusConfigReq, opts ...grpc.CallOption) (*GetInviteBonusConfigRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetInviteBonusConfigRes)
+	err := c.cc.Invoke(ctx, Site_GetInviteBonusConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SiteServer is the server API for Site service.
 // All implementations must embed UnimplementedSiteServer
 // for forward compatibility.
 type SiteServer interface {
 	GetBasicSetting(context.Context, *GetBasicSettingReq) (*GetBasicSettingRes, error)
 	UpdateBasicSetting(context.Context, *UpdateBasicSettingReq) (*UpdateBasicSettingRes, error)
+	GetInviteBonusConfig(context.Context, *GetInviteBonusConfigReq) (*GetInviteBonusConfigRes, error)
 	mustEmbedUnimplementedSiteServer()
 }
 
@@ -83,6 +96,9 @@ func (UnimplementedSiteServer) GetBasicSetting(context.Context, *GetBasicSetting
 }
 func (UnimplementedSiteServer) UpdateBasicSetting(context.Context, *UpdateBasicSettingReq) (*UpdateBasicSettingRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateBasicSetting not implemented")
+}
+func (UnimplementedSiteServer) GetInviteBonusConfig(context.Context, *GetInviteBonusConfigReq) (*GetInviteBonusConfigRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetInviteBonusConfig not implemented")
 }
 func (UnimplementedSiteServer) mustEmbedUnimplementedSiteServer() {}
 func (UnimplementedSiteServer) testEmbeddedByValue()              {}
@@ -141,6 +157,24 @@ func _Site_UpdateBasicSetting_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Site_GetInviteBonusConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInviteBonusConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SiteServer).GetInviteBonusConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Site_GetInviteBonusConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SiteServer).GetInviteBonusConfig(ctx, req.(*GetInviteBonusConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Site_ServiceDesc is the grpc.ServiceDesc for Site service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -155,6 +189,10 @@ var Site_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateBasicSetting",
 			Handler:    _Site_UpdateBasicSetting_Handler,
+		},
+		{
+			MethodName: "GetInviteBonusConfig",
+			Handler:    _Site_GetInviteBonusConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

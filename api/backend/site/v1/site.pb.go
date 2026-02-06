@@ -417,6 +417,166 @@ func (x *UpdateBasicSettingRes) GetMessage() string {
 	return ""
 }
 
+type GetInviteBonusConfigReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID，可选"` // 站点ID，可选
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code" dc:"活动全局唯一编码（默认 INVITE）"`        // 活动全局唯一编码（默认 INVITE）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInviteBonusConfigReq) Reset() {
+	*x = GetInviteBonusConfigReq{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInviteBonusConfigReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInviteBonusConfigReq) ProtoMessage() {}
+
+func (x *GetInviteBonusConfigReq) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInviteBonusConfigReq.ProtoReflect.Descriptor instead.
+func (*GetInviteBonusConfigReq) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetInviteBonusConfigReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigReq) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type GetInviteBonusConfigRes struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	ActivityId          int32                  `protobuf:"varint,1,opt,name=activity_id,json=activityId,proto3" json:"activity_id" dc:"活动ID"`                                  // 活动ID
+	Code                string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code" dc:"活动编码"`                                                                 // 活动编码
+	Status              int32                  `protobuf:"varint,3,opt,name=status,proto3" json:"status" dc:"活动状态"`                                                            // 活动状态
+	Table               string                 `protobuf:"bytes,4,opt,name=table,proto3" json:"table" dc:"活动参数表"`                                                              // 活动参数表
+	TriggerEvent        int32                  `protobuf:"varint,5,opt,name=trigger_event,json=triggerEvent,proto3" json:"trigger_event" dc:"发放触发"`                            // 发放触发
+	RewardType          int32                  `protobuf:"varint,6,opt,name=reward_type,json=rewardType,proto3" json:"reward_type" dc:"奖励类型"`                                  // 奖励类型
+	MinRechargeAmount   float64                `protobuf:"fixed64,7,opt,name=min_recharge_amount,json=minRechargeAmount,proto3" json:"min_recharge_amount" dc:"触发最小充值金额"`      // 触发最小充值金额
+	InviterRewardAmount float64                `protobuf:"fixed64,8,opt,name=inviter_reward_amount,json=inviterRewardAmount,proto3" json:"inviter_reward_amount" dc:"邀请人奖励金额"` // 邀请人奖励金额
+	FixedParams         string                 `protobuf:"bytes,9,opt,name=fixed_params,json=fixedParams,proto3" json:"fixed_params" dc:"固定参数(JSON)"`                          // 固定参数(JSON)
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *GetInviteBonusConfigRes) Reset() {
+	*x = GetInviteBonusConfigRes{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInviteBonusConfigRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInviteBonusConfigRes) ProtoMessage() {}
+
+func (x *GetInviteBonusConfigRes) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInviteBonusConfigRes.ProtoReflect.Descriptor instead.
+func (*GetInviteBonusConfigRes) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetInviteBonusConfigRes) GetActivityId() int32 {
+	if x != nil {
+		return x.ActivityId
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigRes) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *GetInviteBonusConfigRes) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigRes) GetTable() string {
+	if x != nil {
+		return x.Table
+	}
+	return ""
+}
+
+func (x *GetInviteBonusConfigRes) GetTriggerEvent() int32 {
+	if x != nil {
+		return x.TriggerEvent
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigRes) GetRewardType() int32 {
+	if x != nil {
+		return x.RewardType
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigRes) GetMinRechargeAmount() float64 {
+	if x != nil {
+		return x.MinRechargeAmount
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigRes) GetInviterRewardAmount() float64 {
+	if x != nil {
+		return x.InviterRewardAmount
+	}
+	return 0
+}
+
+func (x *GetInviteBonusConfigRes) GetFixedParams() string {
+	if x != nil {
+		return x.FixedParams
+	}
+	return ""
+}
+
 var File_backend_site_v1_site_proto protoreflect.FileDescriptor
 
 const file_backend_site_v1_site_proto_rawDesc = "" +
@@ -466,10 +626,26 @@ const file_backend_site_v1_site_proto_rawDesc = "" +
 	"\vurl_service\x18\f \x01(\tR\n" +
 	"urlService\"1\n" +
 	"\x15UpdateBasicSettingRes\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xa1\x01\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"F\n" +
+	"\x17GetInviteBonusConfigReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"\xc9\x02\n" +
+	"\x17GetInviteBonusConfigRes\x12\x1f\n" +
+	"\vactivity_id\x18\x01 \x01(\x05R\n" +
+	"activityId\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\x05R\x06status\x12\x14\n" +
+	"\x05table\x18\x04 \x01(\tR\x05table\x12#\n" +
+	"\rtrigger_event\x18\x05 \x01(\x05R\ftriggerEvent\x12\x1f\n" +
+	"\vreward_type\x18\x06 \x01(\x05R\n" +
+	"rewardType\x12.\n" +
+	"\x13min_recharge_amount\x18\a \x01(\x01R\x11minRechargeAmount\x122\n" +
+	"\x15inviter_reward_amount\x18\b \x01(\x01R\x13inviterRewardAmount\x12!\n" +
+	"\ffixed_params\x18\t \x01(\tR\vfixedParams2\xf9\x01\n" +
 	"\x04Site\x12G\n" +
 	"\x0fGetBasicSetting\x12\x18.site.GetBasicSettingReq\x1a\x18.site.GetBasicSettingRes\"\x00\x12P\n" +
-	"\x12UpdateBasicSetting\x12\x1b.site.UpdateBasicSettingReq\x1a\x1b.site.UpdateBasicSettingRes\"\x00B$Z\"jh_app_service/api/backend/site/v1b\x06proto3"
+	"\x12UpdateBasicSetting\x12\x1b.site.UpdateBasicSettingReq\x1a\x1b.site.UpdateBasicSettingRes\"\x00\x12V\n" +
+	"\x14GetInviteBonusConfig\x12\x1d.site.GetInviteBonusConfigReq\x1a\x1d.site.GetInviteBonusConfigRes\"\x00B$Z\"jh_app_service/api/backend/site/v1b\x06proto3"
 
 var (
 	file_backend_site_v1_site_proto_rawDescOnce sync.Once
@@ -483,20 +659,24 @@ func file_backend_site_v1_site_proto_rawDescGZIP() []byte {
 	return file_backend_site_v1_site_proto_rawDescData
 }
 
-var file_backend_site_v1_site_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_backend_site_v1_site_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_backend_site_v1_site_proto_goTypes = []any{
-	(*GetBasicSettingReq)(nil),    // 0: site.GetBasicSettingReq
-	(*GetBasicSettingRes)(nil),    // 1: site.GetBasicSettingRes
-	(*UpdateBasicSettingReq)(nil), // 2: site.UpdateBasicSettingReq
-	(*UpdateBasicSettingRes)(nil), // 3: site.UpdateBasicSettingRes
+	(*GetBasicSettingReq)(nil),      // 0: site.GetBasicSettingReq
+	(*GetBasicSettingRes)(nil),      // 1: site.GetBasicSettingRes
+	(*UpdateBasicSettingReq)(nil),   // 2: site.UpdateBasicSettingReq
+	(*UpdateBasicSettingRes)(nil),   // 3: site.UpdateBasicSettingRes
+	(*GetInviteBonusConfigReq)(nil), // 4: site.GetInviteBonusConfigReq
+	(*GetInviteBonusConfigRes)(nil), // 5: site.GetInviteBonusConfigRes
 }
 var file_backend_site_v1_site_proto_depIdxs = []int32{
 	0, // 0: site.Site.GetBasicSetting:input_type -> site.GetBasicSettingReq
 	2, // 1: site.Site.UpdateBasicSetting:input_type -> site.UpdateBasicSettingReq
-	1, // 2: site.Site.GetBasicSetting:output_type -> site.GetBasicSettingRes
-	3, // 3: site.Site.UpdateBasicSetting:output_type -> site.UpdateBasicSettingRes
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	4, // 2: site.Site.GetInviteBonusConfig:input_type -> site.GetInviteBonusConfigReq
+	1, // 3: site.Site.GetBasicSetting:output_type -> site.GetBasicSettingRes
+	3, // 4: site.Site.UpdateBasicSetting:output_type -> site.UpdateBasicSettingRes
+	5, // 5: site.Site.GetInviteBonusConfig:output_type -> site.GetInviteBonusConfigRes
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -513,7 +693,7 @@ func file_backend_site_v1_site_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_backend_site_v1_site_proto_rawDesc), len(file_backend_site_v1_site_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

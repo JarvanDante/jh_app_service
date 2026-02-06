@@ -14,6 +14,7 @@ type (
 	ISite interface {
 		GetBasicSetting(ctx context.Context, req *v1.GetBasicSettingReq) (*v1.GetBasicSettingRes, error)
 		UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSettingReq) (*v1.UpdateBasicSettingRes, error)
+		GetInviteBonusConfig(ctx context.Context, req *v1.GetInviteBonusConfigReq) (*v1.GetInviteBonusConfigRes, error)
 	}
 )
 

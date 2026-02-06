@@ -25,3 +25,8 @@ func (*Controller) GetBasicSetting(ctx context.Context, req *v2.GetBasicSettingR
 func (*Controller) UpdateBasicSetting(ctx context.Context, req *v2.UpdateBasicSettingReq) (res *v2.UpdateBasicSettingRes, err error) {
 	return backend.Site().UpdateBasicSetting(ctx, req)
 }
+
+// GetInviteBonusConfig 获取邀请活动配置 (gRPC)
+func (*Controller) GetInviteBonusConfig(ctx context.Context, req *v2.GetInviteBonusConfigReq) (res *v2.GetInviteBonusConfigRes, err error) {
+	return backend.Site().GetInviteBonusConfig(ctx, req)
+}
