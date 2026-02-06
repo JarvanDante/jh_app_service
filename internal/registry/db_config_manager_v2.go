@@ -538,10 +538,7 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 			}
 
 			if count > 0 {
-				if _, err := tx.Model(activity.Table).Where(where).Data(data).Update(); err != nil {
-					g.Log().Errorf(ctx, "更新活动参数失败: table=%s, activity=%d, error=%v",
-						activity.Table, activity.ActivityId, err)
-				}
+				g.Log().Infof(ctx, "活动参数已存在，跳过覆盖: table=%s, activity=%d", activity.Table, activity.ActivityId)
 				return
 			}
 
