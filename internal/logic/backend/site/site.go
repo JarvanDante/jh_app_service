@@ -89,6 +89,36 @@ var activityParamMappings = map[string][]activityParamField{
 			Type:  "int",
 		},
 	},
+	"activity_deposit_bonus": {
+		{
+			Name:  "trigger_event",
+			Label: "发放触发",
+			Type:  "select",
+			Options: []activityParamOption{
+				{Label: "充值总和", Value: "1"},
+				{Label: "首充", Value: "2"},
+			},
+		},
+		{
+			Name:  "reward_type",
+			Label: "奖励类型",
+			Type:  "select",
+			Options: []activityParamOption{
+				{Label: "固定", Value: "1"},
+				{Label: "比例", Value: "2"},
+			},
+		},
+		{
+			Name:  "min_recharge_amount",
+			Label: "触发最小充值金额",
+			Type:  "number",
+		},
+		{
+			Name:  "reward_amount",
+			Label: "奖励金额/比例值",
+			Type:  "number",
+		},
+	},
 }
 
 // GetBasicSetting 获取站点基本设置
@@ -513,6 +543,21 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 		values["reward_amount"] = gconv.String(config.RewardAmount)
 		values["limit_ip"] = strconv.Itoa(config.LimitIp)
 		values["limit_device"] = strconv.Itoa(config.LimitDevice)
+	case "activity_deposit_bonus":
+		var config *entity.ActivityDepositBonus
+		if err := dao.ActivityDepositBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activity.ActivityId).
+			Scan(&config); err != nil {
+			return nil, fmt.Errorf("查询活动参数失败: %v", err)
+		}
+		if config == nil || config.Id == 0 {
+			return nil, fmt.Errorf("没有对应参数配置表，请确认")
+		}
+		values["trigger_event"] = strconv.Itoa(config.TriggerEvent)
+		values["reward_type"] = strconv.Itoa(config.RewardType)
+		values["min_recharge_amount"] = gconv.String(config.MinRechargeAmount)
+		values["reward_amount"] = gconv.String(config.RewardAmount)
 	default:
 		return nil, fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -660,6 +705,8 @@ func applyActivityParamValues(ctx context.Context, siteCode string, activity *en
 		return applyInviteBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	case "activity_register_bonus":
 		return applyRegisterBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
+	case "activity_deposit_bonus":
+		return applyDepositBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	default:
 		return "", fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -769,6 +816,64 @@ func applyRegisterBonusParamValues(ctx context.Context, siteCode string, activit
 		"reward_amount": config.RewardAmount,
 		"limit_ip":      config.LimitIp,
 		"limit_device":  config.LimitDevice,
+	}
+	data, err := json.Marshal(fixedParams)
+	if err != nil {
+		return "", fmt.Errorf("构建固定参数失败: %v", err)
+	}
+	return string(data), nil
+}
+
+func applyDepositBonusParamValues(ctx context.Context, siteCode string, activityId int, paramValues map[string]string) (string, error) {
+	var config *entity.ActivityDepositBonus
+	if err := dao.ActivityDepositBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Scan(&config); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+	if config == nil || config.Id == 0 {
+		return "", fmt.Errorf("没有对应参数配置表，请确认")
+	}
+
+	updateFields := g.Map{}
+	for key, value := range paramValues {
+		val := strings.TrimSpace(value)
+		if val == "" {
+			continue
+		}
+		switch key {
+		case "trigger_event":
+			config.TriggerEvent = gconv.Int(val)
+			updateFields["trigger_event"] = config.TriggerEvent
+		case "reward_type":
+			config.RewardType = gconv.Int(val)
+			updateFields["reward_type"] = config.RewardType
+		case "min_recharge_amount":
+			config.MinRechargeAmount = gconv.Float64(val)
+			updateFields["min_recharge_amount"] = config.MinRechargeAmount
+		case "reward_amount":
+			config.RewardAmount = gconv.Float64(val)
+			updateFields["reward_amount"] = config.RewardAmount
+		}
+	}
+
+	if len(updateFields) > 0 {
+		updateFields["updated_at"] = gtime.Now()
+		if _, err := dao.ActivityDepositBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activityId).
+			Data(updateFields).
+			Update(); err != nil {
+			return "", fmt.Errorf("更新活动参数失败: %v", err)
+		}
+	}
+
+	fixedParams := map[string]interface{}{
+		"trigger_event":       config.TriggerEvent,
+		"reward_type":         config.RewardType,
+		"min_recharge_amount": config.MinRechargeAmount,
+		"reward_amount":       config.RewardAmount,
 	}
 	data, err := json.Marshal(fixedParams)
 	if err != nil {
