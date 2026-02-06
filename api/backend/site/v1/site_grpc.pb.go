@@ -25,6 +25,8 @@ const (
 	Site_GetBasicSetting_FullMethodName      = "/site.Site/GetBasicSetting"
 	Site_UpdateBasicSetting_FullMethodName   = "/site.Site/UpdateBasicSetting"
 	Site_GetInviteBonusConfig_FullMethodName = "/site.Site/GetInviteBonusConfig"
+	Site_GetSiteActivityList_FullMethodName  = "/site.Site/GetSiteActivityList"
+	Site_UpdateSiteActivity_FullMethodName   = "/site.Site/UpdateSiteActivity"
 )
 
 // SiteClient is the client API for Site service.
@@ -34,6 +36,8 @@ type SiteClient interface {
 	GetBasicSetting(ctx context.Context, in *GetBasicSettingReq, opts ...grpc.CallOption) (*GetBasicSettingRes, error)
 	UpdateBasicSetting(ctx context.Context, in *UpdateBasicSettingReq, opts ...grpc.CallOption) (*UpdateBasicSettingRes, error)
 	GetInviteBonusConfig(ctx context.Context, in *GetInviteBonusConfigReq, opts ...grpc.CallOption) (*GetInviteBonusConfigRes, error)
+	GetSiteActivityList(ctx context.Context, in *GetSiteActivityListReq, opts ...grpc.CallOption) (*GetSiteActivityListRes, error)
+	UpdateSiteActivity(ctx context.Context, in *UpdateSiteActivityReq, opts ...grpc.CallOption) (*UpdateSiteActivityRes, error)
 }
 
 type siteClient struct {
@@ -74,6 +78,26 @@ func (c *siteClient) GetInviteBonusConfig(ctx context.Context, in *GetInviteBonu
 	return out, nil
 }
 
+func (c *siteClient) GetSiteActivityList(ctx context.Context, in *GetSiteActivityListReq, opts ...grpc.CallOption) (*GetSiteActivityListRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSiteActivityListRes)
+	err := c.cc.Invoke(ctx, Site_GetSiteActivityList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *siteClient) UpdateSiteActivity(ctx context.Context, in *UpdateSiteActivityReq, opts ...grpc.CallOption) (*UpdateSiteActivityRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateSiteActivityRes)
+	err := c.cc.Invoke(ctx, Site_UpdateSiteActivity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SiteServer is the server API for Site service.
 // All implementations must embed UnimplementedSiteServer
 // for forward compatibility.
@@ -81,6 +105,8 @@ type SiteServer interface {
 	GetBasicSetting(context.Context, *GetBasicSettingReq) (*GetBasicSettingRes, error)
 	UpdateBasicSetting(context.Context, *UpdateBasicSettingReq) (*UpdateBasicSettingRes, error)
 	GetInviteBonusConfig(context.Context, *GetInviteBonusConfigReq) (*GetInviteBonusConfigRes, error)
+	GetSiteActivityList(context.Context, *GetSiteActivityListReq) (*GetSiteActivityListRes, error)
+	UpdateSiteActivity(context.Context, *UpdateSiteActivityReq) (*UpdateSiteActivityRes, error)
 	mustEmbedUnimplementedSiteServer()
 }
 
@@ -99,6 +125,12 @@ func (UnimplementedSiteServer) UpdateBasicSetting(context.Context, *UpdateBasicS
 }
 func (UnimplementedSiteServer) GetInviteBonusConfig(context.Context, *GetInviteBonusConfigReq) (*GetInviteBonusConfigRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetInviteBonusConfig not implemented")
+}
+func (UnimplementedSiteServer) GetSiteActivityList(context.Context, *GetSiteActivityListReq) (*GetSiteActivityListRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSiteActivityList not implemented")
+}
+func (UnimplementedSiteServer) UpdateSiteActivity(context.Context, *UpdateSiteActivityReq) (*UpdateSiteActivityRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateSiteActivity not implemented")
 }
 func (UnimplementedSiteServer) mustEmbedUnimplementedSiteServer() {}
 func (UnimplementedSiteServer) testEmbeddedByValue()              {}
@@ -175,6 +207,42 @@ func _Site_GetInviteBonusConfig_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Site_GetSiteActivityList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSiteActivityListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SiteServer).GetSiteActivityList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Site_GetSiteActivityList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SiteServer).GetSiteActivityList(ctx, req.(*GetSiteActivityListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Site_UpdateSiteActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSiteActivityReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SiteServer).UpdateSiteActivity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Site_UpdateSiteActivity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SiteServer).UpdateSiteActivity(ctx, req.(*UpdateSiteActivityReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Site_ServiceDesc is the grpc.ServiceDesc for Site service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -193,6 +261,14 @@ var Site_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetInviteBonusConfig",
 			Handler:    _Site_GetInviteBonusConfig_Handler,
+		},
+		{
+			MethodName: "GetSiteActivityList",
+			Handler:    _Site_GetSiteActivityList_Handler,
+		},
+		{
+			MethodName: "UpdateSiteActivity",
+			Handler:    _Site_UpdateSiteActivity_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -30,3 +30,13 @@ func (*Controller) UpdateBasicSetting(ctx context.Context, req *v2.UpdateBasicSe
 func (*Controller) GetInviteBonusConfig(ctx context.Context, req *v2.GetInviteBonusConfigReq) (res *v2.GetInviteBonusConfigRes, err error) {
 	return backend.Site().GetInviteBonusConfig(ctx, req)
 }
+
+// GetSiteActivityList 查询活动配置列表 (gRPC)
+func (*Controller) GetSiteActivityList(ctx context.Context, req *v2.GetSiteActivityListReq) (res *v2.GetSiteActivityListRes, err error) {
+	return backend.Site().GetSiteActivityList(ctx, req)
+}
+
+// UpdateSiteActivity 更新活动配置 (gRPC)
+func (*Controller) UpdateSiteActivity(ctx context.Context, req *v2.UpdateSiteActivityReq) (res *v2.UpdateSiteActivityRes, err error) {
+	return backend.Site().UpdateSiteActivity(ctx, req)
+}

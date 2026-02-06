@@ -10,6 +10,8 @@ service Site {
     rpc GetBasicSetting(GetBasicSettingReq) returns (GetBasicSettingRes) {}
     rpc UpdateBasicSetting(UpdateBasicSettingReq) returns (UpdateBasicSettingRes) {}
     rpc GetInviteBonusConfig(GetInviteBonusConfigReq) returns (GetInviteBonusConfigRes) {}
+    rpc GetSiteActivityList(GetSiteActivityListReq) returns (GetSiteActivityListRes) {}
+    rpc UpdateSiteActivity(UpdateSiteActivityReq) returns (UpdateSiteActivityRes) {}
 }
 
 message GetBasicSettingReq {
@@ -71,4 +73,50 @@ message GetInviteBonusConfigRes {
     double min_recharge_amount = 7;         // 触发最小充值金额
     double inviter_reward_amount = 8;       // 邀请人奖励金额
     string fixed_params = 9;                // 固定参数(JSON)
+}
+
+message GetSiteActivityListReq {
+    int32 site_id = 1;                      // 站点ID，可选
+    int32 activity_id = 2;                  // 活动ID(可选)
+    string code = 3;                        // 活动编码(可选)
+}
+
+message SiteActivityInfo {
+    int32 id = 1;
+    string site_code = 2;
+    int32 activity_id = 3;
+    string name = 4;
+    string code = 5;
+    string description = 6;
+    string start_time = 7;
+    string end_time = 8;
+    string fixed_params = 9;
+    int32 status = 10;
+    int32 sort = 11;
+    string table = 12;
+    string created_at = 13;
+    string updated_at = 14;
+}
+
+message GetSiteActivityListRes {
+    repeated SiteActivityInfo list = 1;
+}
+
+message UpdateSiteActivityReq {
+    int32 site_id = 1;                      // 站点ID，可选
+    int32 activity_id = 2;                  // 活动ID(可选，优先)
+    string code = 3;                        // 活动编码(可选)
+    string description = 4;                 // 活动描述
+    string start_time = 5;                  // 开始时间
+    string end_time = 6;                    // 结束时间
+    string fixed_params = 7;                // 固定参数(JSON)
+    int32 status = 8;                       // 状态
+    int32 sort = 9;                         // 排序
+    bool status_set = 10;                   // 是否更新status
+    bool sort_set = 11;                     // 是否更新sort
+}
+
+message UpdateSiteActivityRes {
+    bool success = 1;
+    string message = 2;
 }

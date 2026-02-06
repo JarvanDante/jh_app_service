@@ -12,8 +12,10 @@ import (
 	"jh_app_service/internal/model/entity"
 	"jh_app_service/internal/registry"
 	"jh_app_service/internal/service/backend"
+	"jh_app_service/internal/util"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
 type (
@@ -311,6 +313,134 @@ func (s *sSite) GetInviteBonusConfig(ctx context.Context, req *v1.GetInviteBonus
 		InviterRewardAmount: config.InviterRewardAmount,
 		FixedParams:         activity.FixedParams,
 	}, nil
+}
+
+// GetSiteActivityList 查询活动配置列表
+func (s *sSite) GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivityListReq) (*v1.GetSiteActivityListRes, error) {
+	siteId := req.SiteId
+	if siteId <= 0 {
+		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
+			siteId = int32(sid)
+		}
+	}
+	if siteId <= 0 {
+		return nil, fmt.Errorf("站点ID不能为空")
+	}
+
+	siteCode := registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
+	if siteCode == "" {
+		return nil, fmt.Errorf("站点代码不存在: site_id=%d", siteId)
+	}
+
+	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
+
+	model := dao.SiteActivity.Ctx(ctx).Where("site_code", siteCode)
+	if req.ActivityId > 0 {
+		model = model.Where("activity_id", req.ActivityId)
+	}
+	if strings.TrimSpace(req.Code) != "" {
+		model = model.Where("code", strings.TrimSpace(req.Code))
+	}
+
+	var list []*entity.SiteActivity
+	if err := model.Order("sort asc, id asc").Scan(&list); err != nil {
+		return nil, fmt.Errorf("查询活动配置失败: %v", err)
+	}
+
+	res := &v1.GetSiteActivityListRes{List: make([]*v1.SiteActivityInfo, 0, len(list))}
+	for _, item := range list {
+		res.List = append(res.List, &v1.SiteActivityInfo{
+			Id:          int32(item.Id),
+			SiteCode:    item.SiteCode,
+			ActivityId:  int32(item.ActivityId),
+			Name:        item.Name,
+			Code:        item.Code,
+			Description: item.Description,
+			StartTime:   util.FormatTime(item.StartTime),
+			EndTime:     util.FormatTime(item.EndTime),
+			FixedParams: item.FixedParams,
+			Status:      int32(item.Status),
+			Sort:        int32(item.Sort),
+			Table:       item.Table,
+			CreatedAt:   util.FormatTime(item.CreatedAt),
+			UpdatedAt:   util.FormatTime(item.UpdatedAt),
+		})
+	}
+
+	return res, nil
+}
+
+// UpdateSiteActivity 更新活动配置
+func (s *sSite) UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivityReq) (*v1.UpdateSiteActivityRes, error) {
+	siteId := req.SiteId
+	if siteId <= 0 {
+		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
+			siteId = int32(sid)
+		}
+	}
+	if siteId <= 0 {
+		return nil, fmt.Errorf("站点ID不能为空")
+	}
+
+	siteCode := registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
+	if siteCode == "" {
+		return nil, fmt.Errorf("站点代码不存在: site_id=%d", siteId)
+	}
+
+	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
+
+	updateFields := g.Map{}
+	if strings.TrimSpace(req.Description) != "" {
+		updateFields["description"] = strings.TrimSpace(req.Description)
+	}
+	if strings.TrimSpace(req.StartTime) != "" {
+		if t, err := gtime.StrToTime(strings.TrimSpace(req.StartTime)); err == nil {
+			updateFields["start_time"] = t
+		} else {
+			updateFields["start_time"] = strings.TrimSpace(req.StartTime)
+		}
+	}
+	if strings.TrimSpace(req.EndTime) != "" {
+		if t, err := gtime.StrToTime(strings.TrimSpace(req.EndTime)); err == nil {
+			updateFields["end_time"] = t
+		} else {
+			updateFields["end_time"] = strings.TrimSpace(req.EndTime)
+		}
+	}
+	if strings.TrimSpace(req.FixedParams) != "" {
+		updateFields["fixed_params"] = strings.TrimSpace(req.FixedParams)
+	}
+	if req.StatusSet {
+		updateFields["status"] = req.Status
+	}
+	if req.SortSet {
+		updateFields["sort"] = req.Sort
+	}
+
+	if len(updateFields) == 0 {
+		return &v1.UpdateSiteActivityRes{Success: false, Message: "没有需要更新的字段"}, nil
+	}
+	updateFields["updated_at"] = gtime.Now()
+
+	model := dao.SiteActivity.Ctx(ctx).Where("site_code", siteCode)
+	if req.ActivityId > 0 {
+		model = model.Where("activity_id", req.ActivityId)
+	} else if strings.TrimSpace(req.Code) != "" {
+		model = model.Where("code", strings.TrimSpace(req.Code))
+	} else {
+		return &v1.UpdateSiteActivityRes{Success: false, Message: "活动ID或编码不能为空"}, nil
+	}
+
+	result, err := model.Data(updateFields).Update()
+	if err != nil {
+		return &v1.UpdateSiteActivityRes{Success: false, Message: err.Error()}, nil
+	}
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return &v1.UpdateSiteActivityRes{Success: false, Message: "未找到匹配活动或数据未变化"}, nil
+	}
+
+	return &v1.UpdateSiteActivityRes{Success: true, Message: "更新成功"}, nil
 }
 
 // validateUpdateBasicSetting 验证更新基本设置的参数

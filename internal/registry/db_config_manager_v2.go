@@ -414,6 +414,57 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 			return data
 		}
 
+		protectKVFields := func(ctx context.Context, tx gdb.TX, key string, data g.Map) g.Map {
+			if len(data) == 0 {
+				return data
+			}
+			// 如果没有这些字段，直接返回
+			if !hasField("description") && !hasField("start_time") && !hasField("end_time") &&
+				!hasField("fixed_params") && !hasField("status") && !hasField("sort") {
+				return data
+			}
+
+			type existingFields struct {
+				Description string      `json:"description"`
+				StartTime   *gtime.Time `json:"start_time"`
+				EndTime     *gtime.Time `json:"end_time"`
+				FixedParams string      `json:"fixed_params"`
+				Status      *int        `json:"status"`
+				Sort        *int        `json:"sort"`
+			}
+
+			var existing existingFields
+			if err := tx.Model("site_activity").
+				Fields("description,start_time,end_time,fixed_params,status,sort").
+				Where(siteFilter).
+				Where(keyField, key).
+				Scan(&existing); err != nil {
+				g.Log().Warningf(ctx, "查询活动已有字段失败: key=%s, error=%v", key, err)
+				return data
+			}
+
+			if hasField("description") && strings.TrimSpace(existing.Description) != "" {
+				delete(data, "description")
+			}
+			if hasField("start_time") && existing.StartTime != nil && !existing.StartTime.IsZero() {
+				delete(data, "start_time")
+			}
+			if hasField("end_time") && existing.EndTime != nil && !existing.EndTime.IsZero() {
+				delete(data, "end_time")
+			}
+			if hasField("fixed_params") && strings.TrimSpace(existing.FixedParams) != "" {
+				delete(data, "fixed_params")
+			}
+			if hasField("status") && existing.Status != nil {
+				delete(data, "status")
+			}
+			if hasField("sort") && existing.Sort != nil {
+				delete(data, "sort")
+			}
+
+			return data
+		}
+
 		syncFixedParams := func(activity ActivityConfig) {
 			if activity.Table == "" {
 				return
@@ -531,10 +582,12 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 			}
 
 			if count > 0 {
+				updateData := buildData(activity, false)
+				updateData = protectKVFields(ctx, tx, key, updateData)
 				_, err = tx.Model("site_activity").
 					Where(siteFilter).
 					Where(keyField, key).
-					Data(buildData(activity, false)).
+					Data(updateData).
 					Update()
 				if err != nil {
 					g.Log().Errorf(ctx, "更新活动配置失败: key=%s, error=%v", key, err)

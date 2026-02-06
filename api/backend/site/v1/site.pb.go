@@ -577,6 +577,434 @@ func (x *GetInviteBonusConfigRes) GetFixedParams() string {
 	return ""
 }
 
+type GetSiteActivityListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID，可选"`              // 站点ID，可选
+	ActivityId    int32                  `protobuf:"varint,2,opt,name=activity_id,json=activityId,proto3" json:"activity_id" dc:"活动ID(可选)"` // 活动ID(可选)
+	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code" dc:"活动编码(可选)"`                                // 活动编码(可选)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSiteActivityListReq) Reset() {
+	*x = GetSiteActivityListReq{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSiteActivityListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSiteActivityListReq) ProtoMessage() {}
+
+func (x *GetSiteActivityListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSiteActivityListReq.ProtoReflect.Descriptor instead.
+func (*GetSiteActivityListReq) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetSiteActivityListReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *GetSiteActivityListReq) GetActivityId() int32 {
+	if x != nil {
+		return x.ActivityId
+	}
+	return 0
+}
+
+func (x *GetSiteActivityListReq) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type SiteActivityInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
+	SiteCode      string                 `protobuf:"bytes,2,opt,name=site_code,json=siteCode,proto3" json:"site_code"`
+	ActivityId    int32                  `protobuf:"varint,3,opt,name=activity_id,json=activityId,proto3" json:"activity_id"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name"`
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code"`
+	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description"`
+	StartTime     string                 `protobuf:"bytes,7,opt,name=start_time,json=startTime,proto3" json:"start_time"`
+	EndTime       string                 `protobuf:"bytes,8,opt,name=end_time,json=endTime,proto3" json:"end_time"`
+	FixedParams   string                 `protobuf:"bytes,9,opt,name=fixed_params,json=fixedParams,proto3" json:"fixed_params"`
+	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status"`
+	Sort          int32                  `protobuf:"varint,11,opt,name=sort,proto3" json:"sort"`
+	Table         string                 `protobuf:"bytes,12,opt,name=table,proto3" json:"table"`
+	CreatedAt     string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
+	UpdatedAt     string                 `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SiteActivityInfo) Reset() {
+	*x = SiteActivityInfo{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SiteActivityInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SiteActivityInfo) ProtoMessage() {}
+
+func (x *SiteActivityInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SiteActivityInfo.ProtoReflect.Descriptor instead.
+func (*SiteActivityInfo) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SiteActivityInfo) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SiteActivityInfo) GetSiteCode() string {
+	if x != nil {
+		return x.SiteCode
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetActivityId() int32 {
+	if x != nil {
+		return x.ActivityId
+	}
+	return 0
+}
+
+func (x *SiteActivityInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetEndTime() string {
+	if x != nil {
+		return x.EndTime
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetFixedParams() string {
+	if x != nil {
+		return x.FixedParams
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *SiteActivityInfo) GetSort() int32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *SiteActivityInfo) GetTable() string {
+	if x != nil {
+		return x.Table
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *SiteActivityInfo) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type GetSiteActivityListRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*SiteActivityInfo    `protobuf:"bytes,1,rep,name=list,proto3" json:"list"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSiteActivityListRes) Reset() {
+	*x = GetSiteActivityListRes{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSiteActivityListRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSiteActivityListRes) ProtoMessage() {}
+
+func (x *GetSiteActivityListRes) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSiteActivityListRes.ProtoReflect.Descriptor instead.
+func (*GetSiteActivityListRes) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetSiteActivityListRes) GetList() []*SiteActivityInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type UpdateSiteActivityReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID，可选"`                  // 站点ID，可选
+	ActivityId    int32                  `protobuf:"varint,2,opt,name=activity_id,json=activityId,proto3" json:"activity_id" dc:"活动ID(可选，优先)"`  // 活动ID(可选，优先)
+	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code" dc:"活动编码(可选)"`                                    // 活动编码(可选)
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description" dc:"活动描述"`                          // 活动描述
+	StartTime     string                 `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3" json:"start_time" dc:"开始时间"`             // 开始时间
+	EndTime       string                 `protobuf:"bytes,6,opt,name=end_time,json=endTime,proto3" json:"end_time" dc:"结束时间"`                   // 结束时间
+	FixedParams   string                 `protobuf:"bytes,7,opt,name=fixed_params,json=fixedParams,proto3" json:"fixed_params" dc:"固定参数(JSON)"` // 固定参数(JSON)
+	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status" dc:"状态"`                                     // 状态
+	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort" dc:"排序"`                                         // 排序
+	StatusSet     bool                   `protobuf:"varint,10,opt,name=status_set,json=statusSet,proto3" json:"status_set" dc:"是否更新status"`     // 是否更新status
+	SortSet       bool                   `protobuf:"varint,11,opt,name=sort_set,json=sortSet,proto3" json:"sort_set" dc:"是否更新sort"`             // 是否更新sort
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateSiteActivityReq) Reset() {
+	*x = UpdateSiteActivityReq{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateSiteActivityReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateSiteActivityReq) ProtoMessage() {}
+
+func (x *UpdateSiteActivityReq) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateSiteActivityReq.ProtoReflect.Descriptor instead.
+func (*UpdateSiteActivityReq) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdateSiteActivityReq) GetSiteId() int32 {
+	if x != nil {
+		return x.SiteId
+	}
+	return 0
+}
+
+func (x *UpdateSiteActivityReq) GetActivityId() int32 {
+	if x != nil {
+		return x.ActivityId
+	}
+	return 0
+}
+
+func (x *UpdateSiteActivityReq) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *UpdateSiteActivityReq) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateSiteActivityReq) GetStartTime() string {
+	if x != nil {
+		return x.StartTime
+	}
+	return ""
+}
+
+func (x *UpdateSiteActivityReq) GetEndTime() string {
+	if x != nil {
+		return x.EndTime
+	}
+	return ""
+}
+
+func (x *UpdateSiteActivityReq) GetFixedParams() string {
+	if x != nil {
+		return x.FixedParams
+	}
+	return ""
+}
+
+func (x *UpdateSiteActivityReq) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *UpdateSiteActivityReq) GetSort() int32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *UpdateSiteActivityReq) GetStatusSet() bool {
+	if x != nil {
+		return x.StatusSet
+	}
+	return false
+}
+
+func (x *UpdateSiteActivityReq) GetSortSet() bool {
+	if x != nil {
+		return x.SortSet
+	}
+	return false
+}
+
+type UpdateSiteActivityRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateSiteActivityRes) Reset() {
+	*x = UpdateSiteActivityRes{}
+	mi := &file_backend_site_v1_site_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateSiteActivityRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateSiteActivityRes) ProtoMessage() {}
+
+func (x *UpdateSiteActivityRes) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_site_v1_site_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateSiteActivityRes.ProtoReflect.Descriptor instead.
+func (*UpdateSiteActivityRes) Descriptor() ([]byte, []int) {
+	return file_backend_site_v1_site_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UpdateSiteActivityRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UpdateSiteActivityRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_backend_site_v1_site_proto protoreflect.FileDescriptor
 
 const file_backend_site_v1_site_proto_rawDesc = "" +
@@ -641,11 +1069,59 @@ const file_backend_site_v1_site_proto_rawDesc = "" +
 	"rewardType\x12.\n" +
 	"\x13min_recharge_amount\x18\a \x01(\x01R\x11minRechargeAmount\x122\n" +
 	"\x15inviter_reward_amount\x18\b \x01(\x01R\x13inviterRewardAmount\x12!\n" +
-	"\ffixed_params\x18\t \x01(\tR\vfixedParams2\xf9\x01\n" +
+	"\ffixed_params\x18\t \x01(\tR\vfixedParams\"f\n" +
+	"\x16GetSiteActivityListReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x1f\n" +
+	"\vactivity_id\x18\x02 \x01(\x05R\n" +
+	"activityId\x12\x12\n" +
+	"\x04code\x18\x03 \x01(\tR\x04code\"\x87\x03\n" +
+	"\x10SiteActivityInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1b\n" +
+	"\tsite_code\x18\x02 \x01(\tR\bsiteCode\x12\x1f\n" +
+	"\vactivity_id\x18\x03 \x01(\x05R\n" +
+	"activityId\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x12\n" +
+	"\x04code\x18\x05 \x01(\tR\x04code\x12 \n" +
+	"\vdescription\x18\x06 \x01(\tR\vdescription\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\a \x01(\tR\tstartTime\x12\x19\n" +
+	"\bend_time\x18\b \x01(\tR\aendTime\x12!\n" +
+	"\ffixed_params\x18\t \x01(\tR\vfixedParams\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\x05R\x06status\x12\x12\n" +
+	"\x04sort\x18\v \x01(\x05R\x04sort\x12\x14\n" +
+	"\x05table\x18\f \x01(\tR\x05table\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\r \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x0e \x01(\tR\tupdatedAt\"D\n" +
+	"\x16GetSiteActivityListRes\x12*\n" +
+	"\x04list\x18\x01 \x03(\v2\x16.site.SiteActivityInfoR\x04list\"\xca\x02\n" +
+	"\x15UpdateSiteActivityReq\x12\x17\n" +
+	"\asite_id\x18\x01 \x01(\x05R\x06siteId\x12\x1f\n" +
+	"\vactivity_id\x18\x02 \x01(\x05R\n" +
+	"activityId\x12\x12\n" +
+	"\x04code\x18\x03 \x01(\tR\x04code\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\x05 \x01(\tR\tstartTime\x12\x19\n" +
+	"\bend_time\x18\x06 \x01(\tR\aendTime\x12!\n" +
+	"\ffixed_params\x18\a \x01(\tR\vfixedParams\x12\x16\n" +
+	"\x06status\x18\b \x01(\x05R\x06status\x12\x12\n" +
+	"\x04sort\x18\t \x01(\x05R\x04sort\x12\x1d\n" +
+	"\n" +
+	"status_set\x18\n" +
+	" \x01(\bR\tstatusSet\x12\x19\n" +
+	"\bsort_set\x18\v \x01(\bR\asortSet\"K\n" +
+	"\x15UpdateSiteActivityRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xa0\x03\n" +
 	"\x04Site\x12G\n" +
 	"\x0fGetBasicSetting\x12\x18.site.GetBasicSettingReq\x1a\x18.site.GetBasicSettingRes\"\x00\x12P\n" +
 	"\x12UpdateBasicSetting\x12\x1b.site.UpdateBasicSettingReq\x1a\x1b.site.UpdateBasicSettingRes\"\x00\x12V\n" +
-	"\x14GetInviteBonusConfig\x12\x1d.site.GetInviteBonusConfigReq\x1a\x1d.site.GetInviteBonusConfigRes\"\x00B$Z\"jh_app_service/api/backend/site/v1b\x06proto3"
+	"\x14GetInviteBonusConfig\x12\x1d.site.GetInviteBonusConfigReq\x1a\x1d.site.GetInviteBonusConfigRes\"\x00\x12S\n" +
+	"\x13GetSiteActivityList\x12\x1c.site.GetSiteActivityListReq\x1a\x1c.site.GetSiteActivityListRes\"\x00\x12P\n" +
+	"\x12UpdateSiteActivity\x12\x1b.site.UpdateSiteActivityReq\x1a\x1b.site.UpdateSiteActivityRes\"\x00B$Z\"jh_app_service/api/backend/site/v1b\x06proto3"
 
 var (
 	file_backend_site_v1_site_proto_rawDescOnce sync.Once
@@ -659,7 +1135,7 @@ func file_backend_site_v1_site_proto_rawDescGZIP() []byte {
 	return file_backend_site_v1_site_proto_rawDescData
 }
 
-var file_backend_site_v1_site_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_backend_site_v1_site_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_backend_site_v1_site_proto_goTypes = []any{
 	(*GetBasicSettingReq)(nil),      // 0: site.GetBasicSettingReq
 	(*GetBasicSettingRes)(nil),      // 1: site.GetBasicSettingRes
@@ -667,19 +1143,29 @@ var file_backend_site_v1_site_proto_goTypes = []any{
 	(*UpdateBasicSettingRes)(nil),   // 3: site.UpdateBasicSettingRes
 	(*GetInviteBonusConfigReq)(nil), // 4: site.GetInviteBonusConfigReq
 	(*GetInviteBonusConfigRes)(nil), // 5: site.GetInviteBonusConfigRes
+	(*GetSiteActivityListReq)(nil),  // 6: site.GetSiteActivityListReq
+	(*SiteActivityInfo)(nil),        // 7: site.SiteActivityInfo
+	(*GetSiteActivityListRes)(nil),  // 8: site.GetSiteActivityListRes
+	(*UpdateSiteActivityReq)(nil),   // 9: site.UpdateSiteActivityReq
+	(*UpdateSiteActivityRes)(nil),   // 10: site.UpdateSiteActivityRes
 }
 var file_backend_site_v1_site_proto_depIdxs = []int32{
-	0, // 0: site.Site.GetBasicSetting:input_type -> site.GetBasicSettingReq
-	2, // 1: site.Site.UpdateBasicSetting:input_type -> site.UpdateBasicSettingReq
-	4, // 2: site.Site.GetInviteBonusConfig:input_type -> site.GetInviteBonusConfigReq
-	1, // 3: site.Site.GetBasicSetting:output_type -> site.GetBasicSettingRes
-	3, // 4: site.Site.UpdateBasicSetting:output_type -> site.UpdateBasicSettingRes
-	5, // 5: site.Site.GetInviteBonusConfig:output_type -> site.GetInviteBonusConfigRes
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	7,  // 0: site.GetSiteActivityListRes.list:type_name -> site.SiteActivityInfo
+	0,  // 1: site.Site.GetBasicSetting:input_type -> site.GetBasicSettingReq
+	2,  // 2: site.Site.UpdateBasicSetting:input_type -> site.UpdateBasicSettingReq
+	4,  // 3: site.Site.GetInviteBonusConfig:input_type -> site.GetInviteBonusConfigReq
+	6,  // 4: site.Site.GetSiteActivityList:input_type -> site.GetSiteActivityListReq
+	9,  // 5: site.Site.UpdateSiteActivity:input_type -> site.UpdateSiteActivityReq
+	1,  // 6: site.Site.GetBasicSetting:output_type -> site.GetBasicSettingRes
+	3,  // 7: site.Site.UpdateBasicSetting:output_type -> site.UpdateBasicSettingRes
+	5,  // 8: site.Site.GetInviteBonusConfig:output_type -> site.GetInviteBonusConfigRes
+	8,  // 9: site.Site.GetSiteActivityList:output_type -> site.GetSiteActivityListRes
+	10, // 10: site.Site.UpdateSiteActivity:output_type -> site.UpdateSiteActivityRes
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_backend_site_v1_site_proto_init() }
@@ -693,7 +1179,7 @@ func file_backend_site_v1_site_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_backend_site_v1_site_proto_rawDesc), len(file_backend_site_v1_site_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
