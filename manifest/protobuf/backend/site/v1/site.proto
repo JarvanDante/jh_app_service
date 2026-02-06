@@ -96,6 +96,7 @@ message SiteActivityInfo {
     string table = 12;
     string created_at = 13;
     string updated_at = 14;
+    string uri = 15;
 }
 
 message GetSiteActivityListRes {

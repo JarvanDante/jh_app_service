@@ -362,6 +362,7 @@ func (s *sSite) GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivity
 			Status:      int32(item.Status),
 			Sort:        int32(item.Sort),
 			Table:       item.Table,
+			Uri:         item.Uri,
 			CreatedAt:   util.FormatTime(item.CreatedAt),
 			UpdatedAt:   util.FormatTime(item.UpdatedAt),
 		})
