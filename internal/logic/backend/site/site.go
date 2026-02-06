@@ -72,6 +72,23 @@ var activityParamMappings = map[string][]activityParamField{
 			Type:  "number",
 		},
 	},
+	"activity_register_bonus": {
+		{
+			Name:  "reward_amount",
+			Label: "注册奖励金额",
+			Type:  "number",
+		},
+		{
+			Name:  "limit_ip",
+			Label: "同IP注册限制次数",
+			Type:  "int",
+		},
+		{
+			Name:  "limit_device",
+			Label: "同设备注册限制次数",
+			Type:  "int",
+		},
+	},
 }
 
 // GetBasicSetting 获取站点基本设置
@@ -482,6 +499,20 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 		values["reward_type"] = strconv.Itoa(config.RewardType)
 		values["min_recharge_amount"] = gconv.String(config.MinRechargeAmount)
 		values["inviter_reward_amount"] = gconv.String(config.InviterRewardAmount)
+	case "activity_register_bonus":
+		var config *entity.ActivityRegisterBonus
+		if err := dao.ActivityRegisterBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activity.ActivityId).
+			Scan(&config); err != nil {
+			return nil, fmt.Errorf("查询活动参数失败: %v", err)
+		}
+		if config == nil || config.Id == 0 {
+			return nil, fmt.Errorf("没有对应参数配置表，请确认")
+		}
+		values["reward_amount"] = gconv.String(config.RewardAmount)
+		values["limit_ip"] = strconv.Itoa(config.LimitIp)
+		values["limit_device"] = strconv.Itoa(config.LimitDevice)
 	default:
 		return nil, fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -627,6 +658,8 @@ func applyActivityParamValues(ctx context.Context, siteCode string, activity *en
 	switch activity.Table {
 	case "activity_invite_bonus":
 		return applyInviteBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
+	case "activity_register_bonus":
+		return applyRegisterBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	default:
 		return "", fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -682,6 +715,60 @@ func applyInviteBonusParamValues(ctx context.Context, siteCode string, activityI
 		"reward_type":           config.RewardType,
 		"min_recharge_amount":   config.MinRechargeAmount,
 		"inviter_reward_amount": config.InviterRewardAmount,
+	}
+	data, err := json.Marshal(fixedParams)
+	if err != nil {
+		return "", fmt.Errorf("构建固定参数失败: %v", err)
+	}
+	return string(data), nil
+}
+
+func applyRegisterBonusParamValues(ctx context.Context, siteCode string, activityId int, paramValues map[string]string) (string, error) {
+	var config *entity.ActivityRegisterBonus
+	if err := dao.ActivityRegisterBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Scan(&config); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+	if config == nil || config.Id == 0 {
+		return "", fmt.Errorf("没有对应参数配置表，请确认")
+	}
+
+	updateFields := g.Map{}
+	for key, value := range paramValues {
+		val := strings.TrimSpace(value)
+		if val == "" {
+			continue
+		}
+		switch key {
+		case "reward_amount":
+			config.RewardAmount = gconv.Float64(val)
+			updateFields["reward_amount"] = config.RewardAmount
+		case "limit_ip":
+			config.LimitIp = gconv.Int(val)
+			updateFields["limit_ip"] = config.LimitIp
+		case "limit_device":
+			config.LimitDevice = gconv.Int(val)
+			updateFields["limit_device"] = config.LimitDevice
+		}
+	}
+
+	if len(updateFields) > 0 {
+		updateFields["updated_at"] = gtime.Now()
+		if _, err := dao.ActivityRegisterBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activityId).
+			Data(updateFields).
+			Update(); err != nil {
+			return "", fmt.Errorf("更新活动参数失败: %v", err)
+		}
+	}
+
+	fixedParams := map[string]interface{}{
+		"reward_amount": config.RewardAmount,
+		"limit_ip":      config.LimitIp,
+		"limit_device":  config.LimitDevice,
 	}
 	data, err := json.Marshal(fixedParams)
 	if err != nil {
