@@ -11,15 +11,17 @@ import (
 
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/hashicorp/consul/api"
 	"google.golang.org/grpc/metadata"
 )
 
 // SiteConfig 站点配置结构（匹配新的KV格式）
 type SiteConfig struct {
-	Meta   MetaConfig   `json:"Meta"`
-	Base   BaseConfig   `json:"Base"`
-	Domain DomainConfig `json:"Domain"`
+	Meta     MetaConfig       `json:"Meta"`
+	Base     BaseConfig       `json:"Base"`
+	Domain   DomainConfig     `json:"Domain"`
+	Activity []ActivityConfig `json:"Activity"`
 }
 
 // MetaConfig 元数据配置
@@ -47,6 +49,20 @@ type DomainConfig struct {
 	H5       []string `json:"h5"`
 	Admin    []string `json:"admin"`
 	Callback []string `json:"callback"`
+}
+
+// ActivityConfig 活动配置
+type ActivityConfig struct {
+	ActivityId   int    `json:"activity_id"`
+	Name         string `json:"name"`
+	Code         string `json:"code"`
+	ActivityType string `json:"activity_type"`
+	Table        string `json:"table"`
+	FixedParams  string `json:"fixed_params"`
+	StartTime    string `json:"start_time"`
+	EndTime      string `json:"end_time"`
+	Status       int    `json:"status"`
+	Sort         int    `json:"sort"`
 }
 
 // DBConfigManagerV2 数据库配置管理器V2 - 无侵入版本
@@ -198,6 +214,11 @@ func (m *DBConfigManagerV2) updateSiteConfig(key string, value []byte) (bool, er
 		g.Log().Debugf(m.ctx, "App服务V2站点配置已更新（仅业务配置）: site=%s, version=%d", siteCode, config.Meta.Version)
 	}
 
+	// 同步活动配置到站点数据库
+	if err := m.syncActivityConfig(siteCode, &config); err != nil {
+		g.Log().Warningf(m.ctx, "同步站点活动配置失败: site=%s, error=%v", siteCode, err)
+	}
+
 	return true, nil
 }
 
@@ -246,6 +267,201 @@ func (m *DBConfigManagerV2) registerDBGroup(siteCode string, config *SiteConfig)
 	}
 
 	return nil
+}
+
+// syncActivityConfig 同步活动配置到站点数据库
+func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConfig) error {
+	groupName := fmt.Sprintf("site_%s", siteCode)
+	db := g.DB(groupName)
+	if db == nil {
+		g.Log().Warningf(m.ctx, "站点 %s 数据库连接不存在，跳过活动配置同步", siteCode)
+		return nil
+	}
+
+	// 检查 site_activity 表是否存在
+	tables, err := db.Tables(m.ctx)
+	if err != nil {
+		return fmt.Errorf("查询数据库表失败: %v", err)
+	}
+
+	hasTable := false
+	for _, table := range tables {
+		if table == "site_activity" {
+			hasTable = true
+			break
+		}
+	}
+	if !hasTable {
+		g.Log().Warningf(m.ctx, "站点 %s 数据库中不存在 site_activity 表，跳过活动配置同步", siteCode)
+		return nil
+	}
+
+	fields, err := db.TableFields(m.ctx, "site_activity")
+	if err != nil {
+		return fmt.Errorf("查询 site_activity 表字段失败: %v", err)
+	}
+
+	hasField := func(name string) bool {
+		_, ok := fields[name]
+		return ok
+	}
+
+	// 站点过滤字段
+	siteFilter := g.Map{}
+	if hasField("site_id") {
+		siteFilter["site_id"] = config.Base.SiteId
+	}
+	if hasField("site_code") {
+		siteFilter["site_code"] = config.Base.Code
+	}
+	if len(siteFilter) == 0 {
+		g.Log().Warningf(m.ctx, "site_activity 表缺少 site_id/site_code 字段，跳过同步: site=%s", siteCode)
+		return nil
+	}
+
+	// 主键字段（优先 activity_id）
+	keyField := ""
+	if hasField("activity_id") {
+		keyField = "activity_id"
+	} else if hasField("code") {
+		keyField = "code"
+	} else {
+		g.Log().Warningf(m.ctx, "site_activity 表缺少 activity_id/code 字段，跳过同步: site=%s", siteCode)
+		return nil
+	}
+
+	// 查询现有活动
+	type keyRow struct {
+		ActivityId int    `json:"activity_id"`
+		Code       string `json:"code"`
+	}
+	var existing []keyRow
+	query := db.Model("site_activity").Fields(keyField).Where(siteFilter)
+	if err := query.Scan(&existing); err != nil {
+		return fmt.Errorf("查询站点活动失败: %v", err)
+	}
+
+	existingMap := make(map[string]bool)
+	for _, row := range existing {
+		if keyField == "activity_id" {
+			existingMap[fmt.Sprintf("%d", row.ActivityId)] = true
+		} else {
+			existingMap[row.Code] = true
+		}
+	}
+
+	g.Log().Infof(m.ctx, "开始同步站点 %s 活动配置，共 %d 个活动", siteCode, len(config.Activity))
+
+	return db.Transaction(m.ctx, func(ctx context.Context, tx gdb.TX) error {
+		configKeys := make(map[string]bool)
+
+		buildData := func(activity ActivityConfig, insert bool) g.Map {
+			data := g.Map{}
+			if hasField("site_id") {
+				data["site_id"] = config.Base.SiteId
+			}
+			if hasField("site_code") {
+				data["site_code"] = config.Base.Code
+			}
+			if hasField("activity_id") {
+				data["activity_id"] = activity.ActivityId
+			}
+			if hasField("name") {
+				data["name"] = activity.Name
+			}
+			if hasField("code") {
+				data["code"] = activity.Code
+			}
+			if hasField("activity_type") {
+				data["activity_type"] = activity.ActivityType
+			}
+			if hasField("table") {
+				data["table"] = activity.Table
+			}
+			if hasField("fixed_params") {
+				data["fixed_params"] = activity.FixedParams
+			}
+			if hasField("start_time") && activity.StartTime != "" {
+				if t, err := gtime.StrToTime(activity.StartTime); err == nil {
+					data["start_time"] = t
+				} else {
+					data["start_time"] = activity.StartTime
+				}
+			}
+			if hasField("end_time") && activity.EndTime != "" {
+				if t, err := gtime.StrToTime(activity.EndTime); err == nil {
+					data["end_time"] = t
+				} else {
+					data["end_time"] = activity.EndTime
+				}
+			}
+			if hasField("status") {
+				data["status"] = activity.Status
+			}
+			if hasField("sort") {
+				data["sort"] = activity.Sort
+			}
+			if insert && hasField("created_at") {
+				data["created_at"] = gtime.Now()
+			}
+			if hasField("updated_at") {
+				data["updated_at"] = gtime.Now()
+			}
+			return data
+		}
+
+		for _, activity := range config.Activity {
+			key := ""
+			if keyField == "activity_id" {
+				key = fmt.Sprintf("%d", activity.ActivityId)
+			} else {
+				key = activity.Code
+			}
+			configKeys[key] = true
+
+			count, err := tx.Model("site_activity").
+				Where(siteFilter).
+				Where(keyField, key).
+				Count()
+			if err != nil {
+				g.Log().Errorf(ctx, "检查活动是否存在失败: key=%s, error=%v", key, err)
+				continue
+			}
+
+			if count > 0 {
+				_, err = tx.Model("site_activity").
+					Where(siteFilter).
+					Where(keyField, key).
+					Data(buildData(activity, false)).
+					Update()
+				if err != nil {
+					g.Log().Errorf(ctx, "更新活动配置失败: key=%s, error=%v", key, err)
+				}
+			} else {
+				_, err = tx.Model("site_activity").
+					Data(buildData(activity, true)).
+					Insert()
+				if err != nil {
+					g.Log().Errorf(ctx, "插入活动配置失败: key=%s, error=%v", key, err)
+				}
+			}
+		}
+
+		// 删除配置中不存在的活动
+		for key := range existingMap {
+			if !configKeys[key] {
+				_, err := tx.Model("site_activity").
+					Where(siteFilter).
+					Where(keyField, key).
+					Delete()
+				if err != nil {
+					g.Log().Errorf(ctx, "删除活动配置失败: key=%s, error=%v", key, err)
+				}
+			}
+		}
+
+		return nil
+	})
 }
 
 // GetDynamicDB 根据上下文获取动态数据库连接
