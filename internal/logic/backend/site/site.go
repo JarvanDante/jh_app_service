@@ -2,7 +2,9 @@ package site
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"jh_app_service/api/backend/site/v1"
@@ -16,6 +18,7 @@ import (
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 type (
@@ -24,6 +27,51 @@ type (
 
 func init() {
 	backend.RegisterSite(&sSite{})
+}
+
+type activityParamOption struct {
+	Label string
+	Value string
+}
+
+type activityParamField struct {
+	Name    string
+	Label   string
+	Type    string
+	Options []activityParamOption
+}
+
+var activityParamMappings = map[string][]activityParamField{
+	"activity_invite_bonus": {
+		{
+			Name:  "trigger_event",
+			Label: "发放触发",
+			Type:  "select",
+			Options: []activityParamOption{
+				{Label: "充值总和", Value: "1"},
+				{Label: "首充", Value: "2"},
+			},
+		},
+		{
+			Name:  "reward_type",
+			Label: "奖励类型",
+			Type:  "select",
+			Options: []activityParamOption{
+				{Label: "固定", Value: "1"},
+				{Label: "比例", Value: "2"},
+			},
+		},
+		{
+			Name:  "min_recharge_amount",
+			Label: "触发最小计算金额",
+			Type:  "number",
+		},
+		{
+			Name:  "inviter_reward_amount",
+			Label: "邀请人奖励金额",
+			Type:  "number",
+		},
+	},
 }
 
 // GetBasicSetting 获取站点基本设置
@@ -371,6 +419,99 @@ func (s *sSite) GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivity
 	return res, nil
 }
 
+// GetSiteActivityParams 获取活动参数配置
+func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivityParamsReq) (*v1.GetSiteActivityParamsRes, error) {
+	if req.ActivityId <= 0 {
+		return nil, fmt.Errorf("活动ID不能为空")
+	}
+
+	siteCode := strings.TrimSpace(req.SiteCode)
+	if siteCode == "" {
+		siteId := req.SiteId
+		if siteId <= 0 {
+			if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
+				siteId = int32(sid)
+			}
+		}
+		if siteId <= 0 {
+			return nil, fmt.Errorf("站点ID不能为空")
+		}
+
+		siteCode = registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
+		if siteCode == "" {
+			return nil, fmt.Errorf("站点代码不存在: site_id=%d", siteId)
+		}
+	}
+
+	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
+
+	var activity *entity.SiteActivity
+	if err := dao.SiteActivity.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", req.ActivityId).
+		Scan(&activity); err != nil {
+		return nil, fmt.Errorf("查询活动失败: %v", err)
+	}
+	if activity == nil || activity.ActivityId == 0 {
+		return nil, fmt.Errorf("活动不存在: activity_id=%d", req.ActivityId)
+	}
+
+	if strings.TrimSpace(activity.Table) == "" {
+		return nil, fmt.Errorf("没有对应参数配置表，请确认")
+	}
+
+	fields, ok := activityParamMappings[activity.Table]
+	if !ok {
+		return nil, fmt.Errorf("没有对应参数配置表，请确认")
+	}
+
+	values := map[string]string{}
+	switch activity.Table {
+	case "activity_invite_bonus":
+		var config *entity.ActivityInviteBonus
+		if err := dao.ActivityInviteBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activity.ActivityId).
+			Scan(&config); err != nil {
+			return nil, fmt.Errorf("查询活动参数失败: %v", err)
+		}
+		if config == nil || config.Id == 0 {
+			return nil, fmt.Errorf("没有对应参数配置表，请确认")
+		}
+		values["trigger_event"] = strconv.Itoa(config.TriggerEvent)
+		values["reward_type"] = strconv.Itoa(config.RewardType)
+		values["min_recharge_amount"] = gconv.String(config.MinRechargeAmount)
+		values["inviter_reward_amount"] = gconv.String(config.InviterRewardAmount)
+	default:
+		return nil, fmt.Errorf("没有对应参数配置表，请确认")
+	}
+
+	res := &v1.GetSiteActivityParamsRes{
+		Table:  activity.Table,
+		Fields: make([]*v1.ActivityParamField, 0, len(fields)),
+		Values: values,
+	}
+	for _, field := range fields {
+		pbField := &v1.ActivityParamField{
+			Name:  field.Name,
+			Label: field.Label,
+			Type:  field.Type,
+		}
+		if len(field.Options) > 0 {
+			pbField.Options = make([]*v1.ParamOption, 0, len(field.Options))
+			for _, opt := range field.Options {
+				pbField.Options = append(pbField.Options, &v1.ParamOption{
+					Label: opt.Label,
+					Value: opt.Value,
+				})
+			}
+		}
+		res.Fields = append(res.Fields, pbField)
+	}
+
+	return res, nil
+}
+
 // UpdateSiteActivity 更新活动配置
 func (s *sSite) UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivityReq) (*v1.UpdateSiteActivityRes, error) {
 	siteId := req.SiteId
@@ -391,6 +532,24 @@ func (s *sSite) UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivi
 	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
 
 	updateFields := g.Map{}
+	var activity *entity.SiteActivity
+	if len(req.ParamValues) > 0 {
+		var err error
+		activity, err = getSiteActivityForUpdate(ctx, siteCode, req.ActivityId, req.Code)
+		if err != nil {
+			return &v1.UpdateSiteActivityRes{Success: false, Message: err.Error()}, nil
+		}
+		if strings.TrimSpace(activity.Table) == "" {
+			return &v1.UpdateSiteActivityRes{Success: false, Message: "没有对应参数配置表，请确认"}, nil
+		}
+		fixedParams, err := applyActivityParamValues(ctx, siteCode, activity, req.ParamValues)
+		if err != nil {
+			return &v1.UpdateSiteActivityRes{Success: false, Message: err.Error()}, nil
+		}
+		if strings.TrimSpace(fixedParams) != "" {
+			updateFields["fixed_params"] = fixedParams
+		}
+	}
 	if strings.TrimSpace(req.Description) != "" {
 		updateFields["description"] = strings.TrimSpace(req.Description)
 	}
@@ -408,7 +567,7 @@ func (s *sSite) UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivi
 			updateFields["end_time"] = strings.TrimSpace(req.EndTime)
 		}
 	}
-	if strings.TrimSpace(req.FixedParams) != "" {
+	if len(req.ParamValues) == 0 && strings.TrimSpace(req.FixedParams) != "" {
 		updateFields["fixed_params"] = strings.TrimSpace(req.FixedParams)
 	}
 	if req.StatusSet {
@@ -437,11 +596,98 @@ func (s *sSite) UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivi
 		return &v1.UpdateSiteActivityRes{Success: false, Message: err.Error()}, nil
 	}
 	rows, _ := result.RowsAffected()
-	if rows == 0 {
+	if rows == 0 && len(req.ParamValues) == 0 {
 		return &v1.UpdateSiteActivityRes{Success: false, Message: "未找到匹配活动或数据未变化"}, nil
 	}
 
 	return &v1.UpdateSiteActivityRes{Success: true, Message: "更新成功"}, nil
+}
+
+func getSiteActivityForUpdate(ctx context.Context, siteCode string, activityId int32, code string) (*entity.SiteActivity, error) {
+	model := dao.SiteActivity.Ctx(ctx).Where("site_code", siteCode)
+	if activityId > 0 {
+		model = model.Where("activity_id", activityId)
+	} else if strings.TrimSpace(code) != "" {
+		model = model.Where("code", strings.TrimSpace(code))
+	} else {
+		return nil, fmt.Errorf("活动ID或编码不能为空")
+	}
+
+	var activity *entity.SiteActivity
+	if err := model.Scan(&activity); err != nil {
+		return nil, fmt.Errorf("查询活动失败: %v", err)
+	}
+	if activity == nil || activity.ActivityId == 0 {
+		return nil, fmt.Errorf("活动不存在")
+	}
+	return activity, nil
+}
+
+func applyActivityParamValues(ctx context.Context, siteCode string, activity *entity.SiteActivity, paramValues map[string]string) (string, error) {
+	switch activity.Table {
+	case "activity_invite_bonus":
+		return applyInviteBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
+	default:
+		return "", fmt.Errorf("没有对应参数配置表，请确认")
+	}
+}
+
+func applyInviteBonusParamValues(ctx context.Context, siteCode string, activityId int, paramValues map[string]string) (string, error) {
+	var config *entity.ActivityInviteBonus
+	if err := dao.ActivityInviteBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Scan(&config); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+	if config == nil || config.Id == 0 {
+		return "", fmt.Errorf("没有对应参数配置表，请确认")
+	}
+
+	updateFields := g.Map{}
+	for key, value := range paramValues {
+		val := strings.TrimSpace(value)
+		if val == "" {
+			continue
+		}
+		switch key {
+		case "trigger_event":
+			config.TriggerEvent = gconv.Int(val)
+			updateFields["trigger_event"] = config.TriggerEvent
+		case "reward_type":
+			config.RewardType = gconv.Int(val)
+			updateFields["reward_type"] = config.RewardType
+		case "min_recharge_amount":
+			config.MinRechargeAmount = gconv.Float64(val)
+			updateFields["min_recharge_amount"] = config.MinRechargeAmount
+		case "inviter_reward_amount":
+			config.InviterRewardAmount = gconv.Float64(val)
+			updateFields["inviter_reward_amount"] = config.InviterRewardAmount
+		}
+	}
+
+	if len(updateFields) > 0 {
+		updateFields["updated_at"] = gtime.Now()
+		if _, err := dao.ActivityInviteBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activityId).
+			Data(updateFields).
+			Update(); err != nil {
+			return "", fmt.Errorf("更新活动参数失败: %v", err)
+		}
+	}
+
+	fixedParams := map[string]interface{}{
+		"trigger_event":         config.TriggerEvent,
+		"reward_type":           config.RewardType,
+		"min_recharge_amount":   config.MinRechargeAmount,
+		"inviter_reward_amount": config.InviterRewardAmount,
+	}
+	data, err := json.Marshal(fixedParams)
+	if err != nil {
+		return "", fmt.Errorf("构建固定参数失败: %v", err)
+	}
+	return string(data), nil
 }
 
 // validateUpdateBasicSetting 验证更新基本设置的参数

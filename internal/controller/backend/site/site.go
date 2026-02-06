@@ -36,6 +36,11 @@ func (*Controller) GetSiteActivityList(ctx context.Context, req *v2.GetSiteActiv
 	return backend.Site().GetSiteActivityList(ctx, req)
 }
 
+// GetSiteActivityParams 获取活动参数配置 (gRPC)
+func (*Controller) GetSiteActivityParams(ctx context.Context, req *v2.GetSiteActivityParamsReq) (res *v2.GetSiteActivityParamsRes, err error) {
+	return backend.Site().GetSiteActivityParams(ctx, req)
+}
+
 // UpdateSiteActivity 更新活动配置 (gRPC)
 func (*Controller) UpdateSiteActivity(ctx context.Context, req *v2.UpdateSiteActivityReq) (res *v2.UpdateSiteActivityRes, err error) {
 	return backend.Site().UpdateSiteActivity(ctx, req)

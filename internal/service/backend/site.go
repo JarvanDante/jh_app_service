@@ -16,6 +16,7 @@ type (
 		UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSettingReq) (*v1.UpdateBasicSettingRes, error)
 		GetInviteBonusConfig(ctx context.Context, req *v1.GetInviteBonusConfigReq) (*v1.GetInviteBonusConfigRes, error)
 		GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivityListReq) (*v1.GetSiteActivityListRes, error)
+		GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivityParamsReq) (*v1.GetSiteActivityParamsRes, error)
 		UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivityReq) (*v1.UpdateSiteActivityRes, error)
 	}
 )
