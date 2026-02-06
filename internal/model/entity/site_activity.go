@@ -20,6 +20,7 @@ type SiteActivity struct {
 	EndTime     *gtime.Time `json:"endTime"     orm:"end_time"     description:"结束时间"`
 	FixedParams string      `json:"fixedParams" orm:"fixed_params" description:"固定参数(JSON)"`
 	Status      int         `json:"status"      orm:"status"       description:"活动是否打开或者或者关闭。1=打开；0=关闭"`
+	Uri         string      `json:"uri"         orm:"uri"          description:"活动uri地址"`
 	Sort        int         `json:"sort"        orm:"sort"         description:"排序"`
 	Table       string      `json:"table"       orm:"table"        description:"表名定义不同属性"`
 	CreatedAt   *gtime.Time `json:"createdAt"   orm:"created_at"   description:""`

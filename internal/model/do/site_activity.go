@@ -22,6 +22,7 @@ type SiteActivity struct {
 	EndTime     *gtime.Time // 结束时间
 	FixedParams any         // 固定参数(JSON)
 	Status      any         // 活动是否打开或者或者关闭。1=打开；0=关闭
+	Uri         any         // 活动uri地址
 	Sort        any         // 排序
 	Table       any         // 表名定义不同属性
 	CreatedAt   *gtime.Time //

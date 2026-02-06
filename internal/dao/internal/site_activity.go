@@ -31,6 +31,7 @@ type SiteActivityColumns struct {
 	EndTime     string // 结束时间
 	FixedParams string // 固定参数(JSON)
 	Status      string // 活动是否打开或者或者关闭。1=打开；0=关闭
+	Uri         string // 活动uri地址
 	Sort        string // 排序
 	Table       string // 表名定义不同属性
 	CreatedAt   string //
@@ -49,6 +50,7 @@ var siteActivityColumns = SiteActivityColumns{
 	EndTime:     "end_time",
 	FixedParams: "fixed_params",
 	Status:      "status",
+	Uri:         "uri",
 	Sort:        "sort",
 	Table:       "table",
 	CreatedAt:   "created_at",
