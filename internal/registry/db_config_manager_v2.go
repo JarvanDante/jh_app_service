@@ -278,17 +278,18 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 		return nil
 	}
 
-	// 检查 site_activity 表是否存在
+	// 检查数据库表
 	tables, err := db.Tables(m.ctx)
 	if err != nil {
 		return fmt.Errorf("查询数据库表失败: %v", err)
 	}
 
+	tableSet := make(map[string]bool, len(tables))
 	hasTable := false
 	for _, table := range tables {
+		tableSet[table] = true
 		if table == "site_activity" {
 			hasTable = true
-			break
 		}
 	}
 	if !hasTable {
@@ -299,6 +300,9 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 	fields, err := db.TableFields(m.ctx, "site_activity")
 	if err != nil {
 		return fmt.Errorf("查询 site_activity 表字段失败: %v", err)
+	}
+	tableFieldsCache := map[string]map[string]*gdb.TableField{
+		"site_activity": fields,
 	}
 
 	hasField := func(name string) bool {
@@ -410,6 +414,104 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 			return data
 		}
 
+		syncFixedParams := func(activity ActivityConfig) {
+			if activity.Table == "" {
+				return
+			}
+			if activity.FixedParams == "" {
+				return
+			}
+			if !tableSet[activity.Table] {
+				g.Log().Warningf(ctx, "活动参数表不存在，跳过同步: site=%s, activity=%d, table=%s",
+					siteCode, activity.ActivityId, activity.Table)
+				return
+			}
+
+			activityFields, ok := tableFieldsCache[activity.Table]
+			if !ok {
+				f, err := db.TableFields(ctx, activity.Table)
+				if err != nil {
+					g.Log().Errorf(ctx, "查询活动参数表字段失败: table=%s, error=%v", activity.Table, err)
+					return
+				}
+				tableFieldsCache[activity.Table] = f
+				activityFields = f
+			}
+
+			var params map[string]interface{}
+			if err := json.Unmarshal([]byte(activity.FixedParams), &params); err != nil {
+				g.Log().Errorf(ctx, "解析 fixed_params 失败: site=%s, activity=%d, error=%v",
+					siteCode, activity.ActivityId, err)
+				return
+			}
+
+			data := g.Map{}
+			for key, value := range params {
+				if _, ok := activityFields[key]; ok {
+					data[key] = value
+				}
+			}
+			if len(data) == 0 {
+				return
+			}
+
+			where := g.Map{}
+			if _, ok := activityFields["site_id"]; ok {
+				where["site_id"] = config.Base.SiteId
+			}
+			if _, ok := activityFields["site_code"]; ok {
+				where["site_code"] = config.Base.Code
+			}
+			if _, ok := activityFields["activity_id"]; ok {
+				where["activity_id"] = activity.ActivityId
+			}
+			if len(where) == 0 {
+				g.Log().Warningf(ctx, "活动参数表缺少定位字段，跳过同步: table=%s, activity=%d",
+					activity.Table, activity.ActivityId)
+				return
+			}
+
+			if _, ok := activityFields["updated_at"]; ok {
+				data["updated_at"] = gtime.Now()
+			}
+
+			count, err := tx.Model(activity.Table).Where(where).Count()
+			if err != nil {
+				g.Log().Errorf(ctx, "检查活动参数是否存在失败: table=%s, activity=%d, error=%v",
+					activity.Table, activity.ActivityId, err)
+				return
+			}
+
+			if count > 0 {
+				if _, err := tx.Model(activity.Table).Where(where).Data(data).Update(); err != nil {
+					g.Log().Errorf(ctx, "更新活动参数失败: table=%s, activity=%d, error=%v",
+						activity.Table, activity.ActivityId, err)
+				}
+				return
+			}
+
+			if _, ok := activityFields["site_id"]; ok {
+				data["site_id"] = config.Base.SiteId
+			}
+			if _, ok := activityFields["site_code"]; ok {
+				data["site_code"] = config.Base.Code
+			}
+			if _, ok := activityFields["activity_id"]; ok {
+				data["activity_id"] = activity.ActivityId
+			}
+			if _, ok := activityFields["created_at"]; ok {
+				data["created_at"] = gtime.Now()
+			}
+			if _, ok := activityFields["updated_at"]; ok {
+				data["updated_at"] = gtime.Now()
+			}
+
+			if _, err := tx.Model(activity.Table).Data(data).Insert(); err != nil {
+				g.Log().Errorf(ctx, "插入活动参数失败: table=%s, activity=%d, error=%v",
+					activity.Table, activity.ActivityId, err)
+			}
+		}
+
 		for _, activity := range config.Activity {
 			key := ""
 			if keyField == "activity_id" {
@@ -445,6 +547,9 @@ func (m *DBConfigManagerV2) syncActivityConfig(siteCode string, config *SiteConf
 					g.Log().Errorf(ctx, "插入活动配置失败: key=%s, error=%v", key, err)
 				}
 			}
+
+			// 同步 fixed_params 到活动参数表
+			syncFixedParams(activity)
 		}
 
 		// 删除配置中不存在的活动
