@@ -1207,18 +1207,11 @@ func (s *sPublic) GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (res *
 		return nil, fmt.Errorf("未获取站点ID")
 	}
 
-	// 确定位置：0=PC(1), 1=手机(2)
-	position := 1 // POSITION_PC = 1
-	if req.Mobile == 1 {
-		position = 2 // POSITION_WAP = 2
-	}
-
 	// 查询广告列表
 	var ads []*entity.Ad
 	err = dao.Ad.Ctx(ctx).
 		Where("site_id", siteId).
-		Where("status", 1). // STATUS_ACTIVE = 1
-		Where("position", position).
+		Where("status", 1).                     // STATUS_ACTIVE = 1
 		Where("start_time <= ?", gtime.Now()).  // 已开始
 		Where("expired_time > ?", gtime.Now()). // 未过期
 		OrderAsc("sort").
