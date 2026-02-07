@@ -828,7 +828,7 @@ func (s *sUser) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLoginLogsRe
 	))
 
 	var logs []*entity.UserLoginLog
-	err = query.Order("created_at DESC").
+	err = query.Order("login_time DESC").
 		Limit(int(size)).
 		Offset(int(offset)).
 		Scan(&logs)
