@@ -78,18 +78,6 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 		}
 	}
 
-	// 检查是否绑定安全问题
-	bindSafeQuestion := 0
-	if user.SafeAnswer != "" {
-		bindSafeQuestion = 1
-	}
-
-	// 检查是否绑定资金密码
-	bindPayPassword := 0
-	if user.PayPassword != "" {
-		bindPayPassword = 1
-	}
-
 	// 检查是否设置资金密码（新增字段）
 	isPayPassword := 0
 	if user.PayPassword != "" {
@@ -98,44 +86,24 @@ func (s *sUser) GetUserInfo(ctx context.Context, req *v1.GetUserInfoReq) (res *v
 
 	// 构建响应
 	res = &v1.GetUserInfoRes{
-		UserId:            int32(user.Id),
-		Username:          user.Username,
-		Realname:          user.Realname,
-		Email:             user.Email,
-		Mobile:            user.Mobile,
-		Qq:                user.Qq,
-		Sex:               int32(user.Sex),
-		Birthday:          gconv.String(user.Birthday),
-		LastLoginTime:     user.LastLoginTime.String(),
-		LastLoginAddress:  user.LastLoginAddress,
-		ShowBeginnerGuide: int32(user.ShowBeginnerGuide),
+		UserId:           int32(user.Id),
+		Username:         user.Username,
+		Email:            user.Email,
+		Mobile:           user.Mobile,
+		Birthday:         gconv.String(user.Birthday),
+		LastLoginTime:    user.LastLoginTime.String(),
+		LastLoginAddress: user.LastLoginAddress,
 
 		// 等级相关
 		GradeId:   int32(user.GradeId),
 		GradeName: gradeName,
 
 		// 绑定状态
-		BindSafeQuestion: int32(bindSafeQuestion),
-		BindPayPassword:  int32(bindPayPassword),
-		// BindBank:         0, // 银行卡信息已移至 balance 服务，字段已从 proto 中移除
 		IsPayPassword: int32(isPayPassword),
 		IsPassword:    int32(user.HasPass),
 
 		// 其他（先写死默认值）
-		UnreadMessageCount:  0,
-		SwitchSign:          0,
-		ApplyBirthdayBonus:  0,
-		AutoBindGameBalance: 0,
-
-		// 统计数据（先写死默认值）
-		TotalBet:    "0.00",
-		TotalBonus:  "0.00",
-		TotalRebate: "0.00",
-
-		// 最后记录（先写死空数组）
-		LastRecharge: []*v1.LastRecord{},
-		LastWithdraw: []*v1.LastRecord{},
-		LastMessage:  []*v1.LastMessage{},
+		UnreadMessageCount: 0,
 	}
 
 	g.Log().Infof(ctx, "获取用户信息成功: user_id=%d, username=%s", userId, user.Username)

@@ -89,9 +89,6 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 	if req.Username != "" {
 		query = query.Where("username = ?", req.Username)
 	}
-	if req.Realname != "" {
-		query = query.Where("realname = ?", req.Realname)
-	}
 	if req.Mobile != "" {
 		query = query.Where("mobile = ?", req.Mobile)
 	}
@@ -166,20 +163,17 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 	var userList []*v1.UserInfo
 	for _, user := range users {
 		userInfo := &v1.UserInfo{
-			Id:            int32(user.Id),
-			Username:      user.Username,
-			GradeId:       int32(user.GradeId),
-			LevelId:       int32(user.LevelId),
-			AgentId:       int32(user.AgentId),
-			Status:        int32(user.Status),
-			RegisterIp:    user.RegisterIp,
-			Realname:      user.Realname,
-			Mobile:        s.maskMobile(user.Mobile),
-			Email:         user.Email,
-			FocusLevel:    int32(user.FocusLevel),
-			BalanceStatus: int32(user.BalanceStatus),
-			IsOnline:      int32(user.IsOnline),
-			PayTimes:      int32(user.PayTimes),
+			Id:         int32(user.Id),
+			Username:   user.Username,
+			GradeId:    int32(user.GradeId),
+			LevelId:    int32(user.LevelId),
+			AgentId:    int32(user.AgentId),
+			Status:     int32(user.Status),
+			RegisterIp: user.RegisterIp,
+			Mobile:     s.maskMobile(user.Mobile),
+			Email:      user.Email,
+			IsOnline:   int32(user.IsOnline),
+			PayTimes:   int32(user.PayTimes),
 		}
 
 		// 时间格式化
@@ -269,14 +263,11 @@ func (s *sUser) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*v1.Upda
 
 	// 构建更新数据
 	updateData := do.User{
-		GradeId:       int(req.GradeId),
-		LevelId:       int(req.LevelId),
-		AgentId:       int(req.AgentId),
-		Sex:           int(req.Sex),
-		FocusLevel:    int(req.FocusLevel),
-		BalanceStatus: uint(req.BalanceStatus),
-		Status:        int(req.Status),
-		UpdatedAt:     gtime.Now(),
+		GradeId:   int(req.GradeId),
+		LevelId:   int(req.LevelId),
+		AgentId:   int(req.AgentId),
+		Status:    int(req.Status),
+		UpdatedAt: gtime.Now(),
 	}
 
 	// 可选字段更新
@@ -296,18 +287,13 @@ func (s *sUser) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*v1.Upda
 		updateData.PayPassword = string(hashedPayPassword)
 	}
 
-	if req.Realname != "" {
-		updateData.Realname = req.Realname
-	}
 	if req.Mobile != "" {
 		updateData.Mobile = req.Mobile
 	}
 	if req.Email != "" {
 		updateData.Email = req.Email
 	}
-	if req.Qq != "" {
-		updateData.Qq = req.Qq
-	}
+
 	if req.Birthday != "" {
 		birthday, err := gtime.StrToTime(req.Birthday)
 		if err == nil {
@@ -379,21 +365,16 @@ func (s *sUser) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoRe
 
 	// 构建基本信息
 	basicInfo := &v1.UserBasicInfo{
-		Id:            int32(user.Id),
-		Username:      user.Username,
-		GradeId:       int32(user.GradeId), // 添加等级ID
-		Realname:      user.Realname,
-		Mobile:        user.Mobile,
-		Email:         user.Email,
-		Sex:           int32(user.Sex),
-		FocusLevel:    int32(user.FocusLevel),
-		BalanceStatus: int32(user.BalanceStatus),
-		Status:        int32(user.Status),
-		Remark:        user.Remark,
-		RegisterIp:    user.RegisterIp,
-		LastLoginIp:   user.LastLoginIp,
-		IsOnline:      int32(user.IsOnline),
-		Qq:            user.Qq,
+		Id:          int32(user.Id),
+		Username:    user.Username,
+		GradeId:     int32(user.GradeId), // 添加等级ID
+		Mobile:      user.Mobile,
+		Email:       user.Email,
+		Status:      int32(user.Status),
+		Remark:      user.Remark,
+		RegisterIp:  user.RegisterIp,
+		LastLoginIp: user.LastLoginIp,
+		IsOnline:    int32(user.IsOnline),
 	}
 
 	// 时间格式化

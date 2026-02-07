@@ -21,76 +21,60 @@ type UserDao struct {
 
 // UserColumns defines and stores column names for the table user.
 type UserColumns struct {
-	Id                string //
-	SiteId            string //
-	GradeId           string //
-	LevelId           string //
-	AgentId           string //
-	InviterId         string // 邀请人ID
-	Username          string //
-	Password          string //
-	PayPassword       string //
-	Status            string //
-	RegisterIp        string //
-	RegisterTime      string //
-	RegisterUrl       string // 注册来源
-	LastLoginIp       string //
-	LastLoginTime     string //
-	LastLoginAddress  string // 最后登录地址
-	Realname          string //
-	Mobile            string //
-	Email             string // 邮箱
-	Qq                string // QQ号
-	Birthday          string //
-	Sex               string // 性别。0=未知；1=男；2=女
-	IsOnline          string //
-	FocusLevel        string // 会员关注级别。1=正常；2=可疑；3=危险
-	BalanceStatus     string // 1=0=
-	SafeQuestion      string // 密保问题
-	SafeAnswer        string // 密保答案
-	ShowBeginnerGuide string // 是否显示新手引导。1=显示；0=不显示
-	Remark            string // 备注
-	CreatedAt         string //
-	UpdatedAt         string //
-	PayTimes          string // 充值次数
-	HasPass           string // 是否设置密码
+	Id               string //
+	SiteId           string //
+	GradeId          string //
+	LevelId          string //
+	AgentId          string //
+	InviterId        string // 邀请人ID
+	Username         string //
+	Password         string //
+	PayPassword      string //
+	Status           string //
+	RegisterIp       string //
+	RegisterTime     string //
+	RegisterUrl      string // 注册来源
+	LastLoginIp      string //
+	LastLoginTime    string //
+	LastLoginAddress string // 最后登录地址
+	Mobile           string //
+	Email            string // 邮箱
+	Birthday         string //
+	IsOnline         string //
+	Remark           string // 备注
+	CreatedAt        string //
+	UpdatedAt        string //
+	PayTimes         string // 充值次数
+	HasPass          string // 是否设置密码
 }
 
 // userColumns holds the columns for the table user.
 var userColumns = UserColumns{
-	Id:                "id",
-	SiteId:            "site_id",
-	GradeId:           "grade_id",
-	LevelId:           "level_id",
-	AgentId:           "agent_id",
-	InviterId:         "inviter_id",
-	Username:          "username",
-	Password:          "password",
-	PayPassword:       "pay_password",
-	Status:            "status",
-	RegisterIp:        "register_ip",
-	RegisterTime:      "register_time",
-	RegisterUrl:       "register_url",
-	LastLoginIp:       "last_login_ip",
-	LastLoginTime:     "last_login_time",
-	LastLoginAddress:  "last_login_address",
-	Realname:          "realname",
-	Mobile:            "mobile",
-	Email:             "email",
-	Qq:                "qq",
-	Birthday:          "birthday",
-	Sex:               "sex",
-	IsOnline:          "is_online",
-	FocusLevel:        "focus_level",
-	BalanceStatus:     "balance_status",
-	SafeQuestion:      "safe_question",
-	SafeAnswer:        "safe_answer",
-	ShowBeginnerGuide: "show_beginner_guide",
-	Remark:            "remark",
-	CreatedAt:         "created_at",
-	UpdatedAt:         "updated_at",
-	PayTimes:          "pay_times",
-	HasPass:           "has_pass",
+	Id:               "id",
+	SiteId:           "site_id",
+	GradeId:          "grade_id",
+	LevelId:          "level_id",
+	AgentId:          "agent_id",
+	InviterId:        "inviter_id",
+	Username:         "username",
+	Password:         "password",
+	PayPassword:      "pay_password",
+	Status:           "status",
+	RegisterIp:       "register_ip",
+	RegisterTime:     "register_time",
+	RegisterUrl:      "register_url",
+	LastLoginIp:      "last_login_ip",
+	LastLoginTime:    "last_login_time",
+	LastLoginAddress: "last_login_address",
+	Mobile:           "mobile",
+	Email:            "email",
+	Birthday:         "birthday",
+	IsOnline:         "is_online",
+	Remark:           "remark",
+	CreatedAt:        "created_at",
+	UpdatedAt:        "updated_at",
+	PayTimes:         "pay_times",
+	HasPass:          "has_pass",
 }
 
 // NewUserDao creates and returns a new DAO object for table data access.
