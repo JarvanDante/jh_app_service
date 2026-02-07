@@ -41,6 +41,29 @@ type activityParamField struct {
 	Options []activityParamOption
 }
 
+func buildSigninParamFields() []activityParamField {
+	fields := make([]activityParamField, 0, 31)
+	for day := 1; day <= 31; day++ {
+		fields = append(fields, activityParamField{
+			Name:  fmt.Sprintf("day_%d", day),
+			Label: fmt.Sprintf("第%d天金额", day),
+			Type:  "number",
+		})
+	}
+	return fields
+}
+
+func parseSigninDayField(name string) (int, bool) {
+	if !strings.HasPrefix(name, "day_") {
+		return 0, false
+	}
+	day, err := strconv.Atoi(strings.TrimPrefix(name, "day_"))
+	if err != nil || day < 1 || day > 31 {
+		return 0, false
+	}
+	return day, true
+}
+
 var activityParamMappings = map[string][]activityParamField{
 	"activity_invite_bonus": {
 		{
@@ -119,6 +142,7 @@ var activityParamMappings = map[string][]activityParamField{
 			Type:  "number",
 		},
 	},
+	"activity_signin_bonus": buildSigninParamFields(),
 }
 
 // GetBasicSetting 获取站点基本设置
@@ -558,6 +582,25 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 		values["reward_type"] = strconv.Itoa(config.RewardType)
 		values["min_recharge_amount"] = gconv.String(config.MinRechargeAmount)
 		values["reward_amount"] = gconv.String(config.RewardAmount)
+	case "activity_signin_bonus":
+		for day := 1; day <= 31; day++ {
+			values[fmt.Sprintf("day_%d", day)] = "0"
+		}
+
+		var list []*entity.ActivitySigninBonus
+		if err := dao.ActivitySigninBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activity.ActivityId).
+			Order("day_no asc").
+			Scan(&list); err != nil {
+			return nil, fmt.Errorf("查询活动参数失败: %v", err)
+		}
+		for _, item := range list {
+			if item == nil || item.DayNo < 1 || item.DayNo > 31 {
+				continue
+			}
+			values[fmt.Sprintf("day_%d", item.DayNo)] = gconv.String(item.RewardAmount)
+		}
 	default:
 		return nil, fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -707,6 +750,8 @@ func applyActivityParamValues(ctx context.Context, siteCode string, activity *en
 		return applyRegisterBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	case "activity_deposit_bonus":
 		return applyDepositBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
+	case "activity_signin_bonus":
+		return applySigninBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	default:
 		return "", fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -876,6 +921,103 @@ func applyDepositBonusParamValues(ctx context.Context, siteCode string, activity
 		"reward_amount":       config.RewardAmount,
 	}
 	data, err := json.Marshal(fixedParams)
+	if err != nil {
+		return "", fmt.Errorf("构建固定参数失败: %v", err)
+	}
+	return string(data), nil
+}
+
+func applySigninBonusParamValues(ctx context.Context, siteCode string, activityId int, paramValues map[string]string) (string, error) {
+	if activityId <= 0 {
+		return "", fmt.Errorf("活动ID不能为空")
+	}
+
+	var exists []*entity.ActivitySigninBonus
+	if err := dao.ActivitySigninBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Scan(&exists); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+
+	dayConfigMap := make(map[int]*entity.ActivitySigninBonus, 31)
+	for _, item := range exists {
+		if item == nil || item.DayNo < 1 || item.DayNo > 31 {
+			continue
+		}
+		dayConfigMap[item.DayNo] = item
+	}
+
+	now := gtime.Now()
+	for key, value := range paramValues {
+		dayNo, ok := parseSigninDayField(key)
+		if !ok {
+			continue
+		}
+
+		val := strings.TrimSpace(value)
+		if val == "" {
+			val = "0"
+		}
+		amount := gconv.Float64(val)
+		if amount < 0 {
+			amount = 0
+		}
+		amount = float64(int(amount*100+0.5)) / 100
+
+		if old, ok := dayConfigMap[dayNo]; ok {
+			if old.RewardAmount == amount {
+				continue
+			}
+			if _, err := dao.ActivitySigninBonus.Ctx(ctx).
+				Where("id", old.Id).
+				Data(g.Map{
+					"reward_amount": amount,
+					"updated_at":    now,
+				}).
+				Update(); err != nil {
+				return "", fmt.Errorf("更新活动参数失败: %v", err)
+			}
+			continue
+		}
+
+		if _, err := dao.ActivitySigninBonus.Ctx(ctx).Data(g.Map{
+			"site_code":     siteCode,
+			"activity_id":   activityId,
+			"day_no":        dayNo,
+			"reward_amount": amount,
+			"created_at":    now,
+			"updated_at":    now,
+		}).Insert(); err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+				return "", fmt.Errorf("签到参数表唯一键冲突，请确认唯一键为(site_code, activity_id, day_no)")
+			}
+			return "", fmt.Errorf("新增活动参数失败: %v", err)
+		}
+	}
+
+	// 回查构建 fixed_params
+	values := make(map[string]float64, 31)
+	for day := 1; day <= 31; day++ {
+		values[fmt.Sprintf("day_%d", day)] = 0
+	}
+
+	var finalList []*entity.ActivitySigninBonus
+	if err := dao.ActivitySigninBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Order("day_no asc").
+		Scan(&finalList); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+	for _, item := range finalList {
+		if item == nil || item.DayNo < 1 || item.DayNo > 31 {
+			continue
+		}
+		values[fmt.Sprintf("day_%d", item.DayNo)] = item.RewardAmount
+	}
+
+	data, err := json.Marshal(values)
 	if err != nil {
 		return "", fmt.Errorf("构建固定参数失败: %v", err)
 	}
