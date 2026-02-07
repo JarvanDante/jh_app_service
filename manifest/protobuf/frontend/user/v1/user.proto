@@ -29,7 +29,6 @@ message GetUserInfoReq {
 message GetUserInfoRes {
     int32 user_id = 1;              // 用户名
     string username = 2;              // 用户名
-    string realname = 3;              // 真实姓名
     string email = 4;                 // 邮箱
     string mobile = 5;                // 手机号
     string birthday = 8;              // 生日
