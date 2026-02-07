@@ -492,16 +492,11 @@ func (s *sUser) GetUserGrades(ctx context.Context, req *v1.GetUserGradesReq) (*v
 		gradeInfo := &v1.UserGradeInfo{
 			Id:                   int32(grade.Id),
 			Name:                 grade.Name,
-			PointsUpgrade:        int32(grade.PointsUpgrade),
-			BonusUpgrade:         grade.BonusUpgrade,
-			BonusBirthday:        grade.BonusBirthday,
 			RebatePercentSports:  grade.RebatePercentSports,
 			RebatePercentLottery: grade.RebatePercentLottery,
 			RebatePercentLive:    grade.RebatePercentLive,
 			RebatePercentEgame:   grade.RebatePercentEgame,
 			RebatePercentPoker:   grade.RebatePercentPoker,
-			FieldsDisable:        grade.FieldsDisable,
-			AutoProviding:        grade.AutoProviding,
 			PaymentLimit:         grade.PaymentLimit,
 			BetLimit:             grade.BetLimit,
 			MoneyLimit:           grade.MoneyLimit,
@@ -539,9 +534,6 @@ func (s *sUser) SaveUserGrades(ctx context.Context, req *v1.SaveUserGradesReq) (
 		grade := &entity.UserGrade{
 			Id:                   uint(gradeInfo.Id),
 			Name:                 gradeInfo.Name,
-			PointsUpgrade:        int(gradeInfo.PointsUpgrade),
-			BonusUpgrade:         gradeInfo.BonusUpgrade,
-			BonusBirthday:        gradeInfo.BonusBirthday,
 			RebatePercentSports:  gradeInfo.RebatePercentSports,
 			RebatePercentLottery: gradeInfo.RebatePercentLottery,
 			RebatePercentLive:    gradeInfo.RebatePercentLive,
@@ -555,7 +547,7 @@ func (s *sUser) SaveUserGrades(ctx context.Context, req *v1.SaveUserGradesReq) (
 	}
 
 	// 保存用户等级
-	err := s.saveUserGrades(ctx, int(req.SiteId), grades, req.FieldsDisable, req.AutoProviding)
+	err := s.saveUserGrades(ctx, int(req.SiteId), grades)
 	if err != nil {
 		tracing.SetSpanError(span, err)
 		return &v1.SaveUserGradesRes{
@@ -622,7 +614,7 @@ func (s *sUser) getUserGradeList(ctx context.Context, siteId int) ([]*entity.Use
 }
 
 // saveUserGrades 保存用户等级（内部方法）
-func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity.UserGrade, fieldsDisable, autoProviding string) error {
+func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity.UserGrade) error {
 	// 使用默认数据库连接
 	db := dao.UserGrade.Ctx(ctx)
 
@@ -630,8 +622,6 @@ func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity
 	return db.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		for _, grade := range grades {
 			grade.SiteId = siteId
-			grade.FieldsDisable = fieldsDisable
-			grade.AutoProviding = autoProviding
 			grade.Status = 1 // 默认状态为正常
 
 			// 记录日志
@@ -645,16 +635,11 @@ func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity
 				// 构建更新数据
 				updateData := g.Map{
 					"name":                   grade.Name,
-					"points_upgrade":         grade.PointsUpgrade,
-					"bonus_upgrade":          grade.BonusUpgrade,
-					"bonus_birthday":         grade.BonusBirthday,
 					"rebate_percent_sports":  grade.RebatePercentSports,
 					"rebate_percent_lottery": grade.RebatePercentLottery,
 					"rebate_percent_live":    grade.RebatePercentLive,
 					"rebate_percent_egame":   grade.RebatePercentEgame,
 					"rebate_percent_poker":   grade.RebatePercentPoker,
-					"fields_disable":         grade.FieldsDisable,
-					"auto_providing":         grade.AutoProviding,
 					"payment_limit":          grade.PaymentLimit,
 					"bet_limit":              grade.BetLimit,
 					"money_limit":            grade.MoneyLimit,

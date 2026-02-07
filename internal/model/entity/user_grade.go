@@ -13,16 +13,11 @@ type UserGrade struct {
 	Id                   uint        `json:"id"                   orm:"id"                     description:""`
 	SiteId               int         `json:"siteId"               orm:"site_id"                description:"站点ID"`
 	Name                 string      `json:"name"                 orm:"name"                   description:"会员等级名称"`
-	PointsUpgrade        int         `json:"pointsUpgrade"        orm:"points_upgrade"         description:"升级消耗积分"`
-	BonusUpgrade         float64     `json:"bonusUpgrade"         orm:"bonus_upgrade"          description:"额外返水比例: 体育"`
-	BonusBirthday        float64     `json:"bonusBirthday"        orm:"bonus_birthday"         description:"生日彩金"`
 	RebatePercentSports  float64     `json:"rebatePercentSports"  orm:"rebate_percent_sports"  description:"额外返水比例: 体育"`
 	RebatePercentLottery float64     `json:"rebatePercentLottery" orm:"rebate_percent_lottery" description:"额外返水比例: 彩票"`
 	RebatePercentLive    float64     `json:"rebatePercentLive"    orm:"rebate_percent_live"    description:"额外返水比例: 真人视讯"`
 	RebatePercentEgame   float64     `json:"rebatePercentEgame"   orm:"rebate_percent_egame"   description:"额外返水比例: 电子游戏"`
 	RebatePercentPoker   float64     `json:"rebatePercentPoker"   orm:"rebate_percent_poker"   description:"额外返水比例：棋牌"`
-	FieldsDisable        string      `json:"fieldsDisable"        orm:"fields_disable"         description:"字段开关，用来关闭哪些字段"`
-	AutoProviding        string      `json:"autoProviding"        orm:"auto_providing"         description:"哪些字段的业务是自动发放的"`
 	Status               int         `json:"status"               orm:"status"                 description:"状态.1=可用；0=禁用"`
 	CreatedAt            *gtime.Time `json:"createdAt"            orm:"created_at"             description:""`
 	UpdatedAt            *gtime.Time `json:"updatedAt"            orm:"updated_at"             description:""`

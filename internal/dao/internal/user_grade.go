@@ -24,16 +24,11 @@ type UserGradeColumns struct {
 	Id                   string //
 	SiteId               string // 站点ID
 	Name                 string // 会员等级名称
-	PointsUpgrade        string // 升级消耗积分
-	BonusUpgrade         string // 额外返水比例: 体育
-	BonusBirthday        string // 生日彩金
 	RebatePercentSports  string // 额外返水比例: 体育
 	RebatePercentLottery string // 额外返水比例: 彩票
 	RebatePercentLive    string // 额外返水比例: 真人视讯
 	RebatePercentEgame   string // 额外返水比例: 电子游戏
 	RebatePercentPoker   string // 额外返水比例：棋牌
-	FieldsDisable        string // 字段开关，用来关闭哪些字段
-	AutoProviding        string // 哪些字段的业务是自动发放的
 	Status               string // 状态.1=可用；0=禁用
 	CreatedAt            string //
 	UpdatedAt            string //
@@ -47,16 +42,11 @@ var userGradeColumns = UserGradeColumns{
 	Id:                   "id",
 	SiteId:               "site_id",
 	Name:                 "name",
-	PointsUpgrade:        "points_upgrade",
-	BonusUpgrade:         "bonus_upgrade",
-	BonusBirthday:        "bonus_birthday",
 	RebatePercentSports:  "rebate_percent_sports",
 	RebatePercentLottery: "rebate_percent_lottery",
 	RebatePercentLive:    "rebate_percent_live",
 	RebatePercentEgame:   "rebate_percent_egame",
 	RebatePercentPoker:   "rebate_percent_poker",
-	FieldsDisable:        "fields_disable",
-	AutoProviding:        "auto_providing",
 	Status:               "status",
 	CreatedAt:            "created_at",
 	UpdatedAt:            "updated_at",

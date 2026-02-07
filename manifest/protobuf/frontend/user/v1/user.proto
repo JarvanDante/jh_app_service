@@ -144,17 +144,14 @@ message GetGradeListRes {
 message GradeItem {
     int32 id = 1;                          // 等级ID
     string name = 2;                       // 等级名称
-    int32 points_upgrade = 3;              // 升级所需积分
-    string bonus_upgrade = 4;              // 升级赠送彩金
-    string bonus_birthday = 5;             // 生日彩金
     string rebate_percent_sports = 6;      // 体育返水比例
     string rebate_percent_lottery = 7;     // 彩票返水比例
     string rebate_percent_live = 8;        // 真人视讯返水比例
     string rebate_percent_egame = 9;       // 电子游戏返水比例
     string rebate_percent_poker = 10;      // 棋牌返水比例
-    string payment_limit = 11;            // 充值金额
-    string bet_limit = 12;                // 投注金额
-    string money_limit = 13;                // 升级礼金
+    string payment_limit = 11;             // 充值金额
+    string bet_limit = 12;                 // 投注金额
+    string money_limit = 13;               // 升级礼金
 }
 
 // 设置支付密码请求

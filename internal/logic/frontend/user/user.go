@@ -482,12 +482,8 @@ func (s *sUser) GetGradeList(ctx context.Context, req *v1.GetGradeListReq) (res 
 
 	for _, grade := range grades {
 		item := &v1.GradeItem{
-			Id:   int32(grade.Id),
-			Name: grade.Name,
-
-			PointsUpgrade:        int32(grade.PointsUpgrade),
-			BonusUpgrade:         fmt.Sprintf("%.2f", grade.BonusUpgrade),
-			BonusBirthday:        fmt.Sprintf("%.2f", grade.BonusBirthday),
+			Id:                   int32(grade.Id),
+			Name:                 grade.Name,
 			RebatePercentSports:  fmt.Sprintf("%.2f", grade.RebatePercentSports*100),
 			RebatePercentLottery: fmt.Sprintf("%.2f", grade.RebatePercentLottery*100),
 			RebatePercentLive:    fmt.Sprintf("%.2f", grade.RebatePercentLive*100),

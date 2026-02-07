@@ -158,19 +158,14 @@ message GetUserGradesReq {
 message UserGradeInfo {
     int32 id = 1;                           // 等级ID
     string name = 2;                        // 等级名称
-    int32 points_upgrade = 3;               // 升级所需积分
-    double bonus_upgrade = 4;               // 升级赠送彩金
-    double bonus_birthday = 5;              // 生日彩金
     double rebate_percent_sports = 6;       // 体育返水比例
     double rebate_percent_lottery = 7;      // 彩票返水比例
     double rebate_percent_live = 8;         // 真人视讯返水比例
     double rebate_percent_egame = 9;        // 电子游戏返水比例
     double rebate_percent_poker = 10;       // 扑克返水比例
-    string fields_disable = 11;             // 禁用字段配置
-    string auto_providing = 12;             // 自动发放配置
-    double payment_limit = 13;               // 存款金额
-    double bet_limit = 14;               // 有效投注
-    double money_limit = 15;               // 升级礼金
+    double payment_limit = 13;              // 存款金额
+    double bet_limit = 14;                  // 有效投注
+    double money_limit = 15;                // 升级礼金
     repeated string activities = 16;        // 关联活动列表
 }
 
@@ -185,8 +180,6 @@ message GetUserGradesRes {
 message SaveUserGradesReq {
     int32 site_id = 1;                      // 站点ID
     repeated UserGradeInfo data = 2;        // 等级数据列表
-    string fields_disable = 3;              // 禁用字段配置
-    string auto_providing = 4;              // 自动发放配置
 }
 
 // 保存用户等级响应
