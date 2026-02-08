@@ -219,6 +219,18 @@ func (s *sUser) BindMobile(ctx context.Context, req *v1.BindMobileReq) (res *v1.
 		return nil, fmt.Errorf("未获取站点ID")
 	}
 
+	// 查询当前用户基础信息（用于后续触发注册送金判定）
+	var currentUser *entity.User
+	err = dao.User.Ctx(ctx).
+		Where("id", userId).
+		Where("site_id", siteId).
+		Fields("id,username").
+		Scan(&currentUser)
+	if err != nil || currentUser == nil {
+		middleware.LogWithTrace(ctx, "error", "用户不存在: %d", userId)
+		return nil, fmt.Errorf("用户不存在")
+	}
+
 	// 检查手机号是否已被其他用户绑定
 	var existUser *entity.User
 	err = dao.User.Ctx(ctx).Where("mobile", req.Mobile).
@@ -243,6 +255,7 @@ func (s *sUser) BindMobile(ctx context.Context, req *v1.BindMobileReq) (res *v1.
 	}
 
 	middleware.LogWithTrace(ctx, "info", "绑定手机号成功: user_id=%d, mobile=%s", userId, req.Mobile)
+	s.tryTriggerRegisterBonusOnBindMobile(ctx, int64(siteId), int64(userId), currentUser.Username)
 
 	res = &v1.BindMobileRes{
 		Message: "绑定手机号成功",
@@ -973,4 +986,47 @@ func (s *sUser) getInviteBonusSummary(ctx context.Context, siteId, userId int64)
 	}
 
 	return resp.TodayAmount, resp.YesterdayAmount, resp.TotalAmount
+}
+
+// tryTriggerRegisterBonusOnBindMobile 绑定手机号后触发一次注册送金判定（幂等）
+func (s *sUser) tryTriggerRegisterBonusOnBindMobile(ctx context.Context, siteId, userId int64, username string) {
+	if siteId <= 0 || userId <= 0 || username == "" {
+		return
+	}
+
+	balanceAddr, err := registry.GetServiceAddr("jh_balance_service")
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "绑定手机号后获取balance服务地址失败: %v", err)
+		return
+	}
+
+	conn, err := grpc.NewClient(
+		balanceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "绑定手机号后连接balance服务失败: %v", err)
+		return
+	}
+	defer conn.Close()
+
+	client := balancev1.NewBalanceClient(conn)
+
+	md := metadata.New(map[string]string{
+		"site_id": gconv.String(siteId),
+	})
+	callCtx := metadata.NewOutgoingContext(ctx, md)
+
+	_, err = client.InitBalanceUser(callCtx, &balancev1.InitBalanceUserReq{
+		SiteId:   int32(siteId),
+		UserId:   int32(userId),
+		Username: username,
+		Currency: "",
+	})
+	if err != nil {
+		middleware.LogWithTrace(ctx, "warning", "绑定手机号后触发注册送金判定失败: %v", err)
+		return
+	}
+
+	middleware.LogWithTrace(ctx, "info", "绑定手机号后触发注册送金判定成功: user_id=%d", userId)
 }
