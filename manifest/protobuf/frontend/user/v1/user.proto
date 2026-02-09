@@ -19,6 +19,11 @@ service User {
     // 邀请相关接口
     rpc GetInviteInfo(GetInviteInfoReq) returns (GetInviteInfoRes) {}
     rpc GetInviteList(GetInviteListReq) returns (GetInviteListRes) {}
+
+    // 消息相关接口
+    rpc GetUserMessages(GetUserMessagesReq) returns (GetUserMessagesRes) {}
+    rpc GetUnreadCount(GetUnreadCountReq) returns (GetUnreadCountRes) {}
+    rpc ReadMessage(ReadMessageReq) returns (ReadMessageRes) {}
 }
 
 // 获取用户信息请求
@@ -196,6 +201,48 @@ message GetInviteListRes {
     int32 total = 2;                // 总数
     int32 page = 3;                 // 当前页
     int32 page_size = 4;            // 每页数量
+}
+
+// 获取用户消息请求
+message GetUserMessagesReq {
+    int32 page = 1;                 // 页码
+    int32 size = 2;                 // 每页数量
+}
+
+// 获取用户消息响应
+message GetUserMessagesRes {
+    repeated UserMessageItem list = 1;
+    int32 total = 2;
+    int32 current_page = 3;
+    int32 per_page = 4;
+    int32 unread_message_count = 5;
+}
+
+// 用户消息项
+message UserMessageItem {
+    int32 id = 1;
+    string title = 2;
+    string content = 3;
+    int32 is_read = 4;
+    string created_at = 5;
+}
+
+// 获取未读数量请求
+message GetUnreadCountReq {}
+
+// 获取未读数量响应
+message GetUnreadCountRes {
+    int32 count = 1;
+}
+
+// 读取消息请求
+message ReadMessageReq {
+    int32 message_id = 1;
+}
+
+// 读取消息响应
+message ReadMessageRes {
+    string message = 1;
 }
 
 // 邀请项

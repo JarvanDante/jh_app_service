@@ -20,6 +20,9 @@ type (
 		ChangePayPassword(ctx context.Context, req *v1.ChangePayPasswordReq) (*v1.ChangePayPasswordRes, error)
 		GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq) (*v1.GetInviteInfoRes, error)
 		GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (*v1.GetInviteListRes, error)
+		GetUserMessages(ctx context.Context, req *v1.GetUserMessagesReq) (*v1.GetUserMessagesRes, error)
+		GetUnreadCount(ctx context.Context, req *v1.GetUnreadCountReq) (*v1.GetUnreadCountRes, error)
+		ReadMessage(ctx context.Context, req *v1.ReadMessageReq) (*v1.ReadMessageRes, error)
 	}
 )
 

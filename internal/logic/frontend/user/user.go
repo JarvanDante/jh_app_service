@@ -909,6 +909,149 @@ func (s *sUser) GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (re
 	return res, nil
 }
 
+// GetUserMessages 获取用户消息列表
+func (s *sUser) GetUserMessages(ctx context.Context, req *v1.GetUserMessagesReq) (res *v1.GetUserMessagesRes, err error) {
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists || userId == 0 {
+		return nil, fmt.Errorf("未登录")
+	}
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists || siteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	page := req.Page
+	if page <= 0 {
+		page = 1
+	}
+	size := req.Size
+	if size <= 0 {
+		size = 20
+	}
+	if size > 100 {
+		size = 100
+	}
+
+	type UserMessageResult struct {
+		Id        uint        `json:"id"`
+		Title     string      `json:"title"`
+		Content   string      `json:"content"`
+		IsRead    int         `json:"is_read"`
+		CreatedAt *gtime.Time `json:"created_at"`
+	}
+
+	var userMessages []*UserMessageResult
+	total, err := dao.UserMessage.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("user_id", userId).
+		Count()
+	if err != nil {
+		return nil, err
+	}
+
+	offset := int((page - 1) * size)
+	if err := dao.UserMessage.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("user_id", userId).
+		Fields("id, title, content, status as is_read, created_at").
+		Order("created_at DESC").
+		Limit(offset, int(size)).
+		Scan(&userMessages); err != nil {
+		return nil, err
+	}
+
+	list := make([]*v1.UserMessageItem, 0, len(userMessages))
+	for _, msg := range userMessages {
+		createdAt := ""
+		if msg.CreatedAt != nil {
+			createdAt = msg.CreatedAt.Format("2006-01-02 15:04:05")
+		}
+		list = append(list, &v1.UserMessageItem{
+			Id:        int32(msg.Id),
+			Title:     msg.Title,
+			Content:   msg.Content,
+			IsRead:    int32(msg.IsRead),
+			CreatedAt: createdAt,
+		})
+	}
+
+	unreadCount, err := dao.UserMessage.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("user_id", userId).
+		Where("status", 0).
+		Count()
+	if err != nil {
+		unreadCount = 0
+	}
+
+	return &v1.GetUserMessagesRes{
+		List:               list,
+		Total:              int32(total),
+		CurrentPage:        page,
+		PerPage:            size,
+		UnreadMessageCount: int32(unreadCount),
+	}, nil
+}
+
+// GetUnreadCount 获取未读数量
+func (s *sUser) GetUnreadCount(ctx context.Context, req *v1.GetUnreadCountReq) (res *v1.GetUnreadCountRes, err error) {
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists || userId == 0 {
+		return nil, fmt.Errorf("未登录")
+	}
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists || siteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+
+	count, err := dao.UserMessage.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("user_id", userId).
+		Where("status", 0).
+		Count()
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.GetUnreadCountRes{
+		Count: int32(count),
+	}, nil
+}
+
+// ReadMessage 标记消息已读
+func (s *sUser) ReadMessage(ctx context.Context, req *v1.ReadMessageReq) (res *v1.ReadMessageRes, err error) {
+	userId, exists := middleware.GetUserIdFromContext(ctx)
+	if !exists || userId == 0 {
+		return nil, fmt.Errorf("未登录")
+	}
+	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists || siteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	if req.MessageId <= 0 {
+		return nil, fmt.Errorf("消息ID不能为空")
+	}
+
+	now := gtime.Now()
+	_, err = dao.UserMessage.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("user_id", userId).
+		Where("id", req.MessageId).
+		Data(g.Map{
+			"status":     1,
+			"read_at":    now,
+			"updated_at": now,
+		}).
+		Update()
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ReadMessageRes{
+		Message: "success",
+	}, nil
+}
+
 // getValidReferralCount 统计有效邀请人数（按充值总额）
 func (s *sUser) getValidReferralCount(ctx context.Context, siteId int64, userIds []int32, minTotal float64) int {
 	if len(userIds) == 0 {

@@ -76,3 +76,18 @@ func (c *Controller) GetInviteInfo(ctx context.Context, req *v1.GetInviteInfoReq
 func (c *Controller) GetInviteList(ctx context.Context, req *v1.GetInviteListReq) (*v1.GetInviteListRes, error) {
 	return frontend.User().GetInviteList(ctx, req)
 }
+
+// GetUserMessages 获取用户消息
+func (c *Controller) GetUserMessages(ctx context.Context, req *v1.GetUserMessagesReq) (*v1.GetUserMessagesRes, error) {
+	return frontend.User().GetUserMessages(ctx, req)
+}
+
+// GetUnreadCount 获取未读消息数量
+func (c *Controller) GetUnreadCount(ctx context.Context, req *v1.GetUnreadCountReq) (*v1.GetUnreadCountRes, error) {
+	return frontend.User().GetUnreadCount(ctx, req)
+}
+
+// ReadMessage 标记消息已读
+func (c *Controller) ReadMessage(ctx context.Context, req *v1.ReadMessageReq) (*v1.ReadMessageRes, error) {
+	return frontend.User().ReadMessage(ctx, req)
+}
