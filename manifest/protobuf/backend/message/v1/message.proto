@@ -7,6 +7,8 @@ option go_package = "jh_app_service/api/backend/message/v1";
 service Message {
     rpc GetMessageList(GetMessageListReq) returns (GetMessageListRes) {}
     rpc CreateMessage(CreateMessageReq) returns (CreateMessageRes) {}
+    rpc UpdateMessage(UpdateMessageReq) returns (UpdateMessageRes) {}
+    rpc DeleteMessage(DeleteMessageReq) returns (DeleteMessageRes) {}
     rpc GetUserMessages(GetUserMessagesReq) returns (GetUserMessagesRes) {}
     rpc GetUnreadCount(GetUnreadCountReq) returns (GetUnreadCountRes) {}
     rpc ReadMessage(ReadMessageReq) returns (ReadMessageRes) {}
@@ -37,6 +39,8 @@ message MessageItem {
     string receiver = 4;
     string created_at = 5;
     string updated_at = 6;
+    string event_code = 7;
+    int32 status = 8;
 }
 
 // 等级项
@@ -65,13 +69,35 @@ message CreateMessageReq {
     string receiver = 4;    // 接收者（用户名或ID列表）
     int32 grade_id = 5;     // 等级ID
     int32 level_id = 6;     // 层级ID
-    int32 status = 7;       // 状态
+    int32 status = 7;       // 状态0=关闭 1=启用
     int32 position = 8;     // 弹框位置
     int32 alert_times = 9;  // 弹框次数
+    string event_code = 10; // v: required|length:1,50
+    double amount = 11;     // 涉及金额(可选)
 }
 
 // 创建消息响应
 message CreateMessageRes {}
+
+// 更新消息请求
+message UpdateMessageReq {
+    int32 id = 1;           // v: required|min:1
+    string event_code = 2;  // v: length:1,50
+    string title = 3;       // v: length:2,255
+    string content = 4;     // v: length:2,5000
+    int32 status = 5;       // v: in:0,1
+}
+
+// 更新消息响应
+message UpdateMessageRes {}
+
+// 删除消息请求
+message DeleteMessageReq {
+    int32 id = 1;           // v: required|min:1
+}
+
+// 删除消息响应
+message DeleteMessageRes {}
 
 // 获取用户消息请求
 message GetUserMessagesReq {

@@ -15,9 +15,16 @@ type UserMessage struct {
 	Id        any         //
 	SiteId    any         // 站点ID
 	UserId    any         // 用户ID
-	MessageId any         // 消息ID
-	Status    any         // 状态。1=已读；0=未读
-	DeleteAt  any         // 是否删除。0=未删除；其他为删除时间戳
+	MessageId any         // 消息模板ID
+	EventCode any         // 业务触发编码(冗余，便于查询)
+	BizId     any         // 业务流水号(充值单号/升级记录等)
+	Amount    any         // 涉及的金额
+	GradeName any         // 会员等级名称
+	Title     any         // 消息标题(快照)
+	Content   any         // 消息内容(快照)
+	Status    any         // 0=未读 1=已读
+	ReadAt    *gtime.Time // 阅读时间
+	DeleteAt  *gtime.Time // 删除时间(软删)
 	CreatedAt *gtime.Time //
 	UpdatedAt *gtime.Time //
 }

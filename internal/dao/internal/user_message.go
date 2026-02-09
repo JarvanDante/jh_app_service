@@ -24,9 +24,16 @@ type UserMessageColumns struct {
 	Id        string //
 	SiteId    string // 站点ID
 	UserId    string // 用户ID
-	MessageId string // 消息ID
-	Status    string // 状态。1=已读；0=未读
-	DeleteAt  string // 是否删除。0=未删除；其他为删除时间戳
+	MessageId string // 消息模板ID
+	EventCode string // 业务触发编码(冗余，便于查询)
+	BizId     string // 业务流水号(充值单号/升级记录等)
+	Amount    string // 涉及的金额
+	GradeName string // 会员等级名称
+	Title     string // 消息标题(快照)
+	Content   string // 消息内容(快照)
+	Status    string // 0=未读 1=已读
+	ReadAt    string // 阅读时间
+	DeleteAt  string // 删除时间(软删)
 	CreatedAt string //
 	UpdatedAt string //
 }
@@ -37,7 +44,14 @@ var userMessageColumns = UserMessageColumns{
 	SiteId:    "site_id",
 	UserId:    "user_id",
 	MessageId: "message_id",
+	EventCode: "event_code",
+	BizId:     "biz_id",
+	Amount:    "amount",
+	GradeName: "grade_name",
+	Title:     "title",
+	Content:   "content",
 	Status:    "status",
+	ReadAt:    "read_at",
 	DeleteAt:  "delete_at",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",

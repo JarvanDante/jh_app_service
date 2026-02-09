@@ -15,9 +15,10 @@ type Message struct {
 	Id        any         //
 	SiteId    any         // 站点ID
 	AdminId   any         // 员工ID
+	EventCode any         // 业务触发编码
 	Title     any         // 消息标题
 	Content   any         // 消息内容
-	Receiver  any         // 接收者
+	Status    any         // 状态0=关闭，1=启用
 	CreatedAt *gtime.Time //
 	UpdatedAt *gtime.Time //
 }

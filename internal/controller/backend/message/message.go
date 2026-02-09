@@ -26,6 +26,16 @@ func (*Controller) CreateMessage(ctx context.Context, req *v1.CreateMessageReq) 
 	return backend.Message().CreateMessage(ctx, req)
 }
 
+// UpdateMessage 更新消息
+func (*Controller) UpdateMessage(ctx context.Context, req *v1.UpdateMessageReq) (res *v1.UpdateMessageRes, err error) {
+	return backend.Message().UpdateMessage(ctx, req)
+}
+
+// DeleteMessage 删除消息
+func (*Controller) DeleteMessage(ctx context.Context, req *v1.DeleteMessageReq) (res *v1.DeleteMessageRes, err error) {
+	return backend.Message().DeleteMessage(ctx, req)
+}
+
 // GetUserMessages 获取用户消息
 func (*Controller) GetUserMessages(ctx context.Context, req *v1.GetUserMessagesReq) (res *v1.GetUserMessagesRes, err error) {
 	return backend.Message().GetUserMessages(ctx, req)

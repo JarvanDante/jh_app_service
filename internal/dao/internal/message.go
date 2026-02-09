@@ -24,9 +24,10 @@ type MessageColumns struct {
 	Id        string //
 	SiteId    string // 站点ID
 	AdminId   string // 员工ID
+	EventCode string // 业务触发编码
 	Title     string // 消息标题
 	Content   string // 消息内容
-	Receiver  string // 接收者
+	Status    string // 状态0=关闭，1=启用
 	CreatedAt string //
 	UpdatedAt string //
 }
@@ -36,9 +37,10 @@ var messageColumns = MessageColumns{
 	Id:        "id",
 	SiteId:    "site_id",
 	AdminId:   "admin_id",
+	EventCode: "event_code",
 	Title:     "title",
 	Content:   "content",
-	Receiver:  "receiver",
+	Status:    "status",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 }
