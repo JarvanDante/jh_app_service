@@ -18,6 +18,7 @@ type (
 		GetUserMessages(ctx context.Context, req *v1.GetUserMessagesReq) (*v1.GetUserMessagesRes, error)
 		GetUnreadCount(ctx context.Context, req *v1.GetUnreadCountReq) (*v1.GetUnreadCountRes, error)
 		ReadMessage(ctx context.Context, req *v1.ReadMessageReq) (*v1.ReadMessageRes, error)
+		SendUserMessage(ctx context.Context, req *v1.SendUserMessageReq) (*v1.SendUserMessageRes, error)
 	}
 )
 

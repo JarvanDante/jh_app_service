@@ -7,6 +7,8 @@ import (
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/service/backend"
+	"regexp"
+	"strings"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -15,6 +17,10 @@ import (
 
 type (
 	sMessage struct{}
+)
+
+var (
+	placeholderPattern = regexp.MustCompile(`\{\{\s*([a-zA-Z0-9_]+)\s*\}\}`)
 )
 
 func init() {
@@ -268,6 +274,9 @@ func (s *sMessage) GetUserMessages(ctx context.Context, req *v1.GetUserMessagesR
 
 	// 默认站点ID为1
 	siteId := int32(1)
+	if sid, ok := middleware.GetSiteIdFromContext(ctx); ok && sid > 0 {
+		siteId = int32(sid)
+	}
 
 	page := req.Page
 	if page <= 0 {
@@ -290,7 +299,6 @@ func (s *sMessage) GetUserMessages(ctx context.Context, req *v1.GetUserMessagesR
 	// 获取用户消息列表
 	var userMessages []*UserMessageResult
 	total, err := dao.UserMessage.Ctx(ctx).
-		LeftJoin("message m", "user_message.message_id = m.id").
 		Where("user_message.site_id", siteId).
 		Where("user_message.user_id", req.UserId).
 		Count()
@@ -302,10 +310,9 @@ func (s *sMessage) GetUserMessages(ctx context.Context, req *v1.GetUserMessagesR
 	// 分页查询
 	offset := int((page - 1) * size)
 	err = dao.UserMessage.Ctx(ctx).
-		LeftJoin("message m", "user_message.message_id = m.id").
 		Where("user_message.site_id", siteId).
 		Where("user_message.user_id", req.UserId).
-		Fields("user_message.id, m.title, m.content, user_message.status as is_read, user_message.created_at").
+		Fields("user_message.id, user_message.title, user_message.content, user_message.status as is_read, user_message.created_at").
 		Order("user_message.created_at DESC").
 		Limit(offset, int(size)).
 		Scan(&userMessages)
@@ -354,6 +361,9 @@ func (s *sMessage) GetUnreadCount(ctx context.Context, req *v1.GetUnreadCountReq
 
 	// 默认站点ID为1
 	siteId := int32(1)
+	if sid, ok := middleware.GetSiteIdFromContext(ctx); ok && sid > 0 {
+		siteId = int32(sid)
+	}
 
 	count, err := dao.UserMessage.Ctx(ctx).
 		Where("site_id", siteId).
@@ -378,11 +388,14 @@ func (s *sMessage) ReadMessage(ctx context.Context, req *v1.ReadMessageReq) (*v1
 
 	// 默认站点ID为1
 	siteId := int32(1)
+	if sid, ok := middleware.GetSiteIdFromContext(ctx); ok && sid > 0 {
+		siteId = int32(sid)
+	}
 
 	_, err := dao.UserMessage.Ctx(ctx).
 		Where("site_id", siteId).
 		Where("user_id", req.UserId).
-		Where("message_id", req.MessageId).
+		Where("id", req.MessageId).
 		Data(g.Map{"status": 1}). // 1表示已读
 		Update()
 	if err != nil {
@@ -514,4 +527,118 @@ func (s *sMessage) sendMessageToUsers(ctx context.Context, messageId int64, req 
 	}
 
 	return nil
+}
+
+// SendUserMessage 根据模板发送用户消息
+func (s *sMessage) SendUserMessage(ctx context.Context, req *v1.SendUserMessageReq) (*v1.SendUserMessageRes, error) {
+	if req == nil {
+		return &v1.SendUserMessageRes{Success: false, Message: "请求参数不能为空"}, nil
+	}
+
+	siteId := int32(0)
+	if sid, ok := middleware.GetSiteIdFromContext(ctx); ok && sid > 0 {
+		siteId = int32(sid)
+	} else if req.SiteId > 0 {
+		siteId = req.SiteId
+	}
+	if siteId <= 0 {
+		return &v1.SendUserMessageRes{Success: false, Message: "未获取站点ID"}, nil
+	}
+	if req.UserId <= 0 {
+		return &v1.SendUserMessageRes{Success: false, Message: "用户ID不能为空"}, nil
+	}
+	if strings.TrimSpace(req.EventCode) == "" {
+		return &v1.SendUserMessageRes{Success: false, Message: "业务触发编码不能为空"}, nil
+	}
+	if strings.TrimSpace(req.BizId) == "" {
+		return &v1.SendUserMessageRes{Success: false, Message: "业务流水号不能为空"}, nil
+	}
+
+	type messageTpl struct {
+		Id      int64  `json:"id"`
+		Title   string `json:"title"`
+		Content string `json:"content"`
+		Status  int    `json:"status"`
+	}
+	var tpl messageTpl
+	if err := dao.Message.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("event_code", strings.TrimSpace(req.EventCode)).
+		Where("status", 1).
+		Fields("id, title, content, status").
+		Scan(&tpl); err != nil {
+		return &v1.SendUserMessageRes{Success: false, Message: "查询消息模板失败"}, nil
+	}
+	if tpl.Id <= 0 {
+		return &v1.SendUserMessageRes{Success: false, Message: "消息模板不存在或未启用"}, nil
+	}
+
+	vars := buildTemplateVars(req)
+	title := renderTemplate(tpl.Title, vars)
+	content := renderTemplate(tpl.Content, vars)
+
+	data := g.Map{
+		"site_id":    siteId,
+		"user_id":    req.UserId,
+		"message_id": tpl.Id,
+		"event_code": strings.TrimSpace(req.EventCode),
+		"biz_id":     strings.TrimSpace(req.BizId),
+		"title":      title,
+		"content":    content,
+		"status":     0,
+		"created_at": gtime.Now(),
+		"updated_at": gtime.Now(),
+	}
+	if req.Amount > 0 {
+		data["amount"] = req.Amount
+	}
+	if strings.TrimSpace(req.GradeName) != "" {
+		data["grade_name"] = strings.TrimSpace(req.GradeName)
+	}
+
+	if _, err := dao.UserMessage.Ctx(ctx).Data(data).Insert(); err != nil {
+		if gstr.Contains(err.Error(), "Duplicate entry") || gstr.Contains(strings.ToLower(err.Error()), "duplicate") {
+			return &v1.SendUserMessageRes{Success: true, Message: "消息已存在"}, nil
+		}
+		return &v1.SendUserMessageRes{Success: false, Message: "发送消息失败"}, nil
+	}
+
+	return &v1.SendUserMessageRes{Success: true, Message: "发送成功"}, nil
+}
+
+func buildTemplateVars(req *v1.SendUserMessageReq) map[string]string {
+	vars := make(map[string]string)
+	for k, v := range req.GetVars() {
+		key := strings.ToLower(strings.TrimSpace(k))
+		if key == "" {
+			continue
+		}
+		vars[key] = v
+	}
+	if req.Amount > 0 {
+		vars["amount"] = fmt.Sprintf("%.2f", req.Amount)
+	}
+	if strings.TrimSpace(req.GradeName) != "" {
+		grade := strings.TrimSpace(req.GradeName)
+		vars["grade_name"] = grade
+		vars["gradename"] = grade
+	}
+	return vars
+}
+
+func renderTemplate(text string, vars map[string]string) string {
+	if text == "" || len(vars) == 0 {
+		return text
+	}
+	return placeholderPattern.ReplaceAllStringFunc(text, func(match string) string {
+		parts := placeholderPattern.FindStringSubmatch(match)
+		if len(parts) < 2 {
+			return match
+		}
+		key := strings.ToLower(strings.TrimSpace(parts[1]))
+		if val, ok := vars[key]; ok {
+			return val
+		}
+		return ""
+	})
 }

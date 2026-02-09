@@ -50,3 +50,8 @@ func (*Controller) GetUnreadCount(ctx context.Context, req *v1.GetUnreadCountReq
 func (*Controller) ReadMessage(ctx context.Context, req *v1.ReadMessageReq) (res *v1.ReadMessageRes, err error) {
 	return backend.Message().ReadMessage(ctx, req)
 }
+
+// SendUserMessage 发送用户消息
+func (*Controller) SendUserMessage(ctx context.Context, req *v1.SendUserMessageReq) (res *v1.SendUserMessageRes, err error) {
+	return backend.Message().SendUserMessage(ctx, req)
+}

@@ -21,12 +21,14 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/crypto/bcrypt"
 
+	messagev1 "jh_app_service/api/backend/message/v1"
 	v1 "jh_app_service/api/frontend/public/v1"
 	"jh_app_service/internal/dao"
 	logic_mq_outbox "jh_app_service/internal/logic/mq_outbox"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/entity"
 	"jh_app_service/internal/registry"
+	backendService "jh_app_service/internal/service/backend"
 	"jh_app_service/internal/service/frontend"
 	"jh_app_service/internal/tracing"
 	"jh_app_service/internal/util"
@@ -187,6 +189,16 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 
 	// 异步同步用户到游戏服务（快速路径）
 	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, username)
+
+	// 注册成功发送消息（不影响主流程）
+	if _, err := backendService.Message().SendUserMessage(ctx, &messagev1.SendUserMessageReq{
+		SiteId:    int32(siteId),
+		UserId:    int32(userId),
+		EventCode: "REGISTER_SYSTEM",
+		BizId:     fmt.Sprintf("REGISTER_%d", userId),
+	}); err != nil {
+		g.Log().Warningf(ctx, "发送注册成功消息失败: user_id=%d, err=%v", userId, err)
+	}
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)
@@ -1055,6 +1067,16 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 
 	// 异步同步用户到游戏服务（快速路径）
 	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, req.Username)
+
+	// 注册成功发送消息（不影响主流程）
+	if _, err := backendService.Message().SendUserMessage(ctx, &messagev1.SendUserMessageReq{
+		SiteId:    int32(siteId),
+		UserId:    int32(userId),
+		EventCode: "REGISTER_SYSTEM",
+		BizId:     fmt.Sprintf("REGISTER_%d", userId),
+	}); err != nil {
+		g.Log().Warningf(ctx, "发送注册成功消息失败: user_id=%d, err=%v", userId, err)
+	}
 
 	// 生成JWT Token和Refresh Token
 	token, refreshToken, expiresIn, refreshExpiresIn, err := s.generateJWTTokenUser(user)

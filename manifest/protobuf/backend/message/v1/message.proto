@@ -12,6 +12,7 @@ service Message {
     rpc GetUserMessages(GetUserMessagesReq) returns (GetUserMessagesRes) {}
     rpc GetUnreadCount(GetUnreadCountReq) returns (GetUnreadCountRes) {}
     rpc ReadMessage(ReadMessageReq) returns (ReadMessageRes) {}
+    rpc SendUserMessage(SendUserMessageReq) returns (SendUserMessageRes) {}
 }
 
 // 获取消息列表请求
@@ -143,3 +144,20 @@ message ReadMessageReq {
 
 // 读取消息响应
 message ReadMessageRes {}
+
+// 发送用户消息请求
+message SendUserMessageReq {
+    int32 site_id = 1;          // 站点ID(可选, 若metadata携带则忽略)
+    int32 user_id = 2;          // 用户ID
+    string event_code = 3;      // 业务触发编码
+    string biz_id = 4;          // 业务流水号
+    double amount = 5;          // 金额(可选)
+    string grade_name = 6;      // 等级名称(可选)
+    map<string, string> vars = 7; // 变量替换(可选)
+}
+
+// 发送用户消息响应
+message SendUserMessageRes {
+    bool success = 1;
+    string message = 2;
+}
