@@ -1239,3 +1239,66 @@ func (s *sPublic) GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (res *
 
 	return res, nil
 }
+
+// GetSiteActivityList 获取活动配置列表（前台）
+func (s *sPublic) GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivityListReq) (*v1.GetSiteActivityListRes, error) {
+	siteId := req.SiteId
+	if siteId <= 0 {
+		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
+			siteId = int32(sid)
+		}
+	}
+	siteCode := ""
+	if siteId > 0 {
+		siteCode = registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
+	}
+	if siteCode == "" {
+		if code, ok := middleware.GetSiteCodeFromContext(ctx); ok {
+			siteCode = code
+		}
+	}
+	if siteCode == "" {
+		if siteId <= 0 {
+			return nil, fmt.Errorf("站点ID不能为空")
+		}
+		return nil, fmt.Errorf("站点代码不存在: site_id=%d", siteId)
+	}
+
+	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
+
+	model := dao.SiteActivity.Ctx(ctx).Where("site_code", siteCode)
+	if req.ActivityId > 0 {
+		model = model.Where("activity_id", req.ActivityId)
+	}
+	if strings.TrimSpace(req.Code) != "" {
+		model = model.Where("code", strings.TrimSpace(req.Code))
+	}
+
+	var list []*entity.SiteActivity
+	if err := model.Order("sort asc, id asc").Scan(&list); err != nil {
+		return nil, fmt.Errorf("查询活动配置失败: %v", err)
+	}
+
+	res := &v1.GetSiteActivityListRes{List: make([]*v1.SiteActivityInfo, 0, len(list))}
+	for _, item := range list {
+		res.List = append(res.List, &v1.SiteActivityInfo{
+			Id:          int32(item.Id),
+			SiteCode:    item.SiteCode,
+			ActivityId:  int32(item.ActivityId),
+			Name:        item.Name,
+			Code:        item.Code,
+			Description: item.Description,
+			StartTime:   util.FormatTime(item.StartTime),
+			EndTime:     util.FormatTime(item.EndTime),
+			FixedParams: item.FixedParams,
+			Status:      int32(item.Status),
+			Sort:        int32(item.Sort),
+			Table:       item.Table,
+			Uri:         item.Uri,
+			CreatedAt:   util.FormatTime(item.CreatedAt),
+			UpdatedAt:   util.FormatTime(item.UpdatedAt),
+		})
+	}
+
+	return res, nil
+}

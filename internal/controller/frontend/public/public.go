@@ -56,3 +56,8 @@ func (c *Controller) GetAppNoticeList(ctx context.Context, req *v1.GetNoticeList
 func (c *Controller) GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (*v1.GetAdListRes, error) {
 	return frontend.Public().GetAppAdList(ctx, req)
 }
+
+// GetSiteActivityList 获取活动配置列表
+func (c *Controller) GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivityListReq) (*v1.GetSiteActivityListRes, error) {
+	return frontend.Public().GetSiteActivityList(ctx, req)
+}

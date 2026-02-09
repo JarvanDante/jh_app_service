@@ -16,6 +16,7 @@ type (
 		GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq) (*v1.GetSiteSettingRes, error)
 		GetAppNoticeList(ctx context.Context, req *v1.GetNoticeListReq) (*v1.GetNoticeListRes, error)
 		GetAppAdList(ctx context.Context, req *v1.GetAdListReq) (*v1.GetAdListRes, error)
+		GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivityListReq) (*v1.GetSiteActivityListRes, error)
 	}
 )
 

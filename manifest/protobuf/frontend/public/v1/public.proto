@@ -13,6 +13,7 @@ service Public {
     rpc GetSiteSetting(GetSiteSettingReq) returns (GetSiteSettingRes) {}
     rpc GetAppNoticeList(GetNoticeListReq) returns (GetNoticeListRes) {}
     rpc GetAppAdList(GetAdListReq) returns (GetAdListRes) {}
+    rpc GetSiteActivityList(GetSiteActivityListReq) returns (GetSiteActivityListRes) {}
 }
 
 // 快速注册请求
@@ -195,6 +196,37 @@ message GetAdListReq {
 // 获取广告列表响应
 message GetAdListRes {
     repeated AdItem list = 1;  // 广告列表
+}
+
+// 获取活动列表请求（前台）
+message GetSiteActivityListReq {
+    int32 site_id = 1;                      // 站点ID，可选
+    int32 activity_id = 2;                  // 活动ID(可选)
+    string code = 3;                        // 活动编码(可选)
+}
+
+// 活动信息
+message SiteActivityInfo {
+    int32 id = 1;
+    string site_code = 2;
+    int32 activity_id = 3;
+    string name = 4;
+    string code = 5;
+    string description = 6;
+    string start_time = 7;
+    string end_time = 8;
+    string fixed_params = 9;
+    int32 status = 10;
+    int32 sort = 11;
+    string table = 12;
+    string created_at = 13;
+    string updated_at = 14;
+    string uri = 15;
+}
+
+// 获取活动列表响应
+message GetSiteActivityListRes {
+    repeated SiteActivityInfo list = 1;
 }
 
 // 广告项
