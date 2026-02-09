@@ -53,6 +53,48 @@ func buildSigninParamFields() []activityParamField {
 	return fields
 }
 
+const luckyWheelSegmentCount = 8
+
+func buildLuckyWheelParamFields() []activityParamField {
+	fields := make([]activityParamField, 0, luckyWheelSegmentCount*6)
+	for segment := 1; segment <= luckyWheelSegmentCount; segment++ {
+		prefix := fmt.Sprintf("segment_%d_", segment)
+		fields = append(fields,
+			activityParamField{
+				Name:  prefix + "prize_name",
+				Label: fmt.Sprintf("扇区%d-奖项名称", segment),
+				Type:  "text",
+			},
+			activityParamField{
+				Name:  prefix + "reward_amount",
+				Label: fmt.Sprintf("扇区%d-奖金额", segment),
+				Type:  "number",
+			},
+			activityParamField{
+				Name:  prefix + "weight",
+				Label: fmt.Sprintf("扇区%d-权重", segment),
+				Type:  "int",
+			},
+			activityParamField{
+				Name:  prefix + "user_daily_win_limit",
+				Label: fmt.Sprintf("扇区%d-单用户日中奖上限", segment),
+				Type:  "int",
+			},
+			activityParamField{
+				Name:  prefix + "min_vip_level",
+				Label: fmt.Sprintf("扇区%d-最低VIP等级", segment),
+				Type:  "int",
+			},
+			activityParamField{
+				Name:  prefix + "icon",
+				Label: fmt.Sprintf("扇区%d-图标", segment),
+				Type:  "text",
+			},
+		)
+	}
+	return fields
+}
+
 func parseSigninDayField(name string) (int, bool) {
 	if !strings.HasPrefix(name, "day_") {
 		return 0, false
@@ -62,6 +104,31 @@ func parseSigninDayField(name string) (int, bool) {
 		return 0, false
 	}
 	return day, true
+}
+
+func parseLuckySegmentField(name string) (int, string, bool) {
+	if !strings.HasPrefix(name, "segment_") {
+		return 0, "", false
+	}
+
+	raw := strings.TrimPrefix(name, "segment_")
+	parts := strings.SplitN(raw, "_", 2)
+	if len(parts) != 2 {
+		return 0, "", false
+	}
+
+	segment, err := strconv.Atoi(parts[0])
+	if err != nil || segment < 1 || segment > luckyWheelSegmentCount {
+		return 0, "", false
+	}
+
+	field := parts[1]
+	switch field {
+	case "prize_name", "reward_amount", "weight", "user_daily_win_limit", "min_vip_level", "icon":
+		return segment, field, true
+	default:
+		return 0, "", false
+	}
 }
 
 var activityParamMappings = map[string][]activityParamField{
@@ -143,6 +210,7 @@ var activityParamMappings = map[string][]activityParamField{
 		},
 	},
 	"activity_signin_bonus": buildSigninParamFields(),
+	"activity_wheel_bonus":  buildLuckyWheelParamFields(),
 }
 
 // GetBasicSetting 获取站点基本设置
@@ -601,6 +669,37 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 			}
 			values[fmt.Sprintf("day_%d", item.DayNo)] = gconv.String(item.RewardAmount)
 		}
+	case "activity_wheel_bonus":
+		for segment := 1; segment <= luckyWheelSegmentCount; segment++ {
+			prefix := fmt.Sprintf("segment_%d_", segment)
+			values[prefix+"prize_name"] = ""
+			values[prefix+"reward_amount"] = "0"
+			values[prefix+"weight"] = "0"
+			values[prefix+"user_daily_win_limit"] = "0"
+			values[prefix+"min_vip_level"] = "0"
+			values[prefix+"icon"] = ""
+		}
+
+		var list []*entity.ActivityWheelBonus
+		if err := dao.ActivityWheelBonus.Ctx(ctx).
+			Where("site_code", siteCode).
+			Where("activity_id", activity.ActivityId).
+			Order("segment_no asc").
+			Scan(&list); err != nil {
+			return nil, fmt.Errorf("查询活动参数失败: %v", err)
+		}
+		for _, item := range list {
+			if item == nil || item.SegmentNo < 1 || item.SegmentNo > luckyWheelSegmentCount {
+				continue
+			}
+			prefix := fmt.Sprintf("segment_%d_", item.SegmentNo)
+			values[prefix+"prize_name"] = item.PrizeName
+			values[prefix+"reward_amount"] = gconv.String(item.RewardAmount)
+			values[prefix+"weight"] = gconv.String(item.Weight)
+			values[prefix+"user_daily_win_limit"] = gconv.String(item.UserDailyWinLimit)
+			values[prefix+"min_vip_level"] = gconv.String(item.MinVipLevel)
+			values[prefix+"icon"] = item.Icon
+		}
 	default:
 		return nil, fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -752,6 +851,8 @@ func applyActivityParamValues(ctx context.Context, siteCode string, activity *en
 		return applyDepositBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	case "activity_signin_bonus":
 		return applySigninBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
+	case "activity_wheel_bonus":
+		return applyWheelBonusParamValues(ctx, siteCode, activity.ActivityId, paramValues)
 	default:
 		return "", fmt.Errorf("没有对应参数配置表，请确认")
 	}
@@ -1015,6 +1116,163 @@ func applySigninBonusParamValues(ctx context.Context, siteCode string, activityI
 			continue
 		}
 		values[fmt.Sprintf("day_%d", item.DayNo)] = item.RewardAmount
+	}
+
+	data, err := json.Marshal(values)
+	if err != nil {
+		return "", fmt.Errorf("构建固定参数失败: %v", err)
+	}
+	return string(data), nil
+}
+
+func applyWheelBonusParamValues(ctx context.Context, siteCode string, activityId int, paramValues map[string]string) (string, error) {
+	if activityId <= 0 {
+		return "", fmt.Errorf("活动ID不能为空")
+	}
+
+	var exists []*entity.ActivityWheelBonus
+	if err := dao.ActivityWheelBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Scan(&exists); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+
+	segmentConfigMap := make(map[int]*entity.ActivityWheelBonus, luckyWheelSegmentCount)
+	for segment := 1; segment <= luckyWheelSegmentCount; segment++ {
+		segmentConfigMap[segment] = &entity.ActivityWheelBonus{
+			SiteCode:          siteCode,
+			ActivityId:        activityId,
+			SegmentNo:         uint(segment),
+			PrizeName:         "",
+			RewardAmount:      0,
+			Weight:            0,
+			UserDailyWinLimit: 0,
+			MinVipLevel:       0,
+			Icon:              "",
+		}
+	}
+	for _, item := range exists {
+		if item == nil || item.SegmentNo < 1 || item.SegmentNo > luckyWheelSegmentCount {
+			continue
+		}
+		segmentConfigMap[int(item.SegmentNo)] = item
+	}
+
+	for key, value := range paramValues {
+		segment, field, ok := parseLuckySegmentField(key)
+		if !ok {
+			continue
+		}
+
+		config := segmentConfigMap[segment]
+		if config == nil {
+			continue
+		}
+
+		val := strings.TrimSpace(value)
+		switch field {
+		case "prize_name":
+			config.PrizeName = val
+		case "reward_amount":
+			amount := gconv.Float64(val)
+			if amount < 0 {
+				amount = 0
+			}
+			config.RewardAmount = float64(int(amount*100+0.5)) / 100
+		case "weight":
+			weight := gconv.Int(val)
+			if weight < 0 {
+				weight = 0
+			}
+			config.Weight = uint(weight)
+		case "user_daily_win_limit":
+			limit := gconv.Int(val)
+			if limit < 0 {
+				limit = 0
+			}
+			config.UserDailyWinLimit = uint(limit)
+		case "min_vip_level":
+			level := gconv.Int(val)
+			if level < 0 {
+				level = 0
+			}
+			config.MinVipLevel = uint(level)
+		case "icon":
+			config.Icon = val
+		}
+	}
+
+	now := gtime.Now()
+	for segment := 1; segment <= luckyWheelSegmentCount; segment++ {
+		config := segmentConfigMap[segment]
+		if config == nil {
+			continue
+		}
+
+		data := g.Map{
+			"prize_name":           config.PrizeName,
+			"reward_amount":        config.RewardAmount,
+			"weight":               config.Weight,
+			"user_daily_win_limit": config.UserDailyWinLimit,
+			"min_vip_level":        config.MinVipLevel,
+			"icon":                 config.Icon,
+			"updated_at":           now,
+		}
+
+		if config.Id > 0 {
+			if _, err := dao.ActivityWheelBonus.Ctx(ctx).
+				Where("id", config.Id).
+				Data(data).
+				Update(); err != nil {
+				return "", fmt.Errorf("更新活动参数失败: %v", err)
+			}
+			continue
+		}
+
+		data["site_code"] = siteCode
+		data["activity_id"] = activityId
+		data["segment_no"] = segment
+		data["created_at"] = now
+
+		if _, err := dao.ActivityWheelBonus.Ctx(ctx).Data(data).Insert(); err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+				return "", fmt.Errorf("大转盘参数表唯一键冲突，请确认唯一键为(site_code, activity_id, segment_no)")
+			}
+			return "", fmt.Errorf("新增活动参数失败: %v", err)
+		}
+	}
+
+	values := make(map[string]interface{}, luckyWheelSegmentCount*6)
+	for segment := 1; segment <= luckyWheelSegmentCount; segment++ {
+		prefix := fmt.Sprintf("segment_%d_", segment)
+		values[prefix+"prize_name"] = ""
+		values[prefix+"reward_amount"] = 0.0
+		values[prefix+"weight"] = 0
+		values[prefix+"user_daily_win_limit"] = 0
+		values[prefix+"min_vip_level"] = 0
+		values[prefix+"icon"] = ""
+	}
+
+	var finalList []*entity.ActivityWheelBonus
+	if err := dao.ActivityWheelBonus.Ctx(ctx).
+		Where("site_code", siteCode).
+		Where("activity_id", activityId).
+		Order("segment_no asc").
+		Scan(&finalList); err != nil {
+		return "", fmt.Errorf("查询活动参数失败: %v", err)
+	}
+	for _, item := range finalList {
+		if item == nil || item.SegmentNo < 1 || item.SegmentNo > luckyWheelSegmentCount {
+			continue
+		}
+		prefix := fmt.Sprintf("segment_%d_", item.SegmentNo)
+		values[prefix+"prize_name"] = item.PrizeName
+		values[prefix+"reward_amount"] = item.RewardAmount
+		values[prefix+"weight"] = item.Weight
+		values[prefix+"user_daily_win_limit"] = item.UserDailyWinLimit
+		values[prefix+"min_vip_level"] = item.MinVipLevel
+		values[prefix+"icon"] = item.Icon
 	}
 
 	data, err := json.Marshal(values)

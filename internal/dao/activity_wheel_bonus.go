@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // activityWheelBonusDao is the data access object for the table activity_wheel_bonus.
@@ -16,7 +19,14 @@ type activityWheelBonusDao struct {
 
 var (
 	// ActivityWheelBonus is a globally accessible object for table activity_wheel_bonus operations.
-	ActivityWheelBonus = activityWheelBonusDao{internal.NewActivityWheelBonusDao()}
+	ActivityWheelBonus = activityWheelBonusDao{internal.NewActivityWheelBonusDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d activityWheelBonusDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
+	originalModel := d.ActivityWheelBonusDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.
