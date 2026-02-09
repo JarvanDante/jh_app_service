@@ -74,6 +74,7 @@ message CreateMessageReq {
     int32 alert_times = 9;  // 弹框次数
     string event_code = 10; // v: required|length:1,50
     double amount = 11;     // 涉及金额(可选)
+    string grade_name = 12; // 等级名称(可选)
 }
 
 // 创建消息响应

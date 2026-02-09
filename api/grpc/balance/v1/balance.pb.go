@@ -25,10 +25,10 @@ const (
 // 初始化用户余额请求
 type InitBalanceUserReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"` // 站点ID
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户ID"` // 用户ID
-	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty" dc:"用户名"`             // 用户名
-	Currency      string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty" dc:"货币类型"`            // 货币类型
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username" dc:"用户名"`             // 用户名
+	Currency      string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency" dc:"货币类型"`            // 货币类型
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,8 +94,8 @@ func (x *InitBalanceUserReq) GetCurrency() string {
 // 初始化用户余额响应
 type InitBalanceUserRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -184,9 +184,9 @@ func (*RefreshBalanceReq) Descriptor() ([]byte, []int) {
 // 刷新用户余额响应
 type RefreshBalanceRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Balance       string                 `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance,omitempty" dc:"余额"`                                    // 余额
-	BalanceFrozen string                 `protobuf:"bytes,2,opt,name=balance_frozen,json=balanceFrozen,proto3" json:"balance_frozen,omitempty" dc:"冻结余额"` // 冻结余额
-	Points        int64                  `protobuf:"varint,3,opt,name=points,proto3" json:"points,omitempty" dc:"积分"`                                     // 积分
+	Balance       string                 `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance" dc:"余额"`                                    // 余额
+	BalanceFrozen string                 `protobuf:"bytes,2,opt,name=balance_frozen,json=balanceFrozen,proto3" json:"balance_frozen" dc:"冻结余额"` // 冻结余额
+	Points        int64                  `protobuf:"varint,3,opt,name=points,proto3" json:"points" dc:"积分"`                                     // 积分
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -245,13 +245,13 @@ func (x *RefreshBalanceRes) GetPoints() int64 {
 // 调整用户余额请求
 type AdjustBalanceReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"`                   // 站点ID
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户ID"`                   // 用户ID
-	Amount        float32                `protobuf:"fixed32,3,opt,name=amount,proto3" json:"amount,omitempty" dc:"金额"`                                  // 金额
-	Type          int32                  `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty" dc:"类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)"` // 类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)
-	GameName      string                 `protobuf:"bytes,5,opt,name=game_name,json=gameName,proto3" json:"game_name,omitempty" dc:"游戏名称"`              // 游戏名称
-	GameId        string                 `protobuf:"bytes,6,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty" dc:"游戏ID"`                    // 游戏ID
-	GameKey       string                 `protobuf:"bytes,7,opt,name=game_key,json=gameKey,proto3" json:"game_key,omitempty" dc:"游戏key（进入游戏时的key）"`     // 游戏key（进入游戏时的key）
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                   // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"`                   // 用户ID
+	Amount        float32                `protobuf:"fixed32,3,opt,name=amount,proto3" json:"amount" dc:"金额"`                                  // 金额
+	Type          int32                  `protobuf:"varint,4,opt,name=type,proto3" json:"type" dc:"类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)"` // 类型：0=转出(从中心账户转账到游戏账户) 1=转入(从游戏账户转账到中心账户)
+	GameName      string                 `protobuf:"bytes,5,opt,name=game_name,json=gameName,proto3" json:"game_name" dc:"游戏名称"`              // 游戏名称
+	GameId        string                 `protobuf:"bytes,6,opt,name=game_id,json=gameId,proto3" json:"game_id" dc:"游戏ID"`                    // 游戏ID
+	GameKey       string                 `protobuf:"bytes,7,opt,name=game_key,json=gameKey,proto3" json:"game_key" dc:"游戏key（进入游戏时的key）"`     // 游戏key（进入游戏时的key）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -338,10 +338,10 @@ func (x *AdjustBalanceReq) GetGameKey() string {
 // 调整用户余额响应
 type AdjustBalanceRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"`              // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`                 // 消息
-	Balance       string                 `protobuf:"bytes,3,opt,name=balance,proto3" json:"balance,omitempty" dc:"调整后的余额"`             // 调整后的余额
-	OrderNo       string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty" dc:"订单号"` // 订单号
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"`              // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`                 // 消息
+	Balance       string                 `protobuf:"bytes,3,opt,name=balance,proto3" json:"balance" dc:"调整后的余额"`             // 调整后的余额
+	OrderNo       string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no" dc:"订单号"` // 订单号
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -407,7 +407,7 @@ func (x *AdjustBalanceRes) GetOrderNo() string {
 // 更新转账状态请求
 type UpdateTransferStatusReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderNo       string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty" dc:"订单号"` // 订单号
+	OrderNo       string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no" dc:"订单号"` // 订单号
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -452,8 +452,8 @@ func (x *UpdateTransferStatusReq) GetOrderNo() string {
 // 更新转账状态响应
 type UpdateTransferStatusRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -505,10 +505,10 @@ func (x *UpdateTransferStatusRes) GetMessage() string {
 // 补偿余额请求
 type CompensateBalanceReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"`  // 站点ID
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户ID"`  // 用户ID
-	OrderNo       string                 `protobuf:"bytes,3,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty" dc:"订单号"` // 订单号
-	Amount        float32                `protobuf:"fixed32,4,opt,name=amount,proto3" json:"amount,omitempty" dc:"需要补偿的金额（负数）"`        // 需要补偿的金额（负数）
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`  // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"`  // 用户ID
+	OrderNo       string                 `protobuf:"bytes,3,opt,name=order_no,json=orderNo,proto3" json:"order_no" dc:"订单号"` // 订单号
+	Amount        float32                `protobuf:"fixed32,4,opt,name=amount,proto3" json:"amount" dc:"需要补偿的金额（负数）"`        // 需要补偿的金额（负数）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -574,8 +574,8 @@ func (x *CompensateBalanceReq) GetAmount() float32 {
 // 补偿余额响应
 type CompensateBalanceRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -627,8 +627,8 @@ func (x *CompensateBalanceRes) GetMessage() string {
 // 最后一次进入游戏请求
 type GetLastBalanceLogGameReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"` // 站点ID
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户ID"` // 用户ID
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -680,8 +680,8 @@ func (x *GetLastBalanceLogGameReq) GetUserId() int32 {
 // 最后一次进入游戏响应
 type GetLastBalanceLogGameRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	GameId        int32                  `protobuf:"varint,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty" dc:"游戏ID"`   // 游戏ID
-	Amount        float32                `protobuf:"fixed32,2,opt,name=amount,proto3" json:"amount,omitempty" dc:"游戏ID无刚用户余额，游戏ID有则为0"` // 游戏ID无刚用户余额，游戏ID有则为0
+	GameId        int32                  `protobuf:"varint,1,opt,name=game_id,json=gameId,proto3" json:"game_id" dc:"游戏ID"`   // 游戏ID
+	Amount        float32                `protobuf:"fixed32,2,opt,name=amount,proto3" json:"amount" dc:"游戏ID无刚用户余额，游戏ID有则为0"` // 游戏ID无刚用户余额，游戏ID有则为0
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -770,20 +770,20 @@ func (*GetPaymentListReq) Descriptor() ([]byte, []int) {
 // 支付渠道信息
 type PaymentInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" dc:"ID"`                                            // ID
-	SiteId        int32                  `protobuf:"varint,2,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"`                    // 站点ID
-	PaymentId     int32                  `protobuf:"varint,3,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty" dc:"总站支付ID"`         // 总站支付ID
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty" dc:"名称"`                                         // 名称
-	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty" dc:"代码"`                                         // 代码
-	Gateway       int32                  `protobuf:"varint,6,opt,name=gateway,proto3" json:"gateway,omitempty" dc:"支付网关：1=在线支付 2=银行"`                    // 支付网关：1=在线支付 2=银行
-	EachMin       float32                `protobuf:"fixed32,7,opt,name=each_min,json=eachMin,proto3" json:"each_min,omitempty" dc:"单笔最低"`                // 单笔最低
-	EachMax       float32                `protobuf:"fixed32,8,opt,name=each_max,json=eachMax,proto3" json:"each_max,omitempty" dc:"单笔最高"`                // 单笔最高
-	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort,omitempty" dc:"排序"`                                        // 排序
-	MoneyList     []string               `protobuf:"bytes,10,rep,name=money_list,json=moneyList,proto3" json:"money_list,omitempty" dc:"可选金额数组"`         // 可选金额数组
-	IsInput       int32                  `protobuf:"varint,11,opt,name=is_input,json=isInput,proto3" json:"is_input,omitempty" dc:"是否支持输入金额：0=不支持 1=支持"` // 是否支持输入金额：0=不支持 1=支持
-	Remark        string                 `protobuf:"bytes,12,opt,name=remark,proto3" json:"remark,omitempty" dc:"描述"`                                    // 描述
-	Logo          string                 `protobuf:"bytes,13,opt,name=logo,proto3" json:"logo,omitempty" dc:"logo地址"`                                    // logo地址
-	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status,omitempty" dc:"状态"`                                   // 状态
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"ID"`                                            // ID
+	SiteId        int32                  `protobuf:"varint,2,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                    // 站点ID
+	PaymentId     int32                  `protobuf:"varint,3,opt,name=payment_id,json=paymentId,proto3" json:"payment_id" dc:"总站支付ID"`         // 总站支付ID
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name" dc:"名称"`                                         // 名称
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code" dc:"代码"`                                         // 代码
+	Gateway       int32                  `protobuf:"varint,6,opt,name=gateway,proto3" json:"gateway" dc:"支付网关：1=在线支付 2=银行"`                    // 支付网关：1=在线支付 2=银行
+	EachMin       float32                `protobuf:"fixed32,7,opt,name=each_min,json=eachMin,proto3" json:"each_min" dc:"单笔最低"`                // 单笔最低
+	EachMax       float32                `protobuf:"fixed32,8,opt,name=each_max,json=eachMax,proto3" json:"each_max" dc:"单笔最高"`                // 单笔最高
+	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort" dc:"排序"`                                        // 排序
+	MoneyList     []string               `protobuf:"bytes,10,rep,name=money_list,json=moneyList,proto3" json:"money_list" dc:"可选金额数组"`         // 可选金额数组
+	IsInput       int32                  `protobuf:"varint,11,opt,name=is_input,json=isInput,proto3" json:"is_input" dc:"是否支持输入金额：0=不支持 1=支持"` // 是否支持输入金额：0=不支持 1=支持
+	Remark        string                 `protobuf:"bytes,12,opt,name=remark,proto3" json:"remark" dc:"描述"`                                    // 描述
+	Logo          string                 `protobuf:"bytes,13,opt,name=logo,proto3" json:"logo" dc:"logo地址"`                                    // logo地址
+	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status" dc:"状态"`                                   // 状态
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -919,7 +919,7 @@ func (x *PaymentInfo) GetStatus() int32 {
 // 获取支付渠道列表响应
 type GetPaymentListRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*PaymentInfo         `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty" dc:"支付渠道列表"` // 支付渠道列表
+	List          []*PaymentInfo         `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"支付渠道列表"` // 支付渠道列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1001,20 +1001,20 @@ func (*GetWithdrawListReq) Descriptor() ([]byte, []int) {
 // 提现渠道信息
 type WithdrawInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" dc:"ID"`                                            // ID
-	SiteId        int32                  `protobuf:"varint,2,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"`                    // 站点ID
-	WithdrawId    int32                  `protobuf:"varint,3,opt,name=withdraw_id,json=withdrawId,proto3" json:"withdraw_id,omitempty" dc:"总站提现ID"`      // 总站提现ID
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty" dc:"名称"`                                         // 名称
-	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty" dc:"代码"`                                         // 代码
-	Gateway       int32                  `protobuf:"varint,6,opt,name=gateway,proto3" json:"gateway,omitempty" dc:"提现网关：1=在线支付 2=银行"`                    // 提现网关：1=在线支付 2=银行
-	EachMin       float32                `protobuf:"fixed32,7,opt,name=each_min,json=eachMin,proto3" json:"each_min,omitempty" dc:"单笔最低"`                // 单笔最低
-	EachMax       float32                `protobuf:"fixed32,8,opt,name=each_max,json=eachMax,proto3" json:"each_max,omitempty" dc:"单笔最高"`                // 单笔最高
-	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort,omitempty" dc:"排序"`                                        // 排序
-	MoneyList     []string               `protobuf:"bytes,10,rep,name=money_list,json=moneyList,proto3" json:"money_list,omitempty" dc:"可选金额数组"`         // 可选金额数组
-	IsInput       int32                  `protobuf:"varint,11,opt,name=is_input,json=isInput,proto3" json:"is_input,omitempty" dc:"是否支持输入金额：0=不支持 1=支持"` // 是否支持输入金额：0=不支持 1=支持
-	Remark        string                 `protobuf:"bytes,12,opt,name=remark,proto3" json:"remark,omitempty" dc:"描述"`                                    // 描述
-	Logo          string                 `protobuf:"bytes,13,opt,name=logo,proto3" json:"logo,omitempty" dc:"logo地址"`                                    // logo地址
-	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status,omitempty" dc:"状态"`                                   // 状态
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"ID"`                                            // ID
+	SiteId        int32                  `protobuf:"varint,2,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                    // 站点ID
+	WithdrawId    int32                  `protobuf:"varint,3,opt,name=withdraw_id,json=withdrawId,proto3" json:"withdraw_id" dc:"总站提现ID"`      // 总站提现ID
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name" dc:"名称"`                                         // 名称
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code" dc:"代码"`                                         // 代码
+	Gateway       int32                  `protobuf:"varint,6,opt,name=gateway,proto3" json:"gateway" dc:"提现网关：1=在线支付 2=银行"`                    // 提现网关：1=在线支付 2=银行
+	EachMin       float32                `protobuf:"fixed32,7,opt,name=each_min,json=eachMin,proto3" json:"each_min" dc:"单笔最低"`                // 单笔最低
+	EachMax       float32                `protobuf:"fixed32,8,opt,name=each_max,json=eachMax,proto3" json:"each_max" dc:"单笔最高"`                // 单笔最高
+	Sort          int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort" dc:"排序"`                                        // 排序
+	MoneyList     []string               `protobuf:"bytes,10,rep,name=money_list,json=moneyList,proto3" json:"money_list" dc:"可选金额数组"`         // 可选金额数组
+	IsInput       int32                  `protobuf:"varint,11,opt,name=is_input,json=isInput,proto3" json:"is_input" dc:"是否支持输入金额：0=不支持 1=支持"` // 是否支持输入金额：0=不支持 1=支持
+	Remark        string                 `protobuf:"bytes,12,opt,name=remark,proto3" json:"remark" dc:"描述"`                                    // 描述
+	Logo          string                 `protobuf:"bytes,13,opt,name=logo,proto3" json:"logo" dc:"logo地址"`                                    // logo地址
+	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status" dc:"状态"`                                   // 状态
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1150,7 +1150,7 @@ func (x *WithdrawInfo) GetStatus() int32 {
 // 获取提现渠道列表响应
 type GetWithdrawListRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*WithdrawInfo        `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty" dc:"提现渠道列表"` // 提现渠道列表
+	List          []*WithdrawInfo        `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"提现渠道列表"` // 提现渠道列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1195,10 +1195,10 @@ func (x *GetWithdrawListRes) GetList() []*WithdrawInfo {
 // 添加银行卡请求
 type AddBankCardReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty" dc:"类型 1=GCASH 2=Maya"`                       // 类型 1=GCASH 2=Maya
-	CardAccount   string                 `protobuf:"bytes,2,opt,name=card_account,json=cardAccount,proto3" json:"card_account,omitempty" dc:"账户名"`     // 账户名
-	CardNo        string                 `protobuf:"bytes,3,opt,name=card_no,json=cardNo,proto3" json:"card_no,omitempty" dc:"卡号"`                     // 卡号
-	IsDefault     int32                  `protobuf:"varint,4,opt,name=is_default,json=isDefault,proto3" json:"is_default,omitempty" dc:"是否默认 0=否 1=是"` // 是否默认 0=否 1=是
+	Type          int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type" dc:"类型 1=GCASH 2=Maya"`                       // 类型 1=GCASH 2=Maya
+	CardAccount   string                 `protobuf:"bytes,2,opt,name=card_account,json=cardAccount,proto3" json:"card_account" dc:"账户名"`     // 账户名
+	CardNo        string                 `protobuf:"bytes,3,opt,name=card_no,json=cardNo,proto3" json:"card_no" dc:"卡号"`                     // 卡号
+	IsDefault     int32                  `protobuf:"varint,4,opt,name=is_default,json=isDefault,proto3" json:"is_default" dc:"是否默认 0=否 1=是"` // 是否默认 0=否 1=是
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1264,8 +1264,8 @@ func (x *AddBankCardReq) GetIsDefault() int32 {
 // 添加银行卡响应
 type AddBankCardRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1354,12 +1354,12 @@ func (*GetBankCardListReq) Descriptor() ([]byte, []int) {
 // 银行卡信息
 type BankCardInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" dc:"ID"`                                          // ID
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty" dc:"类型 1=GCASH 2=Maya"`                       // 类型 1=GCASH 2=Maya
-	CardAccount   string                 `protobuf:"bytes,3,opt,name=card_account,json=cardAccount,proto3" json:"card_account,omitempty" dc:"账户名"`     // 账户名
-	CardNo        string                 `protobuf:"bytes,4,opt,name=card_no,json=cardNo,proto3" json:"card_no,omitempty" dc:"卡号"`                     // 卡号
-	IsDefault     int32                  `protobuf:"varint,5,opt,name=is_default,json=isDefault,proto3" json:"is_default,omitempty" dc:"是否默认 0=否 1=是"` // 是否默认 0=否 1=是
-	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty" dc:"创建时间"`          // 创建时间
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"ID"`                                          // ID
+	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type" dc:"类型 1=GCASH 2=Maya"`                       // 类型 1=GCASH 2=Maya
+	CardAccount   string                 `protobuf:"bytes,3,opt,name=card_account,json=cardAccount,proto3" json:"card_account" dc:"账户名"`     // 账户名
+	CardNo        string                 `protobuf:"bytes,4,opt,name=card_no,json=cardNo,proto3" json:"card_no" dc:"卡号"`                     // 卡号
+	IsDefault     int32                  `protobuf:"varint,5,opt,name=is_default,json=isDefault,proto3" json:"is_default" dc:"是否默认 0=否 1=是"` // 是否默认 0=否 1=是
+	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at" dc:"创建时间"`          // 创建时间
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1439,7 +1439,7 @@ func (x *BankCardInfo) GetCreatedAt() string {
 // 查询银行卡列表响应
 type GetBankCardListRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*BankCardInfo        `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty" dc:"银行卡列表"` // 银行卡列表
+	List          []*BankCardInfo        `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"银行卡列表"` // 银行卡列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1484,7 +1484,7 @@ func (x *GetBankCardListRes) GetList() []*BankCardInfo {
 // 删除银行卡请求
 type DeleteBankCardReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" dc:"银行卡ID"` // 银行卡ID
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"银行卡ID"` // 银行卡ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1529,8 +1529,8 @@ func (x *DeleteBankCardReq) GetId() int32 {
 // 删除银行卡响应
 type DeleteBankCardRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1582,7 +1582,7 @@ func (x *DeleteBankCardRes) GetMessage() string {
 // 设置默认银行卡请求
 type SetDefaultBankCardReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" dc:"银行卡ID"` // 银行卡ID
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id" dc:"银行卡ID"` // 银行卡ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1627,8 +1627,8 @@ func (x *SetDefaultBankCardReq) GetId() int32 {
 // 设置默认银行卡响应
 type SetDefaultBankCardRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1717,9 +1717,9 @@ func (*GetDepositNonceReq) Descriptor() ([]byte, []int) {
 // 获取充值 nonce 响应
 type GetDepositNonceRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Nonce         string                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce,omitempty" dc:"随机数"`                               // 随机数
-	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty" dc:"时间戳"`                      // 时间戳
-	ExpiresIn     int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty" dc:"过期时间（秒）"` // 过期时间（秒）
+	Nonce         string                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce" dc:"随机数"`                               // 随机数
+	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp" dc:"时间戳"`                      // 时间戳
+	ExpiresIn     int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"过期时间（秒）"` // 过期时间（秒）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1815,9 +1815,9 @@ func (*GetWithdrawNonceReq) Descriptor() ([]byte, []int) {
 // 获取提现 nonce 响应
 type GetWithdrawNonceRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Nonce         string                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce,omitempty" dc:"随机数"`                               // 随机数
-	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty" dc:"时间戳"`                      // 时间戳
-	ExpiresIn     int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty" dc:"过期时间（秒）"` // 过期时间（秒）
+	Nonce         string                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce" dc:"随机数"`                               // 随机数
+	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp" dc:"时间戳"`                      // 时间戳
+	ExpiresIn     int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"过期时间（秒）"` // 过期时间（秒）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1876,14 +1876,14 @@ func (x *GetWithdrawNonceRes) GetExpiresIn() int64 {
 // 创建充值订单请求
 type CreateDepositOrderReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PaymentId     int32                  `protobuf:"varint,1,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty" dc:"支付方式ID"`                       // 支付方式ID
-	Money         float64                `protobuf:"fixed64,2,opt,name=money,proto3" json:"money,omitempty" dc:"充值金额"`                                                 // 充值金额
-	OrderType     string                 `protobuf:"bytes,3,opt,name=order_type,json=orderType,proto3" json:"order_type,omitempty" dc:"订单类型: deposit=充值, withdraw=提现"` // 订单类型: deposit=充值, withdraw=提现
-	UserCardNo    string                 `protobuf:"bytes,4,opt,name=user_card_no,json=userCardNo,proto3" json:"user_card_no,omitempty" dc:"用户银行卡号(可选)"`               // 用户银行卡号(可选)
-	UserCardName  string                 `protobuf:"bytes,5,opt,name=user_card_name,json=userCardName,proto3" json:"user_card_name,omitempty" dc:"用户银行卡姓名(可选)"`        // 用户银行卡姓名(可选)
-	Nonce         string                 `protobuf:"bytes,6,opt,name=nonce,proto3" json:"nonce,omitempty" dc:"防重放随机数"`                                                 // 防重放随机数
-	BankCode      string                 `protobuf:"bytes,7,opt,name=bank_code,json=bankCode,proto3" json:"bank_code,omitempty" dc:"银行代码(可选)"`                         // 银行代码(可选)
-	Mobile        int32                  `protobuf:"varint,8,opt,name=mobile,proto3" json:"mobile,omitempty" dc:"是否手机端: 1=是, 0=否"`                                     // 是否手机端: 1=是, 0=否
+	PaymentId     int32                  `protobuf:"varint,1,opt,name=payment_id,json=paymentId,proto3" json:"payment_id" dc:"支付方式ID"`                       // 支付方式ID
+	Money         float64                `protobuf:"fixed64,2,opt,name=money,proto3" json:"money" dc:"充值金额"`                                                 // 充值金额
+	OrderType     string                 `protobuf:"bytes,3,opt,name=order_type,json=orderType,proto3" json:"order_type" dc:"订单类型: deposit=充值, withdraw=提现"` // 订单类型: deposit=充值, withdraw=提现
+	UserCardNo    string                 `protobuf:"bytes,4,opt,name=user_card_no,json=userCardNo,proto3" json:"user_card_no" dc:"用户银行卡号(可选)"`               // 用户银行卡号(可选)
+	UserCardName  string                 `protobuf:"bytes,5,opt,name=user_card_name,json=userCardName,proto3" json:"user_card_name" dc:"用户银行卡姓名(可选)"`        // 用户银行卡姓名(可选)
+	Nonce         string                 `protobuf:"bytes,6,opt,name=nonce,proto3" json:"nonce" dc:"防重放随机数"`                                                 // 防重放随机数
+	BankCode      string                 `protobuf:"bytes,7,opt,name=bank_code,json=bankCode,proto3" json:"bank_code" dc:"银行代码(可选)"`                         // 银行代码(可选)
+	Mobile        int32                  `protobuf:"varint,8,opt,name=mobile,proto3" json:"mobile" dc:"是否手机端: 1=是, 0=否"`                                     // 是否手机端: 1=是, 0=否
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1977,12 +1977,12 @@ func (x *CreateDepositOrderReq) GetMobile() int32 {
 // 创建充值订单响应
 type CreateDepositOrderRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	OrderSn       string                 `protobuf:"bytes,1,opt,name=order_sn,json=orderSn,proto3" json:"order_sn,omitempty" dc:"系统订单号"`                    // 系统订单号
-	SysTradeNo    string                 `protobuf:"bytes,2,opt,name=sys_trade_no,json=sysTradeNo,proto3" json:"sys_trade_no,omitempty" dc:"平台交易流水号"`       // 平台交易流水号
-	ChannelCardNo string                 `protobuf:"bytes,3,opt,name=channel_card_no,json=channelCardNo,proto3" json:"channel_card_no,omitempty" dc:"收款卡号"` // 收款卡号
-	ChannelName   string                 `protobuf:"bytes,4,opt,name=channel_name,json=channelName,proto3" json:"channel_name,omitempty" dc:"渠道名称"`         // 渠道名称
-	ImageUrl      string                 `protobuf:"bytes,5,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty" dc:"支付引导图"`                 // 支付引导图
-	Result        string                 `protobuf:"bytes,6,opt,name=result,proto3" json:"result,omitempty" dc:"返回信息"`                                      // 返回信息
+	OrderSn       string                 `protobuf:"bytes,1,opt,name=order_sn,json=orderSn,proto3" json:"order_sn" dc:"系统订单号"`                    // 系统订单号
+	SysTradeNo    string                 `protobuf:"bytes,2,opt,name=sys_trade_no,json=sysTradeNo,proto3" json:"sys_trade_no" dc:"平台交易流水号"`       // 平台交易流水号
+	ChannelCardNo string                 `protobuf:"bytes,3,opt,name=channel_card_no,json=channelCardNo,proto3" json:"channel_card_no" dc:"收款卡号"` // 收款卡号
+	ChannelName   string                 `protobuf:"bytes,4,opt,name=channel_name,json=channelName,proto3" json:"channel_name" dc:"渠道名称"`         // 渠道名称
+	ImageUrl      string                 `protobuf:"bytes,5,opt,name=image_url,json=imageUrl,proto3" json:"image_url" dc:"支付引导图"`                 // 支付引导图
+	Result        string                 `protobuf:"bytes,6,opt,name=result,proto3" json:"result" dc:"返回信息"`                                      // 返回信息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2062,12 +2062,12 @@ func (x *CreateDepositOrderRes) GetResult() string {
 // 获取账户明细请求
 type GetBalanceLogReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Start         string                 `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty" dc:"开始时间 格式: 2024-01-01 00:00:00"`     // 开始时间 格式: 2024-01-01 00:00:00
-	End           string                 `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty" dc:"结束时间 格式: 2024-01-01 23:59:59"`         // 结束时间 格式: 2024-01-01 23:59:59
-	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty" dc:"类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账"`  // 类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账
-	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty" dc:"状态0=初始化，1=待处理；2=处理中；3=成功；4=失败"` // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
-	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page,omitempty" dc:"页码"`                                // 页码
-	Size          int32                  `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty" dc:"每页数量"`                              // 每页数量
+	Start         string                 `protobuf:"bytes,1,opt,name=start,proto3" json:"start" dc:"开始时间 格式: 2024-01-01 00:00:00"`     // 开始时间 格式: 2024-01-01 00:00:00
+	End           string                 `protobuf:"bytes,2,opt,name=end,proto3" json:"end" dc:"结束时间 格式: 2024-01-01 23:59:59"`         // 结束时间 格式: 2024-01-01 23:59:59
+	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type" dc:"类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账"`  // 类型 0=全部 1=充值 2=提款 3=红利 4=返水 5=转账
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status" dc:"状态0=初始化，1=待处理；2=处理中；3=成功；4=失败"` // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
+	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page" dc:"页码"`                                // 页码
+	Size          int32                  `protobuf:"varint,6,opt,name=size,proto3" json:"size" dc:"每页数量"`                              // 每页数量
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2147,15 +2147,15 @@ func (x *GetBalanceLogReq) GetSize() int32 {
 // 账户明细项
 type BalanceLogItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Channel       string                 `protobuf:"bytes,1,opt,name=channel,proto3" json:"channel,omitempty" dc:"渠道名称"`                                    // 渠道名称
-	ChangeType    int32                  `protobuf:"varint,2,opt,name=change_type,json=changeType,proto3" json:"change_type,omitempty" dc:"交易类型 1=转入 2=转出"` // 交易类型 1=转入 2=转出
-	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty" dc:"订单号"`                      // 订单号
-	Money         float64                `protobuf:"fixed64,4,opt,name=money,proto3" json:"money,omitempty" dc:"金额"`                                        // 金额
-	Remark        string                 `protobuf:"bytes,5,opt,name=remark,proto3" json:"remark,omitempty" dc:"备注"`                                        // 备注
-	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty" dc:"类型 1=充值 2=提款 3=红利 4=返水 5=转账"`                  // 类型 1=充值 2=提款 3=红利 4=返水 5=转账
-	Symbol        string                 `protobuf:"bytes,7,opt,name=symbol,proto3" json:"symbol,omitempty" dc:"符号 + 或 -"`                                  // 符号 + 或 -
-	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty" dc:"状态0=初始化，1=待处理；2=处理中；3=成功；4=失败"`            // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
-	Time          string                 `protobuf:"bytes,9,opt,name=time,proto3" json:"time,omitempty" dc:"时间"`                                            // 时间
+	Channel       string                 `protobuf:"bytes,1,opt,name=channel,proto3" json:"channel" dc:"渠道名称"`                                    // 渠道名称
+	ChangeType    int32                  `protobuf:"varint,2,opt,name=change_type,json=changeType,proto3" json:"change_type" dc:"交易类型 1=转入 2=转出"` // 交易类型 1=转入 2=转出
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no" dc:"订单号"`                      // 订单号
+	Money         float64                `protobuf:"fixed64,4,opt,name=money,proto3" json:"money" dc:"金额"`                                        // 金额
+	Remark        string                 `protobuf:"bytes,5,opt,name=remark,proto3" json:"remark" dc:"备注"`                                        // 备注
+	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type" dc:"类型 1=充值 2=提款 3=红利 4=返水 5=转账"`                  // 类型 1=充值 2=提款 3=红利 4=返水 5=转账
+	Symbol        string                 `protobuf:"bytes,7,opt,name=symbol,proto3" json:"symbol" dc:"符号 + 或 -"`                                  // 符号 + 或 -
+	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status" dc:"状态0=初始化，1=待处理；2=处理中；3=成功；4=失败"`            // 状态0=初始化，1=待处理；2=处理中；3=成功；4=失败
+	Time          string                 `protobuf:"bytes,9,opt,name=time,proto3" json:"time" dc:"时间"`                                            // 时间
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2256,12 +2256,12 @@ func (x *BalanceLogItem) GetTime() string {
 // 获取账户明细响应
 type GetBalanceLogRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TotalRecharge float64                `protobuf:"fixed64,1,opt,name=total_recharge,json=totalRecharge,proto3" json:"total_recharge,omitempty" dc:"充值总计"` // 充值总计
-	TotalWithdraw float64                `protobuf:"fixed64,2,opt,name=total_withdraw,json=totalWithdraw,proto3" json:"total_withdraw,omitempty" dc:"提现总计"` // 提现总计
-	TotalBonus    float64                `protobuf:"fixed64,3,opt,name=total_bonus,json=totalBonus,proto3" json:"total_bonus,omitempty" dc:"红利总计"`          // 红利总计
-	TotalRebate   float64                `protobuf:"fixed64,4,opt,name=total_rebate,json=totalRebate,proto3" json:"total_rebate,omitempty" dc:"返水总计"`       // 返水总计
-	List          []*BalanceLogItem      `protobuf:"bytes,5,rep,name=list,proto3" json:"list,omitempty" dc:"明细列表"`                                          // 明细列表
-	Count         int32                  `protobuf:"varint,6,opt,name=count,proto3" json:"count,omitempty" dc:"总数"`                                         // 总数
+	TotalRecharge float64                `protobuf:"fixed64,1,opt,name=total_recharge,json=totalRecharge,proto3" json:"total_recharge" dc:"充值总计"` // 充值总计
+	TotalWithdraw float64                `protobuf:"fixed64,2,opt,name=total_withdraw,json=totalWithdraw,proto3" json:"total_withdraw" dc:"提现总计"` // 提现总计
+	TotalBonus    float64                `protobuf:"fixed64,3,opt,name=total_bonus,json=totalBonus,proto3" json:"total_bonus" dc:"红利总计"`          // 红利总计
+	TotalRebate   float64                `protobuf:"fixed64,4,opt,name=total_rebate,json=totalRebate,proto3" json:"total_rebate" dc:"返水总计"`       // 返水总计
+	List          []*BalanceLogItem      `protobuf:"bytes,5,rep,name=list,proto3" json:"list" dc:"明细列表"`                                          // 明细列表
+	Count         int32                  `protobuf:"varint,6,opt,name=count,proto3" json:"count" dc:"总数"`                                         // 总数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2341,9 +2341,9 @@ func (x *GetBalanceLogRes) GetCount() int32 {
 // 获取用户流水要求列表请求
 type GetUserFlowRequirementsReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        int32                  `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty" dc:"-1=全部"` // -1=全部
-	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	Size          int32                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+	Status        int32                  `protobuf:"varint,1,opt,name=status,proto3" json:"status" dc:"-1=全部"` // -1=全部
+	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page"`
+	Size          int32                  `protobuf:"varint,3,opt,name=size,proto3" json:"size"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2402,22 +2402,22 @@ func (x *GetUserFlowRequirementsReq) GetSize() int32 {
 // 用户流水要求信息
 type UserFlowRequirementInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SourceType    int32                  `protobuf:"varint,2,opt,name=source_type,json=sourceType,proto3" json:"source_type,omitempty"`
-	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty"`
-	Amount        float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	BonusAmount   float64                `protobuf:"fixed64,5,opt,name=bonus_amount,json=bonusAmount,proto3" json:"bonus_amount,omitempty"`
-	FlowMultiple  float64                `protobuf:"fixed64,6,opt,name=flow_multiple,json=flowMultiple,proto3" json:"flow_multiple,omitempty"`
-	RequiredFlow  float64                `protobuf:"fixed64,7,opt,name=required_flow,json=requiredFlow,proto3" json:"required_flow,omitempty"`
-	CompletedFlow float64                `protobuf:"fixed64,8,opt,name=completed_flow,json=completedFlow,proto3" json:"completed_flow,omitempty"`
-	RemainingFlow float64                `protobuf:"fixed64,9,opt,name=remaining_flow,json=remainingFlow,proto3" json:"remaining_flow,omitempty"`
-	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status,omitempty"`
-	Progress      float64                `protobuf:"fixed64,11,opt,name=progress,proto3" json:"progress,omitempty"`
-	StartTime     string                 `protobuf:"bytes,12,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	ExpireTime    string                 `protobuf:"bytes,13,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
-	CompleteTime  string                 `protobuf:"bytes,14,opt,name=complete_time,json=completeTime,proto3" json:"complete_time,omitempty"`
-	Remark        string                 `protobuf:"bytes,15,opt,name=remark,proto3" json:"remark,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,16,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
+	SourceType    int32                  `protobuf:"varint,2,opt,name=source_type,json=sourceType,proto3" json:"source_type"`
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no"`
+	Amount        float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount"`
+	BonusAmount   float64                `protobuf:"fixed64,5,opt,name=bonus_amount,json=bonusAmount,proto3" json:"bonus_amount"`
+	FlowMultiple  float64                `protobuf:"fixed64,6,opt,name=flow_multiple,json=flowMultiple,proto3" json:"flow_multiple"`
+	RequiredFlow  float64                `protobuf:"fixed64,7,opt,name=required_flow,json=requiredFlow,proto3" json:"required_flow"`
+	CompletedFlow float64                `protobuf:"fixed64,8,opt,name=completed_flow,json=completedFlow,proto3" json:"completed_flow"`
+	RemainingFlow float64                `protobuf:"fixed64,9,opt,name=remaining_flow,json=remainingFlow,proto3" json:"remaining_flow"`
+	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status"`
+	Progress      float64                `protobuf:"fixed64,11,opt,name=progress,proto3" json:"progress"`
+	StartTime     string                 `protobuf:"bytes,12,opt,name=start_time,json=startTime,proto3" json:"start_time"`
+	ExpireTime    string                 `protobuf:"bytes,13,opt,name=expire_time,json=expireTime,proto3" json:"expire_time"`
+	CompleteTime  string                 `protobuf:"bytes,14,opt,name=complete_time,json=completeTime,proto3" json:"complete_time"`
+	Remark        string                 `protobuf:"bytes,15,opt,name=remark,proto3" json:"remark"`
+	CreatedAt     string                 `protobuf:"bytes,16,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2567,8 +2567,8 @@ func (x *UserFlowRequirementInfo) GetCreatedAt() string {
 // 获取用户流水要求列表响应
 type GetUserFlowRequirementsRes struct {
 	state         protoimpl.MessageState     `protogen:"open.v1"`
-	List          []*UserFlowRequirementInfo `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Count         int32                      `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	List          []*UserFlowRequirementInfo `protobuf:"bytes,1,rep,name=list,proto3" json:"list"`
+	Count         int32                      `protobuf:"varint,2,opt,name=count,proto3" json:"count"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2620,10 +2620,10 @@ func (x *GetUserFlowRequirementsRes) GetCount() int32 {
 // 充值异步回调请求
 type DepositCallbackReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TradeStatus   string                 `protobuf:"bytes,1,opt,name=trade_status,json=tradeStatus,proto3" json:"trade_status,omitempty" dc:"交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;"` // 交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;
-	OrderSn       string                 `protobuf:"bytes,2,opt,name=order_sn,json=orderSn,proto3" json:"order_sn,omitempty" dc:"订单号"`                                                         // 订单号
-	ActualAmount  float64                `protobuf:"fixed64,3,opt,name=actual_amount,json=actualAmount,proto3" json:"actual_amount,omitempty" dc:"实际支付金额"`                                     // 实际支付金额
-	Sign          string                 `protobuf:"bytes,4,opt,name=sign,proto3" json:"sign,omitempty" dc:"签名（可选，用于验证）"`                                                                      // 签名（可选，用于验证）
+	TradeStatus   string                 `protobuf:"bytes,1,opt,name=trade_status,json=tradeStatus,proto3" json:"trade_status" dc:"交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;"` // 交易状态 wait：处理中; success：成功; failed：失败;cancel：取消;
+	OrderSn       string                 `protobuf:"bytes,2,opt,name=order_sn,json=orderSn,proto3" json:"order_sn" dc:"订单号"`                                                         // 订单号
+	ActualAmount  float64                `protobuf:"fixed64,3,opt,name=actual_amount,json=actualAmount,proto3" json:"actual_amount" dc:"实际支付金额"`                                     // 实际支付金额
+	Sign          string                 `protobuf:"bytes,4,opt,name=sign,proto3" json:"sign" dc:"签名（可选，用于验证）"`                                                                      // 签名（可选，用于验证）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2689,8 +2689,8 @@ func (x *DepositCallbackReq) GetSign() string {
 // 充值异步回调响应
 type DepositCallbackRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`    // 消息
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"` // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`    // 消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2742,9 +2742,9 @@ func (x *DepositCallbackRes) GetMessage() string {
 // 申请提现请求
 type WithdrawReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Money         float64                `protobuf:"fixed64,1,opt,name=money,proto3" json:"money,omitempty" dc:"提现金额"`                              // 提现金额
-	WithdrawId    int32                  `protobuf:"varint,2,opt,name=withdraw_id,json=withdrawId,proto3" json:"withdraw_id,omitempty" dc:"提现渠道ID"` // 提现渠道ID
-	Nonce         string                 `protobuf:"bytes,3,opt,name=nonce,proto3" json:"nonce,omitempty" dc:"防重放随机数"`                              // 防重放随机数
+	Money         float64                `protobuf:"fixed64,1,opt,name=money,proto3" json:"money" dc:"提现金额"`                              // 提现金额
+	WithdrawId    int32                  `protobuf:"varint,2,opt,name=withdraw_id,json=withdrawId,proto3" json:"withdraw_id" dc:"提现渠道ID"` // 提现渠道ID
+	Nonce         string                 `protobuf:"bytes,3,opt,name=nonce,proto3" json:"nonce" dc:"防重放随机数"`                              // 防重放随机数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2803,9 +2803,9 @@ func (x *WithdrawReq) GetNonce() string {
 // 申请提现响应
 type WithdrawRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"`              // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`                 // 消息
-	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty" dc:"订单号"` // 订单号
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"`              // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`                 // 消息
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no" dc:"订单号"` // 订单号
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2864,10 +2864,10 @@ func (x *WithdrawRes) GetTradeNo() string {
 // 发放邀请红利请求
 type GrantInviteBonusReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"` // 站点ID
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户ID"` // 用户ID
-	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty" dc:"红利金额"`              // 红利金额
-	Remark        string                 `protobuf:"bytes,4,opt,name=remark,proto3" json:"remark,omitempty" dc:"备注"`                  // 备注
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
+	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount" dc:"红利金额"`              // 红利金额
+	Remark        string                 `protobuf:"bytes,4,opt,name=remark,proto3" json:"remark" dc:"备注"`                  // 备注
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2933,9 +2933,9 @@ func (x *GrantInviteBonusReq) GetRemark() string {
 // 发放邀请红利响应
 type GrantInviteBonusRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty" dc:"是否成功"`              // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty" dc:"消息"`                 // 消息
-	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty" dc:"流水号"` // 流水号
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success" dc:"是否成功"`              // 是否成功
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message" dc:"消息"`                 // 消息
+	TradeNo       string                 `protobuf:"bytes,3,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no" dc:"流水号"` // 流水号
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2994,8 +2994,8 @@ func (x *GrantInviteBonusRes) GetTradeNo() string {
 // 获取邀请红利统计请求
 type GetInviteBonusSummaryReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"` // 站点ID
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户ID"` // 用户ID
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"` // 站点ID
+	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id" dc:"用户ID"` // 用户ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3047,9 +3047,9 @@ func (x *GetInviteBonusSummaryReq) GetUserId() int32 {
 // 获取邀请红利统计响应
 type GetInviteBonusSummaryRes struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	TodayAmount     float64                `protobuf:"fixed64,1,opt,name=today_amount,json=todayAmount,proto3" json:"today_amount,omitempty" dc:"今日邀请红利"`             // 今日邀请红利
-	YesterdayAmount float64                `protobuf:"fixed64,2,opt,name=yesterday_amount,json=yesterdayAmount,proto3" json:"yesterday_amount,omitempty" dc:"昨日邀请红利"` // 昨日邀请红利
-	TotalAmount     float64                `protobuf:"fixed64,3,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty" dc:"总邀请红利"`              // 总邀请红利
+	TodayAmount     float64                `protobuf:"fixed64,1,opt,name=today_amount,json=todayAmount,proto3" json:"today_amount" dc:"今日邀请红利"`             // 今日邀请红利
+	YesterdayAmount float64                `protobuf:"fixed64,2,opt,name=yesterday_amount,json=yesterdayAmount,proto3" json:"yesterday_amount" dc:"昨日邀请红利"` // 昨日邀请红利
+	TotalAmount     float64                `protobuf:"fixed64,3,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount" dc:"总邀请红利"`              // 总邀请红利
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -3108,9 +3108,9 @@ func (x *GetInviteBonusSummaryRes) GetTotalAmount() float64 {
 // 统计有效邀请人数请求
 type GetValidReferralCountReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID"`                // 站点ID
-	UserIds       []int32                `protobuf:"varint,2,rep,packed,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty" dc:"被邀请用户ID列表"` // 被邀请用户ID列表
-	MinTotal      float64                `protobuf:"fixed64,3,opt,name=min_total,json=minTotal,proto3" json:"min_total,omitempty" dc:"有效充值门槛"`       // 有效充值门槛
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID"`                // 站点ID
+	UserIds       []int32                `protobuf:"varint,2,rep,packed,name=user_ids,json=userIds,proto3" json:"user_ids" dc:"被邀请用户ID列表"` // 被邀请用户ID列表
+	MinTotal      float64                `protobuf:"fixed64,3,opt,name=min_total,json=minTotal,proto3" json:"min_total" dc:"有效充值门槛"`       // 有效充值门槛
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3169,7 +3169,7 @@ func (x *GetValidReferralCountReq) GetMinTotal() float64 {
 // 统计有效邀请人数响应
 type GetValidReferralCountRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty" dc:"有效邀请人数"` // 有效邀请人数
+	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count" dc:"有效邀请人数"` // 有效邀请人数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

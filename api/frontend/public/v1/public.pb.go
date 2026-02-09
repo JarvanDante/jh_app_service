@@ -25,8 +25,8 @@ const (
 // 快速注册请求
 type QuickRegisterReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Time          string                 `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty" v:"required"`  // v: required
-	Domain        string                 `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty" dc:"注册域名"` // 注册域名
+	Time          string                 `protobuf:"bytes,1,opt,name=time,proto3" json:"time" v:"required"`  // v: required
+	Domain        string                 `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain" dc:"注册域名"` // 注册域名
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -78,11 +78,11 @@ func (x *QuickRegisterReq) GetDomain() string {
 // 快速注册响应
 type QuickRegisterRes struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty" dc:"JWT token"`                                                             // JWT token
-	Username         string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty" dc:"用户名"`                                                             // 用户名
-	RefreshToken     string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty" dc:"刷新token"`                             // 刷新token
-	ExpiresIn        int64                  `protobuf:"varint,4,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty" dc:"token过期时间（秒）"`                                // token过期时间（秒）
-	RefreshExpiresIn int64                  `protobuf:"varint,5,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in,omitempty" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
+	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token" dc:"JWT token"`                                                             // JWT token
+	Username         string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username" dc:"用户名"`                                                             // 用户名
+	RefreshToken     string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token" dc:"刷新token"`                             // 刷新token
+	ExpiresIn        int64                  `protobuf:"varint,4,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"token过期时间（秒）"`                                // token过期时间（秒）
+	RefreshExpiresIn int64                  `protobuf:"varint,5,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -155,10 +155,10 @@ func (x *QuickRegisterRes) GetRefreshExpiresIn() int64 {
 // 登录请求
 type LoginReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty" v:"required"` // v: required
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty" v:"required"` // v: required
-	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty" dc:"验证码"`             // 验证码
-	Time          string                 `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty" dc:"时间戳"`             // 时间戳
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username" v:"required"` // v: required
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password" v:"required"` // v: required
+	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code" dc:"验证码"`             // 验证码
+	Time          string                 `protobuf:"bytes,4,opt,name=time,proto3" json:"time" dc:"时间戳"`             // 时间戳
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -224,10 +224,10 @@ func (x *LoginReq) GetTime() string {
 // 登录响应
 type LoginRes struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty" dc:"JWT token"`                                                             // JWT token
-	RefreshToken     string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty" dc:"刷新token"`                             // 刷新token
-	ExpiresIn        int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty" dc:"token过期时间（秒）"`                                // token过期时间（秒）
-	RefreshExpiresIn int64                  `protobuf:"varint,4,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in,omitempty" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
+	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token" dc:"JWT token"`                                                             // JWT token
+	RefreshToken     string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token" dc:"刷新token"`                             // 刷新token
+	ExpiresIn        int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"token过期时间（秒）"`                                // token过期时间（秒）
+	RefreshExpiresIn int64                  `protobuf:"varint,4,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -293,7 +293,7 @@ func (x *LoginRes) GetRefreshExpiresIn() int64 {
 // 生成验证码请求
 type GenerateCaptchaReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Time          string                 `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty" v:"required"` // v: required
+	Time          string                 `protobuf:"bytes,1,opt,name=time,proto3" json:"time" v:"required"` // v: required
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -338,8 +338,8 @@ func (x *GenerateCaptchaReq) GetTime() string {
 // 生成验证码响应
 type GenerateCaptchaRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Image         []byte                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty" dc:"验证码图片数据"`                             // 验证码图片数据
-	ContentType   string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty" dc:"图片类型"` // 图片类型
+	Image         []byte                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image" dc:"验证码图片数据"`                             // 验证码图片数据
+	ContentType   string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type" dc:"图片类型"` // 图片类型
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -391,7 +391,7 @@ func (x *GenerateCaptchaRes) GetContentType() string {
 // 刷新token请求
 type RefreshTokenReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty" v:"required"` // v: required
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token" v:"required"` // v: required
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -436,10 +436,10 @@ func (x *RefreshTokenReq) GetRefreshToken() string {
 // 刷新token响应
 type RefreshTokenRes struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty" dc:"新的JWT token"`                                                           // 新的JWT token
-	RefreshToken     string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty" dc:"新的刷新token"`                           // 新的刷新token
-	ExpiresIn        int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty" dc:"token过期时间（秒）"`                                // token过期时间（秒）
-	RefreshExpiresIn int64                  `protobuf:"varint,4,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in,omitempty" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
+	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token" dc:"新的JWT token"`                                                           // 新的JWT token
+	RefreshToken     string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token" dc:"新的刷新token"`                           // 新的刷新token
+	ExpiresIn        int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"token过期时间（秒）"`                                // token过期时间（秒）
+	RefreshExpiresIn int64                  `protobuf:"varint,4,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -505,19 +505,19 @@ func (x *RefreshTokenRes) GetRefreshExpiresIn() int64 {
 // 注册请求
 type RegisterReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty" v:"required"`                       // v: required
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty" v:"required"`                       // v: required
-	Mobile        string                 `protobuf:"bytes,3,opt,name=mobile,proto3" json:"mobile,omitempty" dc:"手机号"`                               // 手机号
-	Code          string                 `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty" dc:"图片验证码"`                                 // 图片验证码
-	Time          string                 `protobuf:"bytes,5,opt,name=time,proto3" json:"time,omitempty" dc:"时间戳"`                                   // 时间戳
-	PhoneCode     string                 `protobuf:"bytes,6,opt,name=phone_code,json=phoneCode,proto3" json:"phone_code,omitempty" dc:"手机验证码"`      // 手机验证码
-	PayPassword   string                 `protobuf:"bytes,7,opt,name=pay_password,json=payPassword,proto3" json:"pay_password,omitempty" dc:"资金密码"` // 资金密码
-	Realname      string                 `protobuf:"bytes,8,opt,name=realname,proto3" json:"realname,omitempty" dc:"真实姓名"`                          // 真实姓名
-	Email         string                 `protobuf:"bytes,9,opt,name=email,proto3" json:"email,omitempty" dc:"邮箱"`                                  // 邮箱
-	Birthday      string                 `protobuf:"bytes,10,opt,name=birthday,proto3" json:"birthday,omitempty" dc:"生日"`                           // 生日
-	AgentSalt     string                 `protobuf:"bytes,11,opt,name=agent_salt,json=agentSalt,proto3" json:"agent_salt,omitempty" dc:"代理码"`       // 代理码
-	Domain        string                 `protobuf:"bytes,12,opt,name=domain,proto3" json:"domain,omitempty" dc:"注册域名"`                             // 注册域名
-	InviteCode    string                 `protobuf:"bytes,13,opt,name=invite_code,json=inviteCode,proto3" json:"invite_code,omitempty" dc:"邀请码"`    // 邀请码
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username" v:"required"`                       // v: required
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password" v:"required"`                       // v: required
+	Mobile        string                 `protobuf:"bytes,3,opt,name=mobile,proto3" json:"mobile" dc:"手机号"`                               // 手机号
+	Code          string                 `protobuf:"bytes,4,opt,name=code,proto3" json:"code" dc:"图片验证码"`                                 // 图片验证码
+	Time          string                 `protobuf:"bytes,5,opt,name=time,proto3" json:"time" dc:"时间戳"`                                   // 时间戳
+	PhoneCode     string                 `protobuf:"bytes,6,opt,name=phone_code,json=phoneCode,proto3" json:"phone_code" dc:"手机验证码"`      // 手机验证码
+	PayPassword   string                 `protobuf:"bytes,7,opt,name=pay_password,json=payPassword,proto3" json:"pay_password" dc:"资金密码"` // 资金密码
+	Realname      string                 `protobuf:"bytes,8,opt,name=realname,proto3" json:"realname" dc:"真实姓名"`                          // 真实姓名
+	Email         string                 `protobuf:"bytes,9,opt,name=email,proto3" json:"email" dc:"邮箱"`                                  // 邮箱
+	Birthday      string                 `protobuf:"bytes,10,opt,name=birthday,proto3" json:"birthday" dc:"生日"`                           // 生日
+	AgentSalt     string                 `protobuf:"bytes,11,opt,name=agent_salt,json=agentSalt,proto3" json:"agent_salt" dc:"代理码"`       // 代理码
+	Domain        string                 `protobuf:"bytes,12,opt,name=domain,proto3" json:"domain" dc:"注册域名"`                             // 注册域名
+	InviteCode    string                 `protobuf:"bytes,13,opt,name=invite_code,json=inviteCode,proto3" json:"invite_code" dc:"邀请码"`    // 邀请码
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -646,10 +646,10 @@ func (x *RegisterReq) GetInviteCode() string {
 // 注册响应
 type RegisterRes struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty" dc:"JWT token"`                                                             // JWT token
-	RefreshToken     string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty" dc:"刷新token"`                             // 刷新token
-	ExpiresIn        int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty" dc:"token过期时间（秒）"`                                // token过期时间（秒）
-	RefreshExpiresIn int64                  `protobuf:"varint,4,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in,omitempty" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
+	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token" dc:"JWT token"`                                                             // JWT token
+	RefreshToken     string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token" dc:"刷新token"`                             // 刷新token
+	ExpiresIn        int64                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in" dc:"token过期时间（秒）"`                                // token过期时间（秒）
+	RefreshExpiresIn int64                  `protobuf:"varint,4,opt,name=refresh_expires_in,json=refreshExpiresIn,proto3" json:"refresh_expires_in" dc:"refresh_token过期时间（秒）"` // refresh_token过期时间（秒）
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -752,35 +752,35 @@ func (*GetUserInfoReq) Descriptor() ([]byte, []int) {
 // 获取用户信息响应
 type GetUserInfoRes struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
-	Username           string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty" dc:"用户名"`                                                            // 用户名
-	Realname           string                 `protobuf:"bytes,2,opt,name=realname,proto3" json:"realname,omitempty" dc:"真实姓名"`                                                           // 真实姓名
-	Email              string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty" dc:"邮箱"`                                                                   // 邮箱
-	Mobile             string                 `protobuf:"bytes,4,opt,name=mobile,proto3" json:"mobile,omitempty" dc:"手机号"`                                                                // 手机号
-	Qq                 string                 `protobuf:"bytes,5,opt,name=qq,proto3" json:"qq,omitempty" dc:"QQ号"`                                                                        // QQ号
-	Sex                int32                  `protobuf:"varint,6,opt,name=sex,proto3" json:"sex,omitempty" dc:"性别 0=未知 1=男 2=女"`                                                         // 性别 0=未知 1=男 2=女
-	Birthday           string                 `protobuf:"bytes,7,opt,name=birthday,proto3" json:"birthday,omitempty" dc:"生日"`                                                             // 生日
-	LastLoginTime      string                 `protobuf:"bytes,8,opt,name=last_login_time,json=lastLoginTime,proto3" json:"last_login_time,omitempty" dc:"最后登录时间"`                        // 最后登录时间
-	LastLoginAddress   string                 `protobuf:"bytes,9,opt,name=last_login_address,json=lastLoginAddress,proto3" json:"last_login_address,omitempty" dc:"最后登录地址"`               // 最后登录地址
-	ShowBeginnerGuide  int32                  `protobuf:"varint,10,opt,name=show_beginner_guide,json=showBeginnerGuide,proto3" json:"show_beginner_guide,omitempty" dc:"新手引导 0=不显示 1=显示"` // 新手引导 0=不显示 1=显示
-	Gpwd               string                 `protobuf:"bytes,11,opt,name=gpwd,proto3" json:"gpwd,omitempty" dc:"游戏密码(base64)"`                                                          // 游戏密码(base64)
-	Balance            string                 `protobuf:"bytes,12,opt,name=balance,proto3" json:"balance,omitempty" dc:"余额(默认值)"`                                                         // 余额(默认值)
-	BalanceFrozen      string                 `protobuf:"bytes,13,opt,name=balance_frozen,json=balanceFrozen,proto3" json:"balance_frozen,omitempty" dc:"冻结余额(默认值)"`                      // 冻结余额(默认值)
-	Points             string                 `protobuf:"bytes,14,opt,name=points,proto3" json:"points,omitempty" dc:"积分(默认值)"`                                                           // 积分(默认值)
-	GradeId            int32                  `protobuf:"varint,15,opt,name=grade_id,json=gradeId,proto3" json:"grade_id,omitempty" dc:"会员等级ID"`                                          // 会员等级ID
-	GradeName          string                 `protobuf:"bytes,16,opt,name=grade_name,json=gradeName,proto3" json:"grade_name,omitempty" dc:"会员等级名称"`                                     // 会员等级名称
-	BindSafeQuestion   int32                  `protobuf:"varint,17,opt,name=bind_safe_question,json=bindSafeQuestion,proto3" json:"bind_safe_question,omitempty" dc:"是否绑定安全问题 0=否 1=是"`   // 是否绑定安全问题 0=否 1=是
-	BindPayPassword    int32                  `protobuf:"varint,18,opt,name=bind_pay_password,json=bindPayPassword,proto3" json:"bind_pay_password,omitempty" dc:"是否绑定资金密码 0=否 1=是"`      // 是否绑定资金密码 0=否 1=是
-	UnreadMessageCount int32                  `protobuf:"varint,19,opt,name=unread_message_count,json=unreadMessageCount,proto3" json:"unread_message_count,omitempty" dc:"未读消息数量(默认值)"`  // 未读消息数量(默认值)
-	SwitchSign         int32                  `protobuf:"varint,20,opt,name=switch_sign,json=switchSign,proto3" json:"switch_sign,omitempty" dc:"签到开关 0=关闭 1=开启"`                         // 签到开关 0=关闭 1=开启
+	Username           string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username" dc:"用户名"`                                                            // 用户名
+	Realname           string                 `protobuf:"bytes,2,opt,name=realname,proto3" json:"realname" dc:"真实姓名"`                                                           // 真实姓名
+	Email              string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email" dc:"邮箱"`                                                                   // 邮箱
+	Mobile             string                 `protobuf:"bytes,4,opt,name=mobile,proto3" json:"mobile" dc:"手机号"`                                                                // 手机号
+	Qq                 string                 `protobuf:"bytes,5,opt,name=qq,proto3" json:"qq" dc:"QQ号"`                                                                        // QQ号
+	Sex                int32                  `protobuf:"varint,6,opt,name=sex,proto3" json:"sex" dc:"性别 0=未知 1=男 2=女"`                                                         // 性别 0=未知 1=男 2=女
+	Birthday           string                 `protobuf:"bytes,7,opt,name=birthday,proto3" json:"birthday" dc:"生日"`                                                             // 生日
+	LastLoginTime      string                 `protobuf:"bytes,8,opt,name=last_login_time,json=lastLoginTime,proto3" json:"last_login_time" dc:"最后登录时间"`                        // 最后登录时间
+	LastLoginAddress   string                 `protobuf:"bytes,9,opt,name=last_login_address,json=lastLoginAddress,proto3" json:"last_login_address" dc:"最后登录地址"`               // 最后登录地址
+	ShowBeginnerGuide  int32                  `protobuf:"varint,10,opt,name=show_beginner_guide,json=showBeginnerGuide,proto3" json:"show_beginner_guide" dc:"新手引导 0=不显示 1=显示"` // 新手引导 0=不显示 1=显示
+	Gpwd               string                 `protobuf:"bytes,11,opt,name=gpwd,proto3" json:"gpwd" dc:"游戏密码(base64)"`                                                          // 游戏密码(base64)
+	Balance            string                 `protobuf:"bytes,12,opt,name=balance,proto3" json:"balance" dc:"余额(默认值)"`                                                         // 余额(默认值)
+	BalanceFrozen      string                 `protobuf:"bytes,13,opt,name=balance_frozen,json=balanceFrozen,proto3" json:"balance_frozen" dc:"冻结余额(默认值)"`                      // 冻结余额(默认值)
+	Points             string                 `protobuf:"bytes,14,opt,name=points,proto3" json:"points" dc:"积分(默认值)"`                                                           // 积分(默认值)
+	GradeId            int32                  `protobuf:"varint,15,opt,name=grade_id,json=gradeId,proto3" json:"grade_id" dc:"会员等级ID"`                                          // 会员等级ID
+	GradeName          string                 `protobuf:"bytes,16,opt,name=grade_name,json=gradeName,proto3" json:"grade_name" dc:"会员等级名称"`                                     // 会员等级名称
+	BindSafeQuestion   int32                  `protobuf:"varint,17,opt,name=bind_safe_question,json=bindSafeQuestion,proto3" json:"bind_safe_question" dc:"是否绑定安全问题 0=否 1=是"`   // 是否绑定安全问题 0=否 1=是
+	BindPayPassword    int32                  `protobuf:"varint,18,opt,name=bind_pay_password,json=bindPayPassword,proto3" json:"bind_pay_password" dc:"是否绑定资金密码 0=否 1=是"`      // 是否绑定资金密码 0=否 1=是
+	UnreadMessageCount int32                  `protobuf:"varint,19,opt,name=unread_message_count,json=unreadMessageCount,proto3" json:"unread_message_count" dc:"未读消息数量(默认值)"`  // 未读消息数量(默认值)
+	SwitchSign         int32                  `protobuf:"varint,20,opt,name=switch_sign,json=switchSign,proto3" json:"switch_sign" dc:"签到开关 0=关闭 1=开启"`                         // 签到开关 0=关闭 1=开启
 	// int32 bind_bank = 21;             // 是否绑定银行卡 0=否 1=是 (已移至balance服务)
-	ApplyBirthdayBonus  int32          `protobuf:"varint,22,opt,name=apply_birthday_bonus,json=applyBirthdayBonus,proto3" json:"apply_birthday_bonus,omitempty" dc:"int32 bind_bank = 21;             // 是否绑定银行卡 0=否 1=是 (已移至balance服务)是否可申请生日礼金 0=否 1=是"` // 是否可申请生日礼金 0=否 1=是
-	AutoBindGameBalance int32          `protobuf:"varint,23,opt,name=auto_bind_game_balance,json=autoBindGameBalance,proto3" json:"auto_bind_game_balance,omitempty" dc:"自动绑定游戏余额 0=否 1=是"`                                                                // 自动绑定游戏余额 0=否 1=是
-	TotalBet            string         `protobuf:"bytes,24,opt,name=total_bet,json=totalBet,proto3" json:"total_bet,omitempty" dc:"总投注(默认值)"`                                                                                                              // 总投注(默认值)
-	TotalBonus          string         `protobuf:"bytes,25,opt,name=total_bonus,json=totalBonus,proto3" json:"total_bonus,omitempty" dc:"总彩金(默认值)"`                                                                                                        // 总彩金(默认值)
-	TotalRebate         string         `protobuf:"bytes,26,opt,name=total_rebate,json=totalRebate,proto3" json:"total_rebate,omitempty" dc:"总返水(默认值)"`                                                                                                     // 总返水(默认值)
-	LastRecharge        []*LastRecord  `protobuf:"bytes,27,rep,name=last_recharge,json=lastRecharge,proto3" json:"last_recharge,omitempty" dc:"最后充值记录(默认值)"`                                                                                               // 最后充值记录(默认值)
-	LastWithdraw        []*LastRecord  `protobuf:"bytes,28,rep,name=last_withdraw,json=lastWithdraw,proto3" json:"last_withdraw,omitempty" dc:"最后提现记录(默认值)"`                                                                                               // 最后提现记录(默认值)
-	LastMessage         []*LastMessage `protobuf:"bytes,29,rep,name=last_message,json=lastMessage,proto3" json:"last_message,omitempty" dc:"最后消息(默认值)"`                                                                                                    // 最后消息(默认值)
+	ApplyBirthdayBonus  int32          `protobuf:"varint,22,opt,name=apply_birthday_bonus,json=applyBirthdayBonus,proto3" json:"apply_birthday_bonus" dc:"int32 bind_bank = 21;             // 是否绑定银行卡 0=否 1=是 (已移至balance服务)是否可申请生日礼金 0=否 1=是"` // 是否可申请生日礼金 0=否 1=是
+	AutoBindGameBalance int32          `protobuf:"varint,23,opt,name=auto_bind_game_balance,json=autoBindGameBalance,proto3" json:"auto_bind_game_balance" dc:"自动绑定游戏余额 0=否 1=是"`                                                                // 自动绑定游戏余额 0=否 1=是
+	TotalBet            string         `protobuf:"bytes,24,opt,name=total_bet,json=totalBet,proto3" json:"total_bet" dc:"总投注(默认值)"`                                                                                                              // 总投注(默认值)
+	TotalBonus          string         `protobuf:"bytes,25,opt,name=total_bonus,json=totalBonus,proto3" json:"total_bonus" dc:"总彩金(默认值)"`                                                                                                        // 总彩金(默认值)
+	TotalRebate         string         `protobuf:"bytes,26,opt,name=total_rebate,json=totalRebate,proto3" json:"total_rebate" dc:"总返水(默认值)"`                                                                                                     // 总返水(默认值)
+	LastRecharge        []*LastRecord  `protobuf:"bytes,27,rep,name=last_recharge,json=lastRecharge,proto3" json:"last_recharge" dc:"最后充值记录(默认值)"`                                                                                               // 最后充值记录(默认值)
+	LastWithdraw        []*LastRecord  `protobuf:"bytes,28,rep,name=last_withdraw,json=lastWithdraw,proto3" json:"last_withdraw" dc:"最后提现记录(默认值)"`                                                                                               // 最后提现记录(默认值)
+	LastMessage         []*LastMessage `protobuf:"bytes,29,rep,name=last_message,json=lastMessage,proto3" json:"last_message" dc:"最后消息(默认值)"`                                                                                                    // 最后消息(默认值)
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1014,9 +1014,9 @@ func (x *GetUserInfoRes) GetLastMessage() []*LastMessage {
 // 最后记录
 type LastRecord struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Amount        string                 `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
+	Amount        string                 `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
+	CreatedAt     string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1075,9 +1075,9 @@ func (x *LastRecord) GetCreatedAt() string {
 // 最后消息
 type LastMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title"`
+	CreatedAt     string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1173,17 +1173,17 @@ func (*GetSiteSettingReq) Descriptor() ([]byte, []int) {
 // 获取站点设置响应
 type GetSiteSettingRes struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	AgentUrl       string                 `protobuf:"bytes,1,opt,name=agent_url,json=agentUrl,proto3" json:"agent_url,omitempty" dc:"代理url"`                               // 代理url
-	SiteName       string                 `protobuf:"bytes,2,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty" dc:"站点名称"`                                // 站点名称
-	MobileUrl      string                 `protobuf:"bytes,3,opt,name=mobile_url,json=mobileUrl,proto3" json:"mobile_url,omitempty" dc:"手机url"`                            // 手机url
-	SwitchRegister int32                  `protobuf:"varint,4,opt,name=switch_register,json=switchRegister,proto3" json:"switch_register,omitempty" dc:"会员注册开关 0=关闭 1=开启"` // 会员注册开关 0=关闭 1=开启
-	SwitchGrade    int32                  `protobuf:"varint,5,opt,name=switch_grade,json=switchGrade,proto3" json:"switch_grade,omitempty" dc:"会员等级开关 0=关闭 1=开启"`          // 会员等级开关 0=关闭 1=开启
-	ServiceUrl     string                 `protobuf:"bytes,6,opt,name=service_url,json=serviceUrl,proto3" json:"service_url,omitempty" dc:"客服链接"`                          // 客服链接
-	Close          int32                  `protobuf:"varint,7,opt,name=close,proto3" json:"close,omitempty" dc:"站点关闭开关 0=正常 1=关闭"`                                         // 站点关闭开关 0=正常 1=关闭
-	MinWithdraw    string                 `protobuf:"bytes,8,opt,name=min_withdraw,json=minWithdraw,proto3" json:"min_withdraw,omitempty" dc:"单笔最小提现金额"`                   // 单笔最小提现金额
-	MaxWithdraw    string                 `protobuf:"bytes,9,opt,name=max_withdraw,json=maxWithdraw,proto3" json:"max_withdraw,omitempty" dc:"单笔最大提现金额"`                   // 单笔最大提现金额
-	MobileLogo     string                 `protobuf:"bytes,10,opt,name=mobile_logo,json=mobileLogo,proto3" json:"mobile_logo,omitempty" dc:"手机端logo"`                      // 手机端logo
-	CloseReason    string                 `protobuf:"bytes,11,opt,name=close_reason,json=closeReason,proto3" json:"close_reason,omitempty" dc:"站点关闭理由"`                    // 站点关闭理由
+	AgentUrl       string                 `protobuf:"bytes,1,opt,name=agent_url,json=agentUrl,proto3" json:"agent_url" dc:"代理url"`                               // 代理url
+	SiteName       string                 `protobuf:"bytes,2,opt,name=site_name,json=siteName,proto3" json:"site_name" dc:"站点名称"`                                // 站点名称
+	MobileUrl      string                 `protobuf:"bytes,3,opt,name=mobile_url,json=mobileUrl,proto3" json:"mobile_url" dc:"手机url"`                            // 手机url
+	SwitchRegister int32                  `protobuf:"varint,4,opt,name=switch_register,json=switchRegister,proto3" json:"switch_register" dc:"会员注册开关 0=关闭 1=开启"` // 会员注册开关 0=关闭 1=开启
+	SwitchGrade    int32                  `protobuf:"varint,5,opt,name=switch_grade,json=switchGrade,proto3" json:"switch_grade" dc:"会员等级开关 0=关闭 1=开启"`          // 会员等级开关 0=关闭 1=开启
+	ServiceUrl     string                 `protobuf:"bytes,6,opt,name=service_url,json=serviceUrl,proto3" json:"service_url" dc:"客服链接"`                          // 客服链接
+	Close          int32                  `protobuf:"varint,7,opt,name=close,proto3" json:"close" dc:"站点关闭开关 0=正常 1=关闭"`                                         // 站点关闭开关 0=正常 1=关闭
+	MinWithdraw    string                 `protobuf:"bytes,8,opt,name=min_withdraw,json=minWithdraw,proto3" json:"min_withdraw" dc:"单笔最小提现金额"`                   // 单笔最小提现金额
+	MaxWithdraw    string                 `protobuf:"bytes,9,opt,name=max_withdraw,json=maxWithdraw,proto3" json:"max_withdraw" dc:"单笔最大提现金额"`                   // 单笔最大提现金额
+	MobileLogo     string                 `protobuf:"bytes,10,opt,name=mobile_logo,json=mobileLogo,proto3" json:"mobile_logo" dc:"手机端logo"`                      // 手机端logo
+	CloseReason    string                 `protobuf:"bytes,11,opt,name=close_reason,json=closeReason,proto3" json:"close_reason" dc:"站点关闭理由"`                    // 站点关闭理由
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1298,7 +1298,7 @@ func (x *GetSiteSettingRes) GetCloseReason() string {
 // 获取公告列表请求
 type GetNoticeListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty" dc:"限制数量，默认3"` // 限制数量，默认3
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit" dc:"限制数量，默认3"` // 限制数量，默认3
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1343,7 +1343,7 @@ func (x *GetNoticeListReq) GetLimit() int32 {
 // 获取公告列表响应
 type GetNoticeListRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*NoticeItem          `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty" dc:"公告列表"` // 公告列表
+	List          []*NoticeItem          `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"公告列表"` // 公告列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1388,10 +1388,10 @@ func (x *GetNoticeListRes) GetList() []*NoticeItem {
 // 公告项
 type NoticeItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty" dc:"标题"`                            // 标题
-	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty" dc:"链接"`                                // 链接
-	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty" dc:"内容"`                        // 内容
-	CreatedAt     string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty" dc:"创建时间"` // 创建时间
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title" dc:"标题"`                            // 标题
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url" dc:"链接"`                                // 链接
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content" dc:"内容"`                        // 内容
+	CreatedAt     string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at" dc:"创建时间"` // 创建时间
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1457,7 +1457,7 @@ func (x *NoticeItem) GetCreatedAt() string {
 // 获取广告列表请求
 type GetAdListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Mobile        int32                  `protobuf:"varint,1,opt,name=mobile,proto3" json:"mobile,omitempty" dc:"是否手机端 0=PC 1=手机"` // 是否手机端 0=PC 1=手机
+	Mobile        int32                  `protobuf:"varint,1,opt,name=mobile,proto3" json:"mobile" dc:"是否手机端 0=PC 1=手机"` // 是否手机端 0=PC 1=手机
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1502,7 +1502,7 @@ func (x *GetAdListReq) GetMobile() int32 {
 // 获取广告列表响应
 type GetAdListRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*AdItem              `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty" dc:"广告列表"` // 广告列表
+	List          []*AdItem              `protobuf:"bytes,1,rep,name=list,proto3" json:"list" dc:"广告列表"` // 广告列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1547,9 +1547,9 @@ func (x *GetAdListRes) GetList() []*AdItem {
 // 获取活动列表请求（前台）
 type GetSiteActivityListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id,omitempty" dc:"站点ID，可选"`              // 站点ID，可选
-	ActivityId    int32                  `protobuf:"varint,2,opt,name=activity_id,json=activityId,proto3" json:"activity_id,omitempty" dc:"活动ID(可选)"` // 活动ID(可选)
-	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty" dc:"活动编码(可选)"`                                // 活动编码(可选)
+	SiteId        int32                  `protobuf:"varint,1,opt,name=site_id,json=siteId,proto3" json:"site_id" dc:"站点ID，可选"`              // 站点ID，可选
+	ActivityId    int32                  `protobuf:"varint,2,opt,name=activity_id,json=activityId,proto3" json:"activity_id" dc:"活动ID(可选)"` // 活动ID(可选)
+	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code" dc:"活动编码(可选)"`                                // 活动编码(可选)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1608,21 +1608,21 @@ func (x *GetSiteActivityListReq) GetCode() string {
 // 活动信息
 type SiteActivityInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SiteCode      string                 `protobuf:"bytes,2,opt,name=site_code,json=siteCode,proto3" json:"site_code,omitempty"`
-	ActivityId    int32                  `protobuf:"varint,3,opt,name=activity_id,json=activityId,proto3" json:"activity_id,omitempty"`
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty"`
-	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
-	StartTime     string                 `protobuf:"bytes,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       string                 `protobuf:"bytes,8,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	FixedParams   string                 `protobuf:"bytes,9,opt,name=fixed_params,json=fixedParams,proto3" json:"fixed_params,omitempty"`
-	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status,omitempty"`
-	Sort          int32                  `protobuf:"varint,11,opt,name=sort,proto3" json:"sort,omitempty"`
-	Table         string                 `protobuf:"bytes,12,opt,name=table,proto3" json:"table,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Uri           string                 `protobuf:"bytes,15,opt,name=uri,proto3" json:"uri,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id"`
+	SiteCode      string                 `protobuf:"bytes,2,opt,name=site_code,json=siteCode,proto3" json:"site_code"`
+	ActivityId    int32                  `protobuf:"varint,3,opt,name=activity_id,json=activityId,proto3" json:"activity_id"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name"`
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code"`
+	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description"`
+	StartTime     string                 `protobuf:"bytes,7,opt,name=start_time,json=startTime,proto3" json:"start_time"`
+	EndTime       string                 `protobuf:"bytes,8,opt,name=end_time,json=endTime,proto3" json:"end_time"`
+	FixedParams   string                 `protobuf:"bytes,9,opt,name=fixed_params,json=fixedParams,proto3" json:"fixed_params"`
+	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status"`
+	Sort          int32                  `protobuf:"varint,11,opt,name=sort,proto3" json:"sort"`
+	Table         string                 `protobuf:"bytes,12,opt,name=table,proto3" json:"table"`
+	CreatedAt     string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
+	UpdatedAt     string                 `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at"`
+	Uri           string                 `protobuf:"bytes,15,opt,name=uri,proto3" json:"uri"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1765,7 +1765,7 @@ func (x *SiteActivityInfo) GetUri() string {
 // 获取活动列表响应
 type GetSiteActivityListRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*SiteActivityInfo    `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	List          []*SiteActivityInfo    `protobuf:"bytes,1,rep,name=list,proto3" json:"list"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1810,13 +1810,13 @@ func (x *GetSiteActivityListRes) GetList() []*SiteActivityInfo {
 // 广告项
 type AdItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" dc:"名称"`                                                  // 名称
-	Image         string                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty" dc:"图片地址"`                                              // 图片地址
-	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty" dc:"链接"`                                                    // 链接
-	Type          int32                  `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty" dc:"类型 1=首页图片弹窗 2=首页悬浮图片 3=首页banner图片"`                  // 类型 1=首页图片弹窗 2=首页悬浮图片 3=首页banner图片
-	BeforeLogin   int32                  `protobuf:"varint,5,opt,name=before_login,json=beforeLogin,proto3" json:"before_login,omitempty" dc:"登录前显示 0=登录后 1=登录前"` // 登录前显示 0=登录后 1=登录前
-	Position      int32                  `protobuf:"varint,6,opt,name=position,proto3" json:"position,omitempty" dc:"位置 1=PC 2=WAP"`                              // 位置 1=PC 2=WAP
-	Sort          int32                  `protobuf:"varint,7,opt,name=sort,proto3" json:"sort,omitempty" dc:"排序"`                                                 // 排序
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name" dc:"名称"`                                                  // 名称
+	Image         string                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image" dc:"图片地址"`                                              // 图片地址
+	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url" dc:"链接"`                                                    // 链接
+	Type          int32                  `protobuf:"varint,4,opt,name=type,proto3" json:"type" dc:"类型 1=首页图片弹窗 2=首页悬浮图片 3=首页banner图片"`                  // 类型 1=首页图片弹窗 2=首页悬浮图片 3=首页banner图片
+	BeforeLogin   int32                  `protobuf:"varint,5,opt,name=before_login,json=beforeLogin,proto3" json:"before_login" dc:"登录前显示 0=登录后 1=登录前"` // 登录前显示 0=登录后 1=登录前
+	Position      int32                  `protobuf:"varint,6,opt,name=position,proto3" json:"position" dc:"位置 1=PC 2=WAP"`                              // 位置 1=PC 2=WAP
+	Sort          int32                  `protobuf:"varint,7,opt,name=sort,proto3" json:"sort" dc:"排序"`                                                 // 排序
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
