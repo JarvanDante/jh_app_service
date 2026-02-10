@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	v1 "jh_app_service/api/backend/user/v1"
+	logic_mq_outbox "jh_app_service/internal/logic/mq_outbox"
+	"jh_app_service/internal/registry"
 	"jh_app_service/internal/service/backend"
 
 	"github.com/gogf/gf/v2/database/gdb"
@@ -871,6 +873,7 @@ func (s *sUser) IncreasePayTimes(ctx context.Context, req *v1.IncreasePayTimesRe
 		oldPayTimes int
 		newPayTimes int
 		inviterId   int
+		siteCode    string
 	)
 
 	err := dao.User.Ctx(ctx).Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
@@ -896,7 +899,26 @@ func (s *sUser) IncreasePayTimes(ctx context.Context, req *v1.IncreasePayTimesRe
 				"pay_times":  newPayTimes,
 				"updated_at": gtime.Now(),
 			})
-		return err
+		if err != nil {
+			return err
+		}
+
+		// 解析站点代码（优先从context取）
+		if ctxSiteCode, ok := middleware.GetSiteCodeFromContext(ctx); ok {
+			siteCode = ctxSiteCode
+		}
+		if siteCode == "" {
+			siteCode = registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
+		}
+
+		// 同步用户到 ClickHouse 的 Outbox
+		user.PayTimes = newPayTimes
+		user.UpdatedAt = gtime.Now()
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToClickhouseOutbox(ctx, tx, int64(siteId), &user, siteCode); err != nil {
+			return fmt.Errorf("创建同步用户到ClickHouse Outbox记录失败: %w", err)
+		}
+
+		return nil
 	})
 	if err != nil {
 		middleware.LogWithTrace(ctx, "error", fmt.Sprintf("更新用户充值次数失败: user_id=%d, err=%v", req.UserId, err))

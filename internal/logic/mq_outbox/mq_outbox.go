@@ -10,6 +10,8 @@ import (
 	"jh_app_service/internal/model/entity"
 	"jh_app_service/internal/mq"
 	"jh_app_service/internal/registry"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/gogf/gf/v2/database/gdb"
@@ -20,6 +22,7 @@ import (
 type sMqOutbox struct{}
 
 var insOutbox = sMqOutbox{}
+var outboxMissing sync.Map
 
 func MqOutbox() *sMqOutbox {
 	return &insOutbox
@@ -94,6 +97,68 @@ func (s *sMqOutbox) CreateSyncUserToGameOutbox(ctx context.Context, tx gdb.TX, s
 	return err
 }
 
+// CreateSyncUserToClickhouseOutbox 创建同步用户到 ClickHouse 的 Outbox 记录
+func (s *sMqOutbox) CreateSyncUserToClickhouseOutbox(ctx context.Context, tx gdb.TX, siteID int64, user *entity.User, siteCode string) error {
+	if user == nil || user.Id == 0 {
+		return fmt.Errorf("用户信息为空")
+	}
+
+	msg := &mq.SyncUserToClickHouseMessage{
+		EventID:      0, // 先占位，插入Outbox后再更新
+		SiteID:       uint32(siteID),
+		UserID:       uint64(user.Id),
+		InviterID:    uint64(user.InviterId),
+		Username:     user.Username,
+		Status:       uint8(user.Status),
+		RegisterIP:   user.RegisterIp,
+		RegisterTime: formatGTime(user.RegisterTime),
+		CreatedAt:    formatGTime(user.CreatedAt),
+		UpdatedAt:    formatGTime(user.UpdatedAt),
+		PayTimes:     uint32(user.PayTimes),
+	}
+
+	payload, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("序列化消息失败: %w", err)
+	}
+
+	outbox := &do.MqOutbox{
+		EventType:     "user_sync_clickhouse",
+		AggregateType: "user",
+		AggregateId:   fmt.Sprintf("%d", user.Id),
+		SiteCode:      siteCode,
+		Exchange:      "analytics.sync",
+		RoutingKey:    "analytics.user",
+		Payload:       string(payload), // 先写入占位payload
+		Status:        OutboxStatusPending,
+		RetryCount:    0,
+		NextRetryAt:   gtime.Now(),
+	}
+
+	result, err := dao.MqOutbox.Ctx(ctx).TX(tx).Insert(outbox)
+	if err != nil {
+		return err
+	}
+
+	outboxId, err := result.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("获取Outbox ID失败: %w", err)
+	}
+
+	// 更新payload中的event_id
+	msg.EventID = uint64(outboxId)
+	payload, err = json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("序列化消息失败: %w", err)
+	}
+
+	_, err = dao.MqOutbox.Ctx(ctx).TX(tx).Where("id", outboxId).Update(do.MqOutbox{
+		Payload:   string(payload),
+		UpdatedAt: gtime.Now(),
+	})
+	return err
+}
+
 // ProcessPendingMessages 处理待发送的消息（所有站点）
 func (s *sMqOutbox) ProcessPendingMessages(ctx context.Context) error {
 	return s.ProcessPendingMessagesForSite(ctx, "")
@@ -123,6 +188,10 @@ func (s *sMqOutbox) ProcessPendingMessagesForSite(ctx context.Context, siteCode 
 
 	// 遍历每个站点
 	for _, site := range sites {
+		if _, ok := outboxMissing.Load(site); ok {
+			continue
+		}
+
 		// 数据库配置组名格式为 site_{code}
 		dbGroup := fmt.Sprintf("site_%s", site)
 
@@ -141,6 +210,12 @@ func (s *sMqOutbox) ProcessPendingMessagesForSite(ctx context.Context, siteCode 
 			Scan(&messages)
 
 		if err != nil {
+			if isTableNotFoundErr(err) {
+				if _, loaded := outboxMissing.LoadOrStore(site, struct{}{}); !loaded {
+					g.Log().Warningf(siteCtx, "站点 %s 缺少mq_outbox表，已跳过", site)
+				}
+				continue
+			}
 			g.Log().Errorf(siteCtx, "查询站点 %s 的待发送消息失败: %v", site, err)
 			continue
 		}
@@ -179,9 +254,40 @@ func (s *sMqOutbox) processMessage(ctx context.Context, msg *entity.MqOutbox) er
 		return s.processInitBalanceMessage(ctx, msg)
 	case "user.sync_to_game":
 		return s.processSyncUserToGameMessage(ctx, msg)
+	case "analytics.user":
+		return s.processAnalyticsMessage(ctx, msg)
 	default:
 		return fmt.Errorf("未知的 routing key: %s", msg.RoutingKey)
 	}
+}
+
+// processAnalyticsMessage 处理同步到 ClickHouse 的消息（通用发布）
+func (s *sMqOutbox) processAnalyticsMessage(ctx context.Context, outboxMsg *entity.MqOutbox) error {
+	// 创建带站点信息的 context
+	dbGroup := fmt.Sprintf("site_%s", outboxMsg.SiteCode)
+	msgCtx := context.WithValue(ctx, "dynamic_db_group", dbGroup)
+	msgCtx = context.WithValue(msgCtx, middleware.SiteCodeContextKey, outboxMsg.SiteCode)
+
+	// 直接投递到 MQ（payload 已经是完整 JSON）
+	err := mq.PublishRaw(context.Background(), outboxMsg.Exchange, outboxMsg.RoutingKey, []byte(outboxMsg.Payload))
+	if err != nil {
+		s.markAsFailed(msgCtx, outboxMsg.Id, outboxMsg.SiteCode, err.Error(), true)
+		return fmt.Errorf("发送MQ消息失败: %w", err)
+	}
+
+	// 发送成功，标记为已发送
+	_, err = dao.MqOutbox.Ctx(msgCtx).Where("id", outboxMsg.Id).Update(do.MqOutbox{
+		Status:    OutboxStatusSent,
+		UpdatedAt: gtime.Now(),
+	})
+	if err != nil {
+		g.Log().Errorf(msgCtx, "更新消息状态失败 [ID=%d]: %v", outboxMsg.Id, err)
+	} else {
+		g.Log().Infof(msgCtx, "同步用户到ClickHouse消息发送成功 [ID=%d, UserID=%s, SiteCode=%s]",
+			outboxMsg.Id, outboxMsg.AggregateId, outboxMsg.SiteCode)
+	}
+
+	return err
 }
 
 // processInitBalanceMessage 处理初始化余额消息
@@ -299,4 +405,19 @@ func (s *sMqOutbox) markAsFailed(ctx context.Context, id uint64, siteCode, errMs
 	}
 
 	dao.MqOutbox.Ctx(updateCtx).Where("id", id).Update(update)
+}
+
+func formatGTime(t *gtime.Time) string {
+	if t == nil {
+		return ""
+	}
+	return t.Format("Y-m-d H:i:s")
+}
+
+func isTableNotFoundErr(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "doesn't exist") || strings.Contains(msg, "error 1146") || strings.Contains(msg, "no such table")
 }

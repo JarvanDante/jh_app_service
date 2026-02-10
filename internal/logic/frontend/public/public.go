@@ -84,6 +84,7 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		return nil, err
 	}
 
+	now := gtime.Now()
 	// 创建用户
 	user := &entity.User{
 		SiteId:       int(siteId),
@@ -96,9 +97,11 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		Mobile:       "",
 		Email:        "",
 		RegisterIp:   clientIp,
-		RegisterTime: gtime.Now(),
+		RegisterTime: now,
 		RegisterUrl:  req.Domain,
 		Status:       1,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
 
 	// 获取站点代码和货币
@@ -146,6 +149,12 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 			return fmt.Errorf("创建同步用户到游戏服务Outbox记录失败: %w", err)
 		}
 
+		// 创建同步用户到 ClickHouse 的 Outbox 记录
+		user.Id = uint(userId)
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToClickhouseOutbox(ctx, tx, int64(siteId), user, siteCode); err != nil {
+			return fmt.Errorf("创建同步用户到ClickHouse Outbox记录失败: %w", err)
+		}
+
 		return nil
 	})
 
@@ -168,22 +177,8 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		if err := mq.PublishInitBalanceUser(context.Background(), msg); err != nil {
 			g.Log().Errorf(ctx, "异步发送初始化余额消息失败（将由Outbox兜底）: %v", err)
 		} else {
-			// 发送成功，标记 Outbox 为已发送，避免重复处理
-			// 创建带站点信息的 context
-			dbGroup := fmt.Sprintf("site_%s", siteCode)
-			updateCtx := context.WithValue(context.Background(), "dynamic_db_group", dbGroup)
-			updateCtx = context.WithValue(updateCtx, middleware.SiteCodeContextKey, siteCode)
-
-			_, err := dao.MqOutbox.Ctx(updateCtx).
-				Where("aggregate_type", "user").
-				Where("aggregate_id", userId).
-				Where("status", 0).
-				Update(g.Map{"status": 1, "updated_at": gtime.Now()})
-			if err != nil {
-				g.Log().Errorf(updateCtx, "更新Outbox状态失败: %v", err)
-			} else {
-				g.Log().Infof(updateCtx, "快速路径发送成功，已更新Outbox状态: user_id=%d", userId)
-			}
+			// 发送成功，标记初始化余额 Outbox 为已发送，避免重复处理
+			s.asyncUpdateInitBalanceOutbox(ctx, siteCode, userId)
 		}
 	}(siteCode, userId)
 
@@ -959,6 +954,7 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		}
 	}
 
+	now := gtime.Now()
 	// 创建用户
 	user := &entity.User{
 		SiteId:       int(siteId),
@@ -972,9 +968,11 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		Mobile:       req.Mobile,
 		Email:        req.Email,
 		RegisterIp:   clientIp,
-		RegisterTime: gtime.Now(),
+		RegisterTime: now,
 		RegisterUrl:  req.Domain,
 		Status:       1,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
 
 	// 获取站点代码和货币
@@ -1018,6 +1016,12 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 			return fmt.Errorf("创建同步用户到游戏服务Outbox记录失败: %w", err)
 		}
 
+		// 创建同步用户到 ClickHouse 的 Outbox 记录
+		user.Id = uint(userId)
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToClickhouseOutbox(ctx, tx, int64(siteId), user, siteCode); err != nil {
+			return fmt.Errorf("创建同步用户到ClickHouse Outbox记录失败: %w", err)
+		}
+
 		return nil
 	})
 
@@ -1046,22 +1050,8 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		if err := mq.PublishInitBalanceUser(context.Background(), msg); err != nil {
 			g.Log().Errorf(ctx, "异步发送初始化余额消息失败（将由Outbox兜底）: %v", err)
 		} else {
-			// 发送成功，标记 Outbox 为已发送，避免重复处理
-			// 创建带站点信息的 context
-			dbGroup := fmt.Sprintf("site_%s", siteCode)
-			updateCtx := context.WithValue(context.Background(), "dynamic_db_group", dbGroup)
-			updateCtx = context.WithValue(updateCtx, middleware.SiteCodeContextKey, siteCode)
-
-			_, err := dao.MqOutbox.Ctx(updateCtx).
-				Where("aggregate_type", "user").
-				Where("aggregate_id", userId).
-				Where("status", 0).
-				Update(g.Map{"status": 1, "updated_at": gtime.Now()})
-			if err != nil {
-				g.Log().Errorf(updateCtx, "更新Outbox状态失败: %v", err)
-			} else {
-				g.Log().Infof(updateCtx, "快速路径发送成功，已更新Outbox状态: user_id=%d", userId)
-			}
+			// 发送成功，标记初始化余额 Outbox 为已发送，避免重复处理
+			s.asyncUpdateInitBalanceOutbox(ctx, siteCode, userId)
 		}
 	}(siteCode, userId)
 

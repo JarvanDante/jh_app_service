@@ -150,3 +150,45 @@ func PublishSyncUserToGame(ctx context.Context, msg *SyncUserToGameMessage) erro
 
 	return nil
 }
+
+// PublishRaw 通用发布消息（用于Outbox投递）
+func PublishRaw(ctx context.Context, exchange, routingKey string, body []byte) error {
+	if channel == nil {
+		return fmt.Errorf("RabbitMQ channel未初始化")
+	}
+	if exchange == "" || routingKey == "" {
+		return fmt.Errorf("exchange或routingKey不能为空")
+	}
+
+	// 声明 exchange（幂等操作）
+	if err := channel.ExchangeDeclare(
+		exchange,
+		"topic",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	); err != nil {
+		return fmt.Errorf("声明exchange失败: %v", err)
+	}
+
+	if err := channel.PublishWithContext(
+		context.Background(),
+		exchange,
+		routingKey,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType:  "application/json",
+			Body:         body,
+			DeliveryMode: amqp.Persistent,
+			Timestamp:    time.Now(),
+			MessageId:    uuid.NewString(),
+		},
+	); err != nil {
+		return fmt.Errorf("发布消息失败: %v", err)
+	}
+
+	return nil
+}
