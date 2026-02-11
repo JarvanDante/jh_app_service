@@ -239,8 +239,6 @@ func (s *sMqOutbox) ProcessPendingMessagesForSite(ctx context.Context, siteCode 
 
 	if totalSuccess > 0 || totalFail > 0 {
 		g.Log().Infof(ctx, "消息处理完成: 成功=%d, 失败=%d", totalSuccess, totalFail)
-	} else {
-		g.Log().Debug(ctx, "没有待发送的消息")
 	}
 
 	return nil

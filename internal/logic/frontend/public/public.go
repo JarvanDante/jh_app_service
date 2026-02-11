@@ -861,6 +861,10 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	if !regexp.MustCompile(`^[A-Za-z0-9]+$`).MatchString(req.Username) {
 		return nil, fmt.Errorf("用户名仅允许字母和数字")
 	}
+	// 用户名必须同时包含字母和数字
+	if !regexp.MustCompile(`[A-Za-z]`).MatchString(req.Username) || !regexp.MustCompile(`[0-9]`).MatchString(req.Username) {
+		return nil, fmt.Errorf("用户名必须包含字母和数字")
+	}
 
 	clientIp := util.GetClientIP(ctx)
 	siteCode, _ := middleware.GetSiteCodeFromContext(ctx)
