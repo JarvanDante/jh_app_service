@@ -89,7 +89,6 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	user := &entity.User{
 		SiteId:       int(siteId),
 		GradeId:      siteConfig.DefaultGradeId, // TODO: 获取默认等级
-		LevelId:      siteConfig.DefaultLevelId, // TODO: 获取默认层级
 		AgentId:      siteConfig.DefaultAgentId, // TODO: 根据代理码获取代理ID
 		Username:     username,
 		Password:     hashedPassword,
@@ -963,7 +962,6 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	user := &entity.User{
 		SiteId:       int(siteId),
 		GradeId:      siteConfig.DefaultGradeId,
-		LevelId:      siteConfig.DefaultLevelId,
 		AgentId:      siteConfig.DefaultAgentId,
 		InviterId:    int(inviterId), // 设置邀请人ID
 		Username:     req.Username,

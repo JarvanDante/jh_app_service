@@ -22,7 +22,6 @@ service User {
 // 获取用户列表请求
 message GetUserListReq {
     int32 grade_id = 1;         // 等级ID (可选)
-    int32 level_id = 2;         // 层级ID (可选)
     int32 status = 3;           // 状态 (可选)
     string username = 4;        // 用户名 (可选)
     string realname = 5;        // 真实姓名 (可选)
@@ -45,8 +44,6 @@ message UserInfo {
     string username = 2;                // 用户名
     int32 grade_id = 3;                 // 等级ID
     string grade_name = 4;              // 等级名称
-    int32 level_id = 5;                 // 层级ID
-    string level_name = 6;              // 层级名称
     int32 agent_id = 7;                 // 代理ID
     string agent_username = 8;          // 代理用户名
     int32 status = 9;                   // 状态
@@ -83,7 +80,6 @@ message UpdateUserReq {
     string login_password = 2;          // 登录密码 (可选)
     string pay_password = 3;            // 资金密码 (可选)
     int32 grade_id = 4;                 // 等级ID
-    int32 level_id = 5;                 // 层级ID
     int32 agent_id = 6;                 // 代理ID
     string realname = 7;                // 真实姓名 (可选)
     string mobile = 8;                  // 手机号 (可选)
@@ -114,7 +110,6 @@ message UserBasicInfo {
     string username = 2;                // 用户名
     int32 grade_id = 3;                 // 等级ID
     string grade_name = 4;              // 等级名称
-    string level_name = 5;              // 层级名称
     string balance = 6;                 // 余额
     string register_time = 7;           // 注册时间
     string register_ip = 8;             // 注册IP

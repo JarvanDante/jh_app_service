@@ -85,9 +85,6 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 	if req.GradeId > 0 {
 		query = query.Where("grade_id = ?", req.GradeId)
 	}
-	if req.LevelId > 0 {
-		query = query.Where("level_id = ?", req.LevelId)
-	}
 	if req.Username != "" {
 		query = query.Where("username = ?", req.Username)
 	}
@@ -168,7 +165,6 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 			Id:         int32(user.Id),
 			Username:   user.Username,
 			GradeId:    int32(user.GradeId),
-			LevelId:    int32(user.LevelId),
 			AgentId:    int32(user.AgentId),
 			Status:     int32(user.Status),
 			RegisterIp: user.RegisterIp,
@@ -193,14 +189,6 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 			Where(dao.UserGrade.Columns().Id, user.GradeId).
 			Scan(&grade)
 		userInfo.GradeName = grade.Name
-
-		// 获取层级名称
-		var level entity.UserLevel
-		dao.UserLevel.Ctx(ctx).Where(do.UserLevel{
-			SiteId: siteId,
-			Id:     uint(user.LevelId),
-		}).Scan(&level)
-		userInfo.LevelName = level.Name
 
 		// 获取代理用户名
 		var agent entity.Agent
@@ -266,7 +254,6 @@ func (s *sUser) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*v1.Upda
 	// 构建更新数据
 	updateData := do.User{
 		GradeId:   int(req.GradeId),
-		LevelId:   int(req.LevelId),
 		AgentId:   int(req.AgentId),
 		Status:    int(req.Status),
 		UpdatedAt: gtime.Now(),
@@ -397,14 +384,6 @@ func (s *sUser) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoRe
 		Where(dao.UserGrade.Columns().Id, user.GradeId).
 		Scan(&grade)
 	basicInfo.GradeName = grade.Name
-
-	// 获取层级名称
-	var level entity.UserLevel
-	dao.UserLevel.Ctx(ctx).Where(do.UserLevel{
-		SiteId: siteId,
-		Id:     uint(user.LevelId),
-	}).Scan(&level)
-	basicInfo.LevelName = level.Name
 
 	// 获取代理名称
 	var agent entity.Agent
