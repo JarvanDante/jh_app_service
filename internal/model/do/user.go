@@ -15,7 +15,6 @@ type User struct {
 	Id               any         //
 	SiteId           any         //
 	GradeId          any         //
-	LevelId          any         //
 	AgentId          any         //
 	InviterId        any         // 邀请人ID
 	Username         any         //

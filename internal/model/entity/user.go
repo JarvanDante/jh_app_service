@@ -13,7 +13,6 @@ type User struct {
 	Id               uint        `json:"id"               orm:"id"                 description:""`
 	SiteId           int         `json:"siteId"           orm:"site_id"            description:""`
 	GradeId          int         `json:"gradeId"          orm:"grade_id"           description:""`
-	LevelId          int         `json:"levelId"          orm:"level_id"           description:""`
 	AgentId          int         `json:"agentId"          orm:"agent_id"           description:""`
 	InviterId        int         `json:"inviterId"        orm:"inviter_id"         description:"邀请人ID"`
 	Username         string      `json:"username"         orm:"username"           description:""`
