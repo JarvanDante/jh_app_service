@@ -12,8 +12,8 @@ import (
 type User struct {
 	Id               uint        `json:"id"               orm:"id"                 description:""`
 	SiteId           int         `json:"siteId"           orm:"site_id"            description:""`
-	GradeId          int         `json:"gradeId"          orm:"grade_id"           description:""`
-	AgentId          int         `json:"agentId"          orm:"agent_id"           description:""`
+	GradeId          int         `json:"gradeId"          orm:"grade_id"           description:"等级id"`
+	AgentId          int         `json:"agentId"          orm:"agent_id"           description:"代理id"`
 	InviterId        int         `json:"inviterId"        orm:"inviter_id"         description:"邀请人ID"`
 	Username         string      `json:"username"         orm:"username"           description:""`
 	Password         string      `json:"password"         orm:"password"           description:""`
@@ -22,10 +22,10 @@ type User struct {
 	RegisterIp       string      `json:"registerIp"       orm:"register_ip"        description:""`
 	RegisterTime     *gtime.Time `json:"registerTime"     orm:"register_time"      description:""`
 	RegisterUrl      string      `json:"registerUrl"      orm:"register_url"       description:"注册来源"`
-	LastLoginIp      string      `json:"lastLoginIp"      orm:"last_login_ip"      description:""`
-	LastLoginTime    *gtime.Time `json:"lastLoginTime"    orm:"last_login_time"    description:""`
+	LastLoginIp      string      `json:"lastLoginIp"      orm:"last_login_ip"      description:"最后登录ip"`
+	LastLoginTime    *gtime.Time `json:"lastLoginTime"    orm:"last_login_time"    description:"最后登录时间"`
 	LastLoginAddress string      `json:"lastLoginAddress" orm:"last_login_address" description:"最后登录地址"`
-	Mobile           string      `json:"mobile"           orm:"mobile"             description:""`
+	Mobile           string      `json:"mobile"           orm:"mobile"             description:"手机"`
 	Email            string      `json:"email"            orm:"email"              description:"邮箱"`
 	Birthday         *gtime.Time `json:"birthday"         orm:"birthday"           description:""`
 	IsOnline         int         `json:"isOnline"         orm:"is_online"          description:""`

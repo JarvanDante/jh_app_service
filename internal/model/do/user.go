@@ -14,8 +14,8 @@ type User struct {
 	g.Meta           `orm:"table:user, do:true"`
 	Id               any         //
 	SiteId           any         //
-	GradeId          any         //
-	AgentId          any         //
+	GradeId          any         // 等级id
+	AgentId          any         // 代理id
 	InviterId        any         // 邀请人ID
 	Username         any         //
 	Password         any         //
@@ -24,10 +24,10 @@ type User struct {
 	RegisterIp       any         //
 	RegisterTime     *gtime.Time //
 	RegisterUrl      any         // 注册来源
-	LastLoginIp      any         //
-	LastLoginTime    *gtime.Time //
+	LastLoginIp      any         // 最后登录ip
+	LastLoginTime    *gtime.Time // 最后登录时间
 	LastLoginAddress any         // 最后登录地址
-	Mobile           any         //
+	Mobile           any         // 手机
 	Email            any         // 邮箱
 	Birthday         *gtime.Time //
 	IsOnline         any         //

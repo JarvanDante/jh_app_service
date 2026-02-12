@@ -23,8 +23,8 @@ type UserDao struct {
 type UserColumns struct {
 	Id               string //
 	SiteId           string //
-	GradeId          string //
-	AgentId          string //
+	GradeId          string // 等级id
+	AgentId          string // 代理id
 	InviterId        string // 邀请人ID
 	Username         string //
 	Password         string //
@@ -33,10 +33,10 @@ type UserColumns struct {
 	RegisterIp       string //
 	RegisterTime     string //
 	RegisterUrl      string // 注册来源
-	LastLoginIp      string //
-	LastLoginTime    string //
+	LastLoginIp      string // 最后登录ip
+	LastLoginTime    string // 最后登录时间
 	LastLoginAddress string // 最后登录地址
-	Mobile           string //
+	Mobile           string // 手机
 	Email            string // 邮箱
 	Birthday         string //
 	IsOnline         string //
