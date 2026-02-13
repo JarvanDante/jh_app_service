@@ -47,6 +47,7 @@ upload:
       - "image/jpeg"
       - "image/gif"
       - "image/png"
+      - "image/webp"
     maxSize: 2048 # KB (2MB)
   mobile_logo:
     imgType:

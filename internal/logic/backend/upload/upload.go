@@ -168,7 +168,7 @@ func (s *sUpload) getAllowedFileTypes(uploadCode string) []string {
 	ctx := context.Background()
 
 	// 默认配置
-	defaultTypes := []string{"image/jpg", "image/jpeg", "image/gif", "image/png"}
+	defaultTypes := []string{"image/jpg", "image/jpeg", "image/gif", "image/png", "image/webp"}
 
 	// 从配置文件获取
 	configKey := fmt.Sprintf("upload.%s.imgType", uploadCode)
