@@ -53,6 +53,40 @@ func formatDate(t *gtime.Time) string {
 	return t.Format("Y-m-d")
 }
 
+func fetchGameDailyStats(ctx context.Context, siteId int64, startDate, endDate string, agentId int64) (map[string]int64, error) {
+	if startDate == "" || endDate == "" {
+		return map[string]int64{}, nil
+	}
+	gameAddr, err := registry.GetServiceAddr("jh_game_service")
+	if err != nil {
+		return nil, fmt.Errorf("获取游戏服务地址失败: %v", err)
+	}
+	conn, err := grpc.NewClient(gameAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("连接游戏服务失败: %v", err)
+	}
+	defer conn.Close()
+
+	client := gamegrpc.NewAgentSettlementClient(conn)
+	md := metadata.New(map[string]string{"site_id": gconv.String(siteId)})
+	grpcCtx := metadata.NewOutgoingContext(ctx, md)
+	res, err := client.GetAgentDailyBetStats(grpcCtx, &gamegrpc.GetAgentDailyBetStatsReq{
+		StartDate: startDate,
+		EndDate:   endDate,
+		AgentId:   agentId,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]int64, len(res.List))
+	for _, it := range res.List {
+		key := fmt.Sprintf("%s_%d", it.StatDate, it.AgentId)
+		result[key] = it.MemberCount
+	}
+	return result, nil
+}
+
 func (s *sAgentSettlement) GetAgentSettlementDailyList(ctx context.Context, req *v1.GetAgentSettlementDailyListReq) (*v1.GetAgentSettlementDailyListRes, error) {
 	siteId := getSiteID(ctx)
 	page := req.Page
@@ -151,15 +185,36 @@ func (s *sAgentSettlement) GetAgentSettlementDailyList(ctx context.Context, req 
 		COALESCE(SUM(s.commission_amount),0) AS commission_amount
 	`).Scan(&summary)
 
+	startDate := req.StartDate
+	endDate := req.EndDate
+	if startDate == "" || endDate == "" {
+		for _, row := range list {
+			d := formatDate(row.StatDate)
+			if d == "" {
+				continue
+			}
+			if startDate == "" || d < startDate {
+				startDate = d
+			}
+			if endDate == "" || d > endDate {
+				endDate = d
+			}
+		}
+	}
+	memberMap, _ := fetchGameDailyStats(ctx, siteId, startDate, endDate, req.AgentId)
+
 	statusMap := map[int]string{0: "待结算", 1: "已结算", 2: "已作废"}
 	items := make([]*v1.AgentSettlementDailyItem, 0, len(list))
 	for _, row := range list {
+		statDate := formatDate(row.StatDate)
+		memberCount := memberMap[fmt.Sprintf("%s_%d", statDate, row.AgentId)]
+		summary.MemberCount += memberCount
 		items = append(items, &v1.AgentSettlementDailyItem{
 			Id:               row.Id,
-			StatDate:         formatDate(row.StatDate),
+			StatDate:         statDate,
 			AgentId:          row.AgentId,
 			AgentName:        row.AgentName,
-			MemberCount:      0,
+			MemberCount:      memberCount,
 			BetAmount:        row.BetAmount,
 			ValidAmount:      row.ValidBetAmount,
 			NetAmount:        row.WinLoss,
