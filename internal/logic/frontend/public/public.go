@@ -432,7 +432,9 @@ func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, sit
 				referer = values[0]
 			}
 		}
-		if loginURL == "" {
+		if values := md.Get("login-domain"); len(values) > 0 && values[0] != "" {
+			loginURL = values[0]
+		} else if loginURL == "" {
 			if values := md.Get("path"); len(values) > 0 {
 				loginURL = values[0]
 			}
