@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package agent_settlement;
+
+option go_package = "jh_app_service/api/grpc/agent_settlement/v1";
+
+service AgentSettlement {
+  rpc GetAgentDailyBetStats(GetAgentDailyBetStatsReq) returns (GetAgentDailyBetStatsRes) {}
+}
+
+message GetAgentDailyBetStatsReq {
+  string start_date = 1;
+  string end_date = 2;
+  int64 agent_id = 3;
+}
+
+message AgentDailyBetStatItem {
+  string stat_date = 1;
+  int64 agent_id = 2;
+  double bet_amount = 3;
+  double valid_bet_amount = 4;
+  double win_loss = 5;
+  int64 member_count = 6;
+}
+
+message GetAgentDailyBetStatsRes {
+  repeated AgentDailyBetStatItem list = 1;
+}

@@ -4,13 +4,20 @@ import (
 	"context"
 	"fmt"
 	v1 "jh_app_service/api/backend/agent_settlement/v1"
+	grpcsettlement "jh_app_service/api/grpc/agent_settlement/v1"
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/do"
 	"jh_app_service/internal/model/entity"
+	"jh_app_service/internal/registry"
 	"jh_app_service/internal/service/backend"
 	"jh_app_service/internal/util"
 	"strings"
+
+	"github.com/gogf/gf/v2/util/gconv"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/gogf/gf/v2/os/gtime"
 )
@@ -189,49 +196,66 @@ func (s *sAgentSettlement) CalcAgentSettlementDaily(ctx context.Context, req *v1
 		return nil, err
 	}
 
-	betQuery := dao.Agent.Ctx(ctx).As("a").
-		LeftJoin("bet_records b", "b.site_id=a.site_id AND b.agent_id=a.id AND DATE(b.bet_time) BETWEEN ? AND ?", startDate, endDate).
-		Where("a.site_id", siteId)
-	if req.AgentId > 0 {
-		betQuery = betQuery.Where("a.id", req.AgentId)
-	}
-
-	var rows []struct {
-		StatDate       string  `json:"stat_date"`
-		AgentId        int64   `json:"agent_id"`
-		SettleType     int32   `json:"settle_type"`
-		Rate           float64 `json:"rate"`
-		BetAmount      float64 `json:"bet_amount"`
-		ValidBetAmount float64 `json:"valid_bet_amount"`
-		WinLoss        float64 `json:"win_loss"`
-	}
-
-	err = betQuery.Fields(`
-		DATE(b.bet_time) AS stat_date,
-		a.id AS agent_id,
-		a.settle_type,
-		COALESCE(a.rate,0) AS rate,
-		COALESCE(SUM(b.bet_amount),0) AS bet_amount,
-		COALESCE(SUM(b.valid_amount),0) AS valid_bet_amount,
-		COALESCE(SUM(b.net_amount),0) AS win_loss
-	`).Where("b.id IS NOT NULL").Group("DATE(b.bet_time), a.id, a.settle_type, a.rate").Scan(&rows)
+	gameAddr, err := registry.GetServiceAddr("jh_game_service")
 	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "doesn't exist") && strings.Contains(strings.ToLower(err.Error()), "bet_records") {
-			return nil, fmt.Errorf("站点库缺少 bet_records 表，请先在站点库执行 jh_game_service/manifest/sql/mysql_bet_records.sql")
-		}
+		return nil, fmt.Errorf("获取游戏服务地址失败: %v", err)
+	}
+	conn, err := grpc.NewClient(gameAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("连接游戏服务失败: %v", err)
+	}
+	defer conn.Close()
+
+	gameClient := grpcsettlement.NewAgentSettlementClient(conn)
+	md := metadata.New(map[string]string{"site_id": gconv.String(siteId)})
+	grpcCtx := metadata.NewOutgoingContext(ctx, md)
+	statRes, err := gameClient.GetAgentDailyBetStats(grpcCtx, &grpcsettlement.GetAgentDailyBetStatsReq{
+		StartDate: startDate,
+		EndDate:   endDate,
+		AgentId:   req.AgentId,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("调用游戏服务统计失败: %v", err)
+	}
+
+	var agentRows []struct {
+		Id         int64   `json:"id"`
+		SettleType int32   `json:"settle_type"`
+		Rate       float64 `json:"rate"`
+	}
+	agentQuery := dao.Agent.Ctx(ctx).Where("site_id", siteId)
+	if req.AgentId > 0 {
+		agentQuery = agentQuery.Where("id", req.AgentId)
+	}
+	if err = agentQuery.Fields("id, settle_type, rate").Scan(&agentRows); err != nil {
 		return nil, err
+	}
+	agentMap := make(map[int64]struct {
+		SettleType int32
+		Rate       float64
+	}, len(agentRows))
+	for _, a := range agentRows {
+		agentMap[a.Id] = struct {
+			SettleType int32
+			Rate       float64
+		}{SettleType: a.SettleType, Rate: a.Rate}
 	}
 
 	affected := 0
 	now := gtime.Now()
-	for _, row := range rows {
+	for _, row := range statRes.List {
+		agentCfg, ok := agentMap[row.AgentId]
+		if !ok {
+			continue
+		}
+
 		commission := 0.0
-		switch row.SettleType {
+		switch agentCfg.SettleType {
 		case 2:
-			commission = row.ValidBetAmount * row.Rate / 100
+			commission = row.ValidBetAmount * agentCfg.Rate / 100
 		default:
 			if row.WinLoss < 0 {
-				commission = -row.WinLoss * row.Rate / 100
+				commission = -row.WinLoss * agentCfg.Rate / 100
 			}
 		}
 
