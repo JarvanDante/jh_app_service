@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package game;
 
-option go_package = "jh_game_service/api/backend/game/v1";
+option go_package = "jh_app_service/api/grpc/game/v1";
 
 service AgentSettlement {
   // 获取代理日统计（供代理结算）

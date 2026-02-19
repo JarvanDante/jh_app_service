@@ -24,6 +24,7 @@ var (
 
 // Ctx 重写Ctx方法，使用动态数据库连接
 func (d agentDomainDao) Ctx(ctx context.Context) *gdb.Model {
+	// 使用辅助函数获取动态Model
 	originalModel := d.AgentDomainDao.Ctx(ctx)
 	return GetDynamicModel(ctx, d.Table(), originalModel)
 }
