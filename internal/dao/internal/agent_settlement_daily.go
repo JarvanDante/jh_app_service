@@ -25,6 +25,7 @@ type AgentSettlementDailyColumns struct {
 	SiteId           string //
 	AgentId          string //
 	StatDate         string //
+	BetAmount        string //
 	ValidBetAmount   string //
 	WinLoss          string //
 	CommissionAmount string //
@@ -40,6 +41,7 @@ var agentSettlementDailyColumns = AgentSettlementDailyColumns{
 	SiteId:           "site_id",
 	AgentId:          "agent_id",
 	StatDate:         "stat_date",
+	BetAmount:        "bet_amount",
 	ValidBetAmount:   "valid_bet_amount",
 	WinLoss:          "win_loss",
 	CommissionAmount: "commission_amount",

@@ -16,6 +16,7 @@ type AgentSettlementDaily struct {
 	SiteId           any         //
 	AgentId          any         //
 	StatDate         *gtime.Time //
+	BetAmount        any         //
 	ValidBetAmount   any         //
 	WinLoss          any         //
 	CommissionAmount any         //

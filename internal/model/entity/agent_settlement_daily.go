@@ -14,6 +14,7 @@ type AgentSettlementDaily struct {
 	SiteId           int64       `json:"siteId"           orm:"site_id"           description:""`
 	AgentId          int64       `json:"agentId"          orm:"agent_id"          description:""`
 	StatDate         *gtime.Time `json:"statDate"         orm:"stat_date"         description:""`
+	BetAmount        float64     `json:"betAmount"        orm:"bet_amount"        description:""`
 	ValidBetAmount   float64     `json:"validBetAmount"   orm:"valid_bet_amount"  description:""`
 	WinLoss          float64     `json:"winLoss"          orm:"win_loss"          description:""`
 	CommissionAmount float64     `json:"commissionAmount" orm:"commission_amount" description:""`
