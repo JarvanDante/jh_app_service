@@ -174,12 +174,12 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 			PayTimes:   int32(user.PayTimes),
 		}
 
-		// 时间格式化
+		// 时间格式化（统一返回 yyyy-mm-dd hh:mm:ss）
 		if user.RegisterTime != nil {
-			userInfo.RegisterTime = user.RegisterTime.Format("2006-01-02 15:04:05")
+			userInfo.RegisterTime = strings.ReplaceAll(user.RegisterTime.Format("2006-01-02 15:04:05"), "/", "-")
 		}
 		if user.LastLoginTime != nil {
-			userInfo.LastLoginTime = user.LastLoginTime.Format("2006-01-02 15:04:05")
+			userInfo.LastLoginTime = strings.ReplaceAll(user.LastLoginTime.Format("2006-01-02 15:04:05"), "/", "-")
 		}
 
 		// 获取等级名称
