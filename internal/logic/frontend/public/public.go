@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/metadata"
+
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -399,15 +401,42 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 }
 
 func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, siteId int, clientIp string) error {
-	req := g.RequestFromCtx(ctx)
-	if req == nil {
-		return nil
+	var (
+		ua       string
+		referer  string
+		loginURL string
+		network  string
+		screen   string
+	)
+
+	if req := g.RequestFromCtx(ctx); req != nil {
+		ua = req.Header.Get("User-Agent")
+		referer = req.Header.Get("Referer")
+		if referer == "" {
+			referer = req.Header.Get("Origin")
+		}
+		loginURL = req.URL.String()
+		network = req.Header.Get("X-Network-Type")
+		screen = req.Header.Get("X-Screen-Resolution")
 	}
 
-	ua := req.Header.Get("User-Agent")
-	referer := req.Header.Get("Referer")
-	if referer == "" {
-		referer = req.Header.Get("Origin")
+	// gRPC 链路场景（gateway -> app_service）从 metadata 补充信息
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if ua == "" {
+			if values := md.Get("user-agent"); len(values) > 0 {
+				ua = values[0]
+			}
+		}
+		if referer == "" {
+			if values := md.Get("referer"); len(values) > 0 {
+				referer = values[0]
+			}
+		}
+		if loginURL == "" {
+			if values := md.Get("path"); len(values) > 0 {
+				loginURL = values[0]
+			}
+		}
 	}
 
 	osName, browserName, device := parseUserAgentMeta(ua)
@@ -417,13 +446,13 @@ func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, sit
 		dao.UserLoginLog.Columns().UserId:       user.Id,
 		dao.UserLoginLog.Columns().Username:     user.Username,
 		dao.UserLoginLog.Columns().RefererUrl:   referer,
-		dao.UserLoginLog.Columns().LoginUrl:     req.URL.String(),
+		dao.UserLoginLog.Columns().LoginUrl:     loginURL,
 		dao.UserLoginLog.Columns().LoginTime:    gtime.Now(),
 		dao.UserLoginLog.Columns().LoginIp:      clientIp,
 		dao.UserLoginLog.Columns().LoginAddress: "",
 		dao.UserLoginLog.Columns().Os:           osName,
-		dao.UserLoginLog.Columns().Network:      req.Header.Get("X-Network-Type"),
-		dao.UserLoginLog.Columns().Screen:       req.Header.Get("X-Screen-Resolution"),
+		dao.UserLoginLog.Columns().Network:      network,
+		dao.UserLoginLog.Columns().Screen:       screen,
 		dao.UserLoginLog.Columns().Browser:      browserName,
 		dao.UserLoginLog.Columns().Device:       device,
 		dao.UserLoginLog.Columns().IsRobot:      0,
