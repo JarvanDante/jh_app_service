@@ -60,3 +60,21 @@ func (s *siteDao) GetCodeById(ctx context.Context, siteId uint) (string, error) 
 
 	return site.Code, nil
 }
+
+// GetIdByCode 根据站点代码获取站点ID
+func (s *siteDao) GetIdByCode(ctx context.Context, siteCode string) (uint, error) {
+	var site struct {
+		Id uint `json:"id"`
+	}
+	err := s.Ctx(ctx).
+		Fields("id").
+		Where("code", siteCode).
+		Scan(&site)
+	if err != nil {
+		return 0, err
+	}
+	if site.Id == 0 {
+		return 0, fmt.Errorf("siteCode [%s] not found", siteCode)
+	}
+	return site.Id, nil
+}

@@ -40,8 +40,17 @@ func (s *sAdmin) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, err
 	))
 	defer span.End()
 
-	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
+	// 获取站点ID：优先 metadata 里的 site_id，兜底使用 site_code 反查
 	siteId, exists := middleware.GetSiteIdFromContext(ctx)
+	if !exists {
+		if siteCode, ok := middleware.GetSiteCodeFromContext(ctx); ok && strings.TrimSpace(siteCode) != "" {
+			if resolvedSiteID, err := dao.Site.GetIdByCode(ctx, strings.TrimSpace(siteCode)); err == nil && resolvedSiteID > 0 {
+				siteId = resolvedSiteID
+				exists = true
+				middleware.LogWithTrace(ctx, "warning", "site_id缺失，已通过site_code兜底解析: site_code=%s -> site_id=%d", siteCode, siteId)
+			}
+		}
+	}
 	if !exists {
 		tracing.AddSpanEvent(span, "site_id_not_found")
 		middleware.LogWithTrace(ctx, "error", "未获取站点ID")
