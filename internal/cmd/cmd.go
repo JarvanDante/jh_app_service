@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"jh_app_service/internal/controller/backend/ad"
 	"jh_app_service/internal/controller/backend/agent"
+	agentdomain "jh_app_service/internal/controller/backend/agent_domain"
 	"jh_app_service/internal/controller/backend/admin"
 	"jh_app_service/internal/controller/backend/message"
 	"jh_app_service/internal/controller/backend/notice"
@@ -123,6 +124,7 @@ var (
 			message.Register(s)
 			ad.Register(s)
 			agent.Register(s)
+			agentdomain.Register(s)
 			notice.Register(s)
 			option.Register(s)
 
