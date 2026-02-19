@@ -196,7 +196,7 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 			SiteId: siteId,
 			Id:     uint(user.AgentId),
 		}).Scan(&agent)
-		userInfo.AgentUsername = agent.AgentCode
+		userInfo.AgentUsername = agent.AgentName
 
 		userList = append(userList, userInfo)
 	}
