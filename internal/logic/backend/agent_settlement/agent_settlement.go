@@ -266,7 +266,10 @@ func (s *sAgentSettlement) CalcAgentSettlementDaily(ctx context.Context, req *v1
 			Where("stat_date", row.StatDate).
 			Scan(&exist)
 		if err != nil {
-			return nil, err
+			if !strings.Contains(strings.ToLower(err.Error()), "no rows") {
+				return nil, err
+			}
+			err = nil
 		}
 
 		if exist.Id > 0 {
