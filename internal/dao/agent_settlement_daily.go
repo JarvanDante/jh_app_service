@@ -5,7 +5,10 @@
 package dao
 
 import (
+	"context"
 	"jh_app_service/internal/dao/internal"
+
+	"github.com/gogf/gf/v2/database/gdb"
 )
 
 // agentSettlementDailyDao is the data access object for the table agent_settlement_daily.
@@ -16,7 +19,13 @@ type agentSettlementDailyDao struct {
 
 var (
 	// AgentSettlementDaily is a globally accessible object for table agent_settlement_daily operations.
-	AgentSettlementDaily = agentSettlementDailyDao{internal.NewAgentSettlementDailyDao()}
+	AgentSettlementDaily = agentSettlementDailyDao{internal.NewAgentSettlementDailyDao(DynamicDBHandler)}
 )
+
+// Ctx 重写Ctx方法，使用动态数据库连接
+func (d agentSettlementDailyDao) Ctx(ctx context.Context) *gdb.Model {
+	originalModel := d.AgentSettlementDailyDao.Ctx(ctx)
+	return GetDynamicModel(ctx, d.Table(), originalModel)
+}
 
 // Add your custom methods and functionality below.

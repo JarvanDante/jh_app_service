@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package agent_settlement;
+
+option go_package = "jh_app_service/api/backend/agent_settlement/v1";
+
+service AgentSettlement {
+  rpc GetAgentSettlementDailyList(GetAgentSettlementDailyListReq) returns (GetAgentSettlementDailyListRes) {}
+  rpc CalcAgentSettlementDaily(CalcAgentSettlementDailyReq) returns (CalcAgentSettlementDailyRes) {}
+  rpc SettleAgentSettlementDaily(SettleAgentSettlementDailyReq) returns (SettleAgentSettlementDailyRes) {}
+  rpc SettleAgentSettlementBatch(SettleAgentSettlementBatchReq) returns (SettleAgentSettlementBatchRes) {}
+}
+
+message OptionItem {
+  int32 value = 1;
+  string name = 2;
+}
+
+message SettlementSummary {
+  int64 member_count = 1;
+  double bet_amount = 2;
+  double valid_amount = 3;
+  double net_amount = 4;
+  double commission_amount = 5;
+}
+
+message AgentSettlementDailyItem {
+  int64 id = 1;
+  string stat_date = 2;
+  int64 agent_id = 3;
+  string agent_name = 4;
+  int64 member_count = 5;
+  double bet_amount = 6;
+  double valid_amount = 7;
+  double net_amount = 8;
+  double rate = 9;
+  double commission_amount = 10;
+  int32 settle_status = 11;
+  string settle_status_name = 12;
+  string settled_at = 13;
+  string created_at = 14;
+  string updated_at = 15;
+}
+
+message GetAgentSettlementDailyListReq {
+  int32 page = 1;
+  int32 size = 2;
+  int64 agent_id = 3;
+  int32 settle_status = 4; // -1 不筛选
+  string start_date = 5;
+  string end_date = 6;
+}
+
+message GetAgentSettlementDailyListRes {
+  repeated AgentSettlementDailyItem list = 1;
+  int32 total = 2;
+  int32 current_page = 3;
+  int32 per_page = 4;
+  repeated OptionItem status_list = 5;
+  SettlementSummary summary = 6;
+}
+
+message CalcAgentSettlementDailyReq {
+  string start_date = 1;
+  string end_date = 2;
+  int64 agent_id = 3; // 可选
+}
+
+message CalcAgentSettlementDailyRes {
+  int32 affected = 1;
+}
+
+message SettleAgentSettlementDailyReq {
+  int64 id = 1;
+}
+
+message SettleAgentSettlementDailyRes {}
+
+message SettleAgentSettlementBatchReq {
+  string start_date = 1;
+  string end_date = 2;
+  int64 agent_id = 3; // 可选
+}
+
+message SettleAgentSettlementBatchRes {
+  int32 affected = 1;
+}

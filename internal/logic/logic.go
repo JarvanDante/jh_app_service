@@ -8,6 +8,7 @@ import (
 	_ "jh_app_service/internal/logic/backend/ad"
 	_ "jh_app_service/internal/logic/backend/agent"
 	_ "jh_app_service/internal/logic/backend/agent_domain"
+	_ "jh_app_service/internal/logic/backend/agent_settlement"
 	_ "jh_app_service/internal/logic/backend/admin"
 	_ "jh_app_service/internal/logic/backend/message"
 	_ "jh_app_service/internal/logic/backend/notice"
