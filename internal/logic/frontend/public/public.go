@@ -149,7 +149,7 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		}
 
 		// 创建同步用户到游戏服务的 Outbox 记录
-		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToGameOutbox(ctx, tx, int64(siteId), userId, username, siteCode); err != nil {
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToGameOutbox(ctx, tx, int64(siteId), userId, int64(user.AgentId), username, siteCode); err != nil {
 			return fmt.Errorf("创建同步用户到游戏服务Outbox记录失败: %w", err)
 		}
 
@@ -187,7 +187,7 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	}(siteCode, userId)
 
 	// 异步同步用户到游戏服务（快速路径）
-	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, username)
+	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, int64(user.AgentId), username)
 
 	// 注册成功发送消息（不影响主流程）
 	if _, err := backendService.Message().SendUserMessage(ctx, &messagev1.SendUserMessageReq{
@@ -1218,7 +1218,7 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		}
 
 		// 创建同步用户到游戏服务的 Outbox 记录
-		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToGameOutbox(ctx, tx, int64(siteId), userId, req.Username, siteCode); err != nil {
+		if err := logic_mq_outbox.MqOutbox().CreateSyncUserToGameOutbox(ctx, tx, int64(siteId), userId, int64(user.AgentId), req.Username, siteCode); err != nil {
 			return fmt.Errorf("创建同步用户到游戏服务Outbox记录失败: %w", err)
 		}
 
@@ -1262,7 +1262,7 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	}(siteCode, userId)
 
 	// 异步同步用户到游戏服务（快速路径）
-	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, req.Username)
+	s.asyncSyncUserToGame(ctx, int32(siteId), siteCode, userId, int64(user.AgentId), req.Username)
 
 	// 注册成功发送消息（不影响主流程）
 	if _, err := backendService.Message().SendUserMessage(ctx, &messagev1.SendUserMessageReq{

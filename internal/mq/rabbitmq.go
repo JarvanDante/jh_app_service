@@ -74,6 +74,7 @@ type SyncUserToGameMessage struct {
 	SiteID   int32  `json:"site_id"`
 	SiteCode string `json:"site_code"`
 	UserID   int64  `json:"user_id"`
+	AgentID  int64  `json:"agent_id"`
 	Username string `json:"username"`
 }
 

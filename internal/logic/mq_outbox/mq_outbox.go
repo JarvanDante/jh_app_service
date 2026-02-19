@@ -67,11 +67,12 @@ func (s *sMqOutbox) CreateInitBalanceOutbox(ctx context.Context, tx gdb.TX, site
 }
 
 // CreateSyncUserToGameOutbox 创建同步用户到游戏服务的 Outbox 记录
-func (s *sMqOutbox) CreateSyncUserToGameOutbox(ctx context.Context, tx gdb.TX, siteID int64, userID int64, username, siteCode string) error {
+func (s *sMqOutbox) CreateSyncUserToGameOutbox(ctx context.Context, tx gdb.TX, siteID int64, userID int64, agentID int64, username, siteCode string) error {
 	msg := &mq.SyncUserToGameMessage{
 		SiteID:   int32(siteID),
 		SiteCode: siteCode,
 		UserID:   userID,
+		AgentID:  agentID,
 		Username: username,
 	}
 

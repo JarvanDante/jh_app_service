@@ -12,12 +12,13 @@ import (
 )
 
 // asyncSyncUserToGame 异步同步用户到游戏服务（快速路径）
-func (s *sPublic) asyncSyncUserToGame(ctx context.Context, siteId int32, siteCode string, userId int64, username string) {
+func (s *sPublic) asyncSyncUserToGame(ctx context.Context, siteId int32, siteCode string, userId int64, agentId int64, username string) {
 	go func(siteCode string, userId int64) {
 		msg := &mq.SyncUserToGameMessage{
 			SiteID:   siteId,
 			SiteCode: siteCode,
 			UserID:   userId,
+			AgentID:  agentId,
 			Username: username,
 		}
 
