@@ -437,6 +437,16 @@ func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, sit
 				loginURL = values[0]
 			}
 		}
+		if network == "" {
+			if values := md.Get("x-network-type"); len(values) > 0 {
+				network = values[0]
+			}
+		}
+		if screen == "" {
+			if values := md.Get("x-screen-resolution"); len(values) > 0 {
+				screen = values[0]
+			}
+		}
 	}
 
 	osName, browserName, device := parseUserAgentMeta(ua)
