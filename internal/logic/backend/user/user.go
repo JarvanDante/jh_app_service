@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"fmt"
-	"strings"
 	v1 "jh_app_service/api/backend/user/v1"
 	logic_mq_outbox "jh_app_service/internal/logic/mq_outbox"
 	"jh_app_service/internal/registry"
@@ -175,12 +174,12 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 			PayTimes:   int32(user.PayTimes),
 		}
 
-		// 时间格式化（统一返回 yyyy-mm-dd hh:mm:ss）
-		if user.RegisterTime != nil {
-			userInfo.RegisterTime = strings.ReplaceAll(user.RegisterTime.Format("2006-01-02 15:04:05"), "/", "-")
+		// 时间格式化（gtime 要用标准库 time.Time 来格式化，避免返回模板字符串）
+		if user.RegisterTime != nil && !user.RegisterTime.IsZero() {
+			userInfo.RegisterTime = user.RegisterTime.Time.Format("2006-01-02 15:04:05")
 		}
-		if user.LastLoginTime != nil {
-			userInfo.LastLoginTime = strings.ReplaceAll(user.LastLoginTime.Format("2006-01-02 15:04:05"), "/", "-")
+		if user.LastLoginTime != nil && !user.LastLoginTime.IsZero() {
+			userInfo.LastLoginTime = user.LastLoginTime.Time.Format("2006-01-02 15:04:05")
 		}
 
 		// 获取等级名称
