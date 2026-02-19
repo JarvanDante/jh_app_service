@@ -94,7 +94,6 @@ func (s *sAgentSettlement) GetAgentSettlementDailyList(ctx context.Context, req 
 		CreatedAt        *gtime.Time `json:"created_at"`
 		UpdatedAt        *gtime.Time `json:"updated_at"`
 		Rate             float64     `json:"rate"`
-		MemberCount      int64       `json:"member_count"`
 	}
 
 	err = query.Fields(`
@@ -110,15 +109,8 @@ func (s *sAgentSettlement) GetAgentSettlementDailyList(ctx context.Context, req 
 		s.settled_at,
 		s.created_at,
 		s.updated_at,
-		COALESCE(a.rate, 0) AS rate,
-		(
-			SELECT COUNT(DISTINCT b.user_id)
-			FROM bet_records b
-			WHERE b.site_id = s.site_id
-			  AND b.agent_id = s.agent_id
-			  AND DATE(b.bet_time) = DATE(s.stat_date)
-		) AS member_count
-	`).Order("s.stat_date DESC, s.id DESC").Limit(offset, int(size)).Scan(&list)
+		COALESCE(a.rate, 0) AS rate
+	`).Order("s.stat_date DESC").Order("s.id DESC").Limit(offset, int(size)).Scan(&list)
 	if err != nil {
 		return nil, err
 	}
@@ -155,13 +147,12 @@ func (s *sAgentSettlement) GetAgentSettlementDailyList(ctx context.Context, req 
 	statusMap := map[int]string{0: "待结算", 1: "已结算", 2: "已作废"}
 	items := make([]*v1.AgentSettlementDailyItem, 0, len(list))
 	for _, row := range list {
-		summary.MemberCount += row.MemberCount
 		items = append(items, &v1.AgentSettlementDailyItem{
 			Id:               row.Id,
 			StatDate:         formatDate(row.StatDate),
 			AgentId:          row.AgentId,
 			AgentName:        row.AgentName,
-			MemberCount:      row.MemberCount,
+			MemberCount:      0,
 			BetAmount:        row.BetAmount,
 			ValidAmount:      row.ValidBetAmount,
 			NetAmount:        row.WinLoss,
@@ -225,6 +216,9 @@ func (s *sAgentSettlement) CalcAgentSettlementDaily(ctx context.Context, req *v1
 		COALESCE(SUM(b.net_amount),0) AS win_loss
 	`).Where("b.id IS NOT NULL").Group("DATE(b.bet_time), a.id, a.settle_type, a.rate").Scan(&rows)
 	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "doesn't exist") && strings.Contains(strings.ToLower(err.Error()), "bet_records") {
+			return nil, fmt.Errorf("站点库缺少 bet_records 表，请先在站点库执行 jh_game_service/manifest/sql/mysql_bet_records.sql")
+		}
 		return nil, err
 	}
 
