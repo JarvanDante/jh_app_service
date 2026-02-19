@@ -196,7 +196,7 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 			SiteId: siteId,
 			Id:     uint(user.AgentId),
 		}).Scan(&agent)
-		userInfo.AgentUsername = agent.Username
+		userInfo.AgentUsername = agent.AgentCode
 
 		userList = append(userList, userInfo)
 	}
@@ -391,7 +391,7 @@ func (s *sUser) GetUserBasicInfo(ctx context.Context, req *v1.GetUserBasicInfoRe
 		SiteId: siteId,
 		Id:     uint(user.AgentId),
 	}).Scan(&agent)
-	basicInfo.AgentName = agent.Username
+	basicInfo.AgentName = agent.AgentName
 
 	middleware.LogWithTrace(ctx, "info", fmt.Sprintf("获取用户基本信息成功，用户ID: %d, 用户名: %s, VIP等级: %d", req.Id, user.Username, user.GradeId))
 
