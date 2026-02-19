@@ -6,6 +6,7 @@ package logic
 
 import (
 	_ "jh_app_service/internal/logic/backend/ad"
+	_ "jh_app_service/internal/logic/backend/agent"
 	_ "jh_app_service/internal/logic/backend/admin"
 	_ "jh_app_service/internal/logic/backend/message"
 	_ "jh_app_service/internal/logic/backend/notice"
