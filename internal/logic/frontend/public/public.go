@@ -375,7 +375,10 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 		"last_login_time": gtime.Now(),
 	})
 
-	// TODO: 记录登录日志
+	// 记录会员登录日志
+	if logErr := s.recordUserLoginLog(ctx, user, int(siteId), clientIp); logErr != nil {
+		middleware.LogWithTrace(ctx, "error", "记录会员登录日志失败: %v", logErr)
+	}
 	// TODO: 清空登录失败次数
 
 	// 生成JWT Token和Refresh Token
@@ -393,6 +396,84 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 	}
 
 	return res, nil
+}
+
+func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, siteId int, clientIp string) error {
+	req := g.RequestFromCtx(ctx)
+	if req == nil {
+		return nil
+	}
+
+	ua := req.Header.Get("User-Agent")
+	referer := req.Header.Get("Referer")
+	if referer == "" {
+		referer = req.Header.Get("Origin")
+	}
+
+	osName, browserName, device := parseUserAgentMeta(ua)
+
+	_, err := dao.UserLoginLog.Ctx(ctx).Insert(g.Map{
+		dao.UserLoginLog.Columns().SiteId:       siteId,
+		dao.UserLoginLog.Columns().UserId:       user.Id,
+		dao.UserLoginLog.Columns().Username:     user.Username,
+		dao.UserLoginLog.Columns().RefererUrl:   referer,
+		dao.UserLoginLog.Columns().LoginUrl:     req.URL.String(),
+		dao.UserLoginLog.Columns().LoginTime:    gtime.Now(),
+		dao.UserLoginLog.Columns().LoginIp:      clientIp,
+		dao.UserLoginLog.Columns().LoginAddress: "",
+		dao.UserLoginLog.Columns().Os:           osName,
+		dao.UserLoginLog.Columns().Network:      req.Header.Get("X-Network-Type"),
+		dao.UserLoginLog.Columns().Screen:       req.Header.Get("X-Screen-Resolution"),
+		dao.UserLoginLog.Columns().Browser:      browserName,
+		dao.UserLoginLog.Columns().Device:       device,
+		dao.UserLoginLog.Columns().IsRobot:      0,
+		dao.UserLoginLog.Columns().CreatedAt:    gtime.Now(),
+	})
+	return err
+}
+
+func parseUserAgentMeta(ua string) (osName string, browser string, device int) {
+	uaLower := strings.ToLower(ua)
+	osName = "Unknown"
+	browser = "Unknown"
+	device = 1
+
+	switch {
+	case strings.Contains(uaLower, "android"):
+		osName = "Android"
+		device = 2
+	case strings.Contains(uaLower, "iphone") || strings.Contains(uaLower, "ios"):
+		osName = "iOS"
+		device = 2
+	case strings.Contains(uaLower, "ipad"):
+		osName = "iPadOS"
+		device = 3
+	case strings.Contains(uaLower, "windows"):
+		osName = "Windows"
+	case strings.Contains(uaLower, "mac os") || strings.Contains(uaLower, "macintosh"):
+		osName = "macOS"
+	case strings.Contains(uaLower, "linux"):
+		osName = "Linux"
+	}
+
+	switch {
+	case strings.Contains(uaLower, "edg/"):
+		browser = "Edge"
+	case strings.Contains(uaLower, "chrome/"):
+		browser = "Chrome"
+	case strings.Contains(uaLower, "safari/") && !strings.Contains(uaLower, "chrome/"):
+		browser = "Safari"
+	case strings.Contains(uaLower, "firefox/"):
+		browser = "Firefox"
+	case strings.Contains(uaLower, "opr/") || strings.Contains(uaLower, "opera"):
+		browser = "Opera"
+	}
+
+	if strings.Contains(uaLower, "ipad") || strings.Contains(uaLower, "tablet") {
+		device = 3
+	}
+
+	return
 }
 
 // GenerateCaptcha 生成验证码
