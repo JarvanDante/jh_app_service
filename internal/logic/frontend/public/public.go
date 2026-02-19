@@ -9,6 +9,7 @@ import (
 	"image/color"
 	"image/png"
 	"jh_app_service/internal/mq"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -87,11 +88,13 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	}
 
 	now := gtime.Now()
+	agentId := s.resolveRegisterAgentId(ctx, siteId, req.Domain, siteConfig.DefaultAgentId)
+
 	// 创建用户
 	user := &entity.User{
 		SiteId:       int(siteId),
 		GradeId:      siteConfig.DefaultGradeId, // TODO: 获取默认等级
-		AgentId:      siteConfig.DefaultAgentId, // TODO: 根据代理码获取代理ID
+		AgentId:      agentId,
 		Username:     username,
 		Password:     hashedPassword,
 		PayPassword:  "",
@@ -292,6 +295,70 @@ func (s *sPublic) hashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hashedBytes), nil
+}
+
+func normalizeDomain(raw string) string {
+	raw = strings.TrimSpace(strings.ToLower(raw))
+	if raw == "" {
+		return ""
+	}
+	if strings.Contains(raw, "://") {
+		if u, err := url.Parse(raw); err == nil {
+			raw = u.Host
+		}
+	}
+	if idx := strings.Index(raw, "/"); idx >= 0 {
+		raw = raw[:idx]
+	}
+	if idx := strings.Index(raw, ":"); idx >= 0 {
+		raw = raw[:idx]
+	}
+	return strings.TrimSpace(raw)
+}
+
+func (s *sPublic) resolveRegisterAgentId(ctx context.Context, siteId uint, fallbackDomain string, defaultAgentId int) int {
+	domain := ""
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if domains := md.Get("domain"); len(domains) > 0 {
+			domain = normalizeDomain(domains[0])
+		}
+	}
+	if domain == "" {
+		domain = normalizeDomain(fallbackDomain)
+	}
+	if domain == "" {
+		return defaultAgentId
+	}
+
+	var exact entity.AgentDomain
+	_ = dao.AgentDomain.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("status", 1).
+		Where("domain", domain).
+		Scan(&exact)
+	if exact.Id > 0 && exact.AgentId > 0 {
+		middleware.LogWithTrace(ctx, "info", "注册命中代理域名(精确): domain=%s, agent_id=%d", domain, exact.AgentId)
+		return int(exact.AgentId)
+	}
+
+	var wildcardList []entity.AgentDomain
+	_ = dao.AgentDomain.Ctx(ctx).
+		Where("site_id", siteId).
+		Where("status", 1).
+		WhereLike("domain", "*.%").
+		Scan(&wildcardList)
+	for _, item := range wildcardList {
+		pattern := strings.TrimPrefix(normalizeDomain(item.Domain), "*.")
+		if pattern == "" {
+			continue
+		}
+		if domain == pattern || strings.HasSuffix(domain, "."+pattern) {
+			middleware.LogWithTrace(ctx, "info", "注册命中代理域名(通配): domain=%s, rule=%s, agent_id=%d", domain, item.Domain, item.AgentId)
+			return int(item.AgentId)
+		}
+	}
+
+	return defaultAgentId
 }
 
 // Login 用户登录
@@ -1094,11 +1161,12 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	}
 
 	now := gtime.Now()
+	agentId := s.resolveRegisterAgentId(ctx, siteId, req.Domain, siteConfig.DefaultAgentId)
 	// 创建用户
 	user := &entity.User{
 		SiteId:       int(siteId),
 		GradeId:      siteConfig.DefaultGradeId,
-		AgentId:      siteConfig.DefaultAgentId,
+		AgentId:      agentId,
 		InviterId:    int(inviterId), // 设置邀请人ID
 		Username:     req.Username,
 		Password:     hashedPassword,
