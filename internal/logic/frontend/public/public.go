@@ -421,6 +421,8 @@ func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, sit
 	}
 
 	// gRPC 链路场景（gateway -> app_service）从 metadata 补充信息
+	deviceOSHeader := ""
+	deviceBrowserHeader := ""
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		if ua == "" {
 			if values := md.Get("user-agent"); len(values) > 0 {
@@ -439,6 +441,12 @@ func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, sit
 				loginURL = values[0]
 			}
 		}
+		if values := md.Get("x-device-os"); len(values) > 0 {
+			deviceOSHeader = values[0]
+		}
+		if values := md.Get("x-device-browser"); len(values) > 0 {
+			deviceBrowserHeader = values[0]
+		}
 		if network == "" {
 			if values := md.Get("x-network-type"); len(values) > 0 {
 				network = values[0]
@@ -452,6 +460,12 @@ func (s *sPublic) recordUserLoginLog(ctx context.Context, user *entity.User, sit
 	}
 
 	osName, browserName, device := parseUserAgentMeta(ua)
+	if osName == "Unknown" && deviceOSHeader != "" {
+		osName = deviceOSHeader
+	}
+	if browserName == "Unknown" && deviceBrowserHeader != "" {
+		browserName = deviceBrowserHeader
+	}
 
 	_, err := dao.UserLoginLog.Ctx(ctx).Insert(g.Map{
 		dao.UserLoginLog.Columns().SiteId:       siteId,
