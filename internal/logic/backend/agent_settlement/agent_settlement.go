@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	v1 "jh_app_service/api/backend/agent_settlement/v1"
-	grpcsettlement "jh_app_service/api/grpc/agent_settlement/v1"
+	gamegrpc "jh_app_service/api/grpc/game/v1"
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/model/do"
@@ -206,10 +206,10 @@ func (s *sAgentSettlement) CalcAgentSettlementDaily(ctx context.Context, req *v1
 	}
 	defer conn.Close()
 
-	gameClient := grpcsettlement.NewAgentSettlementClient(conn)
+	gameClient := gamegrpc.NewAgentSettlementClient(conn)
 	md := metadata.New(map[string]string{"site_id": gconv.String(siteId)})
 	grpcCtx := metadata.NewOutgoingContext(ctx, md)
-	statRes, err := gameClient.GetAgentDailyBetStats(grpcCtx, &grpcsettlement.GetAgentDailyBetStatsReq{
+	statRes, err := gameClient.GetAgentDailyBetStats(grpcCtx, &gamegrpc.GetAgentDailyBetStatsReq{
 		StartDate: startDate,
 		EndDate:   endDate,
 		AgentId:   req.AgentId,

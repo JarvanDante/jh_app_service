@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package game;
+
+option go_package = "jh_game_service/api/backend/game/v1";
+
+service AgentSettlement {
+  // 获取代理日统计（供代理结算）
+  rpc GetAgentDailyBetStats(GetAgentDailyBetStatsReq) returns (GetAgentDailyBetStatsRes) {}
+}
+
+message GetAgentDailyBetStatsReq {
+  string start_date = 1; // 开始日期，格式：2006-01-02
+  string end_date = 2;   // 结束日期，格式：2006-01-02
+  int64 agent_id = 3;    // 代理ID（可选，0=全部）
+}
+
+message AgentDailyBetStatItem {
+  string stat_date = 1;        // 统计日期
+  int64 agent_id = 2;          // 代理ID
+  double bet_amount = 3;       // 投注金额
+  double valid_bet_amount = 4; // 有效投注
+  double win_loss = 5;         // 净输赢
+  int64 member_count = 6;      // 会员数
+}
+
+message GetAgentDailyBetStatsRes {
+  repeated AgentDailyBetStatItem list = 1;
+}
