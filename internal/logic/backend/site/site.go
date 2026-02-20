@@ -42,7 +42,7 @@ type activityParamField struct {
 }
 
 func buildSigninParamFields() []activityParamField {
-	fields := make([]activityParamField, 0, 31)
+	fields := make([]activityParamField, 0, 33)
 	for day := 1; day <= 31; day++ {
 		fields = append(fields, activityParamField{
 			Name:  fmt.Sprintf("day_%d", day),
@@ -50,6 +50,18 @@ func buildSigninParamFields() []activityParamField {
 			Type:  "number",
 		})
 	}
+	fields = append(fields,
+		activityParamField{
+			Name:  "min_recharge_amount",
+			Label: "领取门槛-当日最小充值",
+			Type:  "number",
+		},
+		activityParamField{
+			Name:  "min_valid_bet_amount",
+			Label: "领取门槛-当日最小有效投注",
+			Type:  "number",
+		},
+	)
 	return fields
 }
 
@@ -654,6 +666,20 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 		for day := 1; day <= 31; day++ {
 			values[fmt.Sprintf("day_%d", day)] = "0"
 		}
+		values["min_recharge_amount"] = "0"
+		values["min_valid_bet_amount"] = "0"
+
+		if strings.TrimSpace(activity.FixedParams) != "" {
+			fixed := map[string]interface{}{}
+			if err := json.Unmarshal([]byte(activity.FixedParams), &fixed); err == nil {
+				if v, ok := fixed["min_recharge_amount"]; ok {
+					values["min_recharge_amount"] = gconv.String(v)
+				}
+				if v, ok := fixed["min_valid_bet_amount"]; ok {
+					values["min_valid_bet_amount"] = gconv.String(v)
+				}
+			}
+		}
 
 		var list []*entity.ActivitySigninBonus
 		if err := dao.ActivitySigninBonus.Ctx(ctx).
@@ -1050,6 +1076,23 @@ func applySigninBonusParamValues(ctx context.Context, siteCode string, activityI
 	}
 
 	now := gtime.Now()
+	minRechargeAmount := 0.0
+	minValidBetAmount := 0.0
+	if raw, ok := paramValues["min_recharge_amount"]; ok {
+		minRechargeAmount = gconv.Float64(strings.TrimSpace(raw))
+		if minRechargeAmount < 0 {
+			minRechargeAmount = 0
+		}
+		minRechargeAmount = float64(int(minRechargeAmount*100+0.5)) / 100
+	}
+	if raw, ok := paramValues["min_valid_bet_amount"]; ok {
+		minValidBetAmount = gconv.Float64(strings.TrimSpace(raw))
+		if minValidBetAmount < 0 {
+			minValidBetAmount = 0
+		}
+		minValidBetAmount = float64(int(minValidBetAmount*100+0.5)) / 100
+	}
+
 	for key, value := range paramValues {
 		dayNo, ok := parseSigninDayField(key)
 		if !ok {
@@ -1098,7 +1141,7 @@ func applySigninBonusParamValues(ctx context.Context, siteCode string, activityI
 	}
 
 	// 回查构建 fixed_params
-	values := make(map[string]float64, 31)
+	values := make(map[string]float64, 33)
 	for day := 1; day <= 31; day++ {
 		values[fmt.Sprintf("day_%d", day)] = 0
 	}
@@ -1117,6 +1160,8 @@ func applySigninBonusParamValues(ctx context.Context, siteCode string, activityI
 		}
 		values[fmt.Sprintf("day_%d", item.DayNo)] = item.RewardAmount
 	}
+	values["min_recharge_amount"] = minRechargeAmount
+	values["min_valid_bet_amount"] = minValidBetAmount
 
 	data, err := json.Marshal(values)
 	if err != nil {
