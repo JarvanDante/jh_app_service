@@ -1134,31 +1134,31 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		return nil, err
 	}
 
-	// 处理邀请码
+	// 处理邀请码（Invite 活动下线，临时关闭 inviter 绑定）
 	var inviterId uint = 0
-	if req.InviteCode != "" {
-		// 验证邀请码格式
-		if !util.ValidateInviteCode(req.InviteCode) {
-			g.Log().Warningf(ctx, "邀请码格式无效: invite_code=%s", req.InviteCode)
-		} else {
-			// 解码邀请码获取邀请人ID
-			inviterUserId := util.DecodeInviteCode(req.InviteCode)
-			if inviterUserId > 0 {
-				// 验证邀请人是否存在
-				var inviter *entity.User
-				err = dao.User.Ctx(ctx).Where("id", inviterUserId).
-					Where("site_id", siteId).
-					Where("status", 1). // 只有正常状态的用户才能邀请
-					Scan(&inviter)
-				if err == nil && inviter != nil {
-					inviterId = inviterUserId
-					g.Log().Infof(ctx, "注册使用邀请码: invite_code=%s, inviter_id=%d, username=%s", req.InviteCode, inviterId, inviter.Username)
-				} else {
-					g.Log().Warningf(ctx, "邀请码对应的用户不存在或已禁用: invite_code=%s, inviter_id=%d", req.InviteCode, inviterUserId)
-				}
-			}
-		}
-	}
+	// if req.InviteCode != "" {
+	// 	// 验证邀请码格式
+	// 	if !util.ValidateInviteCode(req.InviteCode) {
+	// 		g.Log().Warningf(ctx, "邀请码格式无效: invite_code=%s", req.InviteCode)
+	// 	} else {
+	// 		// 解码邀请码获取邀请人ID
+	// 		inviterUserId := util.DecodeInviteCode(req.InviteCode)
+	// 		if inviterUserId > 0 {
+	// 			// 验证邀请人是否存在
+	// 			var inviter *entity.User
+	// 			err = dao.User.Ctx(ctx).Where("id", inviterUserId).
+	// 				Where("site_id", siteId).
+	// 				Where("status", 1). // 只有正常状态的用户才能邀请
+	// 				Scan(&inviter)
+	// 			if err == nil && inviter != nil {
+	// 				inviterId = inviterUserId
+	// 				g.Log().Infof(ctx, "注册使用邀请码: invite_code=%s, inviter_id=%d, username=%s", req.InviteCode, inviterId, inviter.Username)
+	// 			} else {
+	// 				g.Log().Warningf(ctx, "邀请码对应的用户不存在或已禁用: invite_code=%s, inviter_id=%d", req.InviteCode, inviterUserId)
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	now := gtime.Now()
 	agentId := s.resolveRegisterAgentId(ctx, siteId, req.Domain, siteConfig.DefaultAgentId)
