@@ -43,13 +43,6 @@ type activityParamField struct {
 
 func buildSigninParamFields() []activityParamField {
 	fields := make([]activityParamField, 0, 33)
-	for day := 1; day <= 31; day++ {
-		fields = append(fields, activityParamField{
-			Name:  fmt.Sprintf("day_%d", day),
-			Label: fmt.Sprintf("第%d天金额", day),
-			Type:  "number",
-		})
-	}
 	fields = append(fields,
 		activityParamField{
 			Name:  "min_recharge_amount",
@@ -62,6 +55,13 @@ func buildSigninParamFields() []activityParamField {
 			Type:  "number",
 		},
 	)
+	for day := 1; day <= 31; day++ {
+		fields = append(fields, activityParamField{
+			Name:  fmt.Sprintf("day_%d", day),
+			Label: fmt.Sprintf("第%d天金额", day),
+			Type:  "number",
+		})
+	}
 	return fields
 }
 
