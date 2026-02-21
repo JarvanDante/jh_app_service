@@ -2,10 +2,17 @@ package admin
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/rand"
+	"crypto/sha1"
+	"encoding/base32"
+	"encoding/binary"
 	"fmt"
 	v1 "jh_app_service/api/backend/admin/v1"
 	"jh_app_service/internal/service/backend"
 	"jh_app_service/internal/util"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -117,11 +124,15 @@ func (s *sAdmin) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, err
 			tracing.AddSpanEvent(span, "google_2fa_code_missing")
 			return nil, fmt.Errorf("请输入动态验证码")
 		}
-		// 这里需要实现Google 2FA验证逻辑
-		// valid := validateGoogle2FA(admin.Google2FaSecret, req.Code)
-		// if !valid {
-		//     return nil, fmt.Errorf("动态验证码错误")
-		// }
+		secret := strings.TrimSpace(admin.Google2FaSecret)
+		if secret == "" {
+			tracing.AddSpanEvent(span, "google_2fa_secret_missing")
+			return nil, fmt.Errorf("二次验证未正确配置，请联系上级管理员")
+		}
+		if !verifyTOTP(secret, strings.TrimSpace(req.Code), time.Now()) {
+			tracing.AddSpanEvent(span, "google_2fa_code_invalid")
+			return nil, fmt.Errorf("动态验证码错误")
+		}
 	}
 
 	// 生成JWT token span
@@ -747,14 +758,15 @@ func (s *sAdmin) GetAdminList(ctx context.Context, req *v1.GetAdminListReq) (*v1
 
 	for _, admin := range admins {
 		adminInfo := &v1.AdminInfo{
-			Id:            int32(admin.Id),
-			Username:      admin.Username,
-			Nickname:      admin.Nickname,
-			Role:          int32(admin.AdminRoleId),
-			Status:        int32(admin.Status),
-			LastLoginIp:   admin.LastLoginIp, // 直接赋值，即使为空字符串
-			LastLoginTime: admin.LastLoginTime.Format("2006-01-02 15:04:05"),
-			CreatedAt:     admin.CreatedAt.Format("2006-01-02 15:04:05"),
+			Id:              int32(admin.Id),
+			Username:        admin.Username,
+			Nickname:        admin.Nickname,
+			Role:            int32(admin.AdminRoleId),
+			Status:          int32(admin.Status),
+			LastLoginIp:     admin.LastLoginIp, // 直接赋值，即使为空字符串
+			LastLoginTime:   admin.LastLoginTime.Format("2006-01-02 15:04:05"),
+			CreatedAt:       admin.CreatedAt.Format("2006-01-02 15:04:05"),
+			SwitchGoogle2Fa: int32(admin.SwitchGoogle2Fa),
 		}
 
 		// 设置角色名称
@@ -771,11 +783,10 @@ func (s *sAdmin) GetAdminList(ctx context.Context, req *v1.GetAdminListReq) (*v1
 	// google2faAccess := AdminRole::validRolePermission($this->admin->admin_role_id, 'bind-google2fa');
 
 	res := &v1.GetAdminListRes{
-		List:            adminList,
-		Total:           int32(total),
-		Page:            int32(page),
-		Size:            int32(size),
-		Google2FaAccess: false, // 暂时设为false，需要实现权限检查
+		List:  adminList,
+		Total: int32(total),
+		Page:  int32(page),
+		Size:  int32(size),
 	}
 
 	tracing.SetSpanAttributes(span, attribute.Bool("success", true))
@@ -1556,4 +1567,109 @@ func (s *sAdmin) buildMenusForMenusAPI(ctx context.Context, admin *entity.Admin)
 		len(rolePermissions), len(rootMenus))
 
 	return rootMenus
+}
+
+func (s *sAdmin) GenerateGoogle2FA(ctx context.Context, req *v1.GenerateGoogle2FAReq) (*v1.GenerateGoogle2FARes, error) {
+	siteId, _ := middleware.GetSiteIdFromContext(ctx)
+	if req.Id <= 0 {
+		return nil, fmt.Errorf("管理员ID不能为空")
+	}
+
+	var admin *entity.Admin
+	if err := dao.Admin.Ctx(ctx).Where("id", req.Id).Where("site_id", siteId).Scan(&admin); err != nil {
+		return nil, err
+	}
+	if admin == nil || admin.Id == 0 {
+		return nil, fmt.Errorf("管理员不存在")
+	}
+
+	secret := strings.TrimSpace(admin.Google2FaSecret)
+	if secret == "" {
+		generated, err := generateGoogleSecret()
+		if err != nil {
+			return nil, fmt.Errorf("生成2FA密钥失败")
+		}
+		secret = generated
+	}
+
+	issuer := "JH"
+	label := url.QueryEscape(fmt.Sprintf("%s:%s", issuer, admin.Username))
+	otpauth := fmt.Sprintf("otpauth://totp/%s?secret=%s&issuer=%s", label, secret, url.QueryEscape(issuer))
+	qrURL := "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=" + url.QueryEscape(otpauth)
+
+	return &v1.GenerateGoogle2FARes{
+		Id:              int32(admin.Id),
+		Secret:          secret,
+		OtpauthUrl:      otpauth,
+		QrUrl:           qrURL,
+		SwitchGoogle2Fa: int32(admin.SwitchGoogle2Fa),
+	}, nil
+}
+
+func (s *sAdmin) BindGoogle2FA(ctx context.Context, req *v1.BindGoogle2FAReq) (*v1.BindGoogle2FARes, error) {
+	siteId, _ := middleware.GetSiteIdFromContext(ctx)
+	if req.Id <= 0 {
+		return &v1.BindGoogle2FARes{Success: false, Message: "管理员ID不能为空"}, nil
+	}
+	secret := strings.ToUpper(strings.TrimSpace(req.Secret))
+	code := strings.TrimSpace(req.Code)
+	if secret == "" || code == "" {
+		return &v1.BindGoogle2FARes{Success: false, Message: "密钥和验证码不能为空"}, nil
+	}
+
+	valid := verifyTOTP(secret, code, time.Now())
+	if !valid {
+		return &v1.BindGoogle2FARes{Success: false, Message: "动态验证码错误"}, nil
+	}
+
+	_, err := dao.Admin.Ctx(ctx).Where("id", req.Id).Where("site_id", siteId).Data(g.Map{
+		"google2fa_secret": secret,
+		"switch_google2fa": 1,
+		"updated_at":       gtime.Now(),
+	}).Update()
+	if err != nil {
+		return &v1.BindGoogle2FARes{Success: false, Message: "绑定失败"}, nil
+	}
+
+	return &v1.BindGoogle2FARes{Success: true, Message: "绑定成功"}, nil
+}
+
+func generateGoogleSecret() (string, error) {
+	b := make([]byte, 20)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	enc := base32.StdEncoding.WithPadding(base32.NoPadding)
+	return enc.EncodeToString(b), nil
+}
+
+func verifyTOTP(secret, code string, now time.Time) bool {
+	for i := -1; i <= 1; i++ {
+		if generateTOTPCode(secret, now.Add(time.Duration(i)*30*time.Second)) == code {
+			return true
+		}
+	}
+	return false
+}
+
+func generateTOTPCode(secret string, t time.Time) string {
+	enc := base32.StdEncoding.WithPadding(base32.NoPadding)
+	key, err := enc.DecodeString(strings.ToUpper(strings.TrimSpace(secret)))
+	if err != nil {
+		return ""
+	}
+	counter := uint64(t.Unix() / 30)
+	buf := make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, counter)
+	h := hmac.New(sha1.New, key)
+	h.Write(buf)
+	hash := h.Sum(nil)
+	offset := hash[len(hash)-1] & 0x0f
+	binaryCode := (int(hash[offset])&0x7f)<<24 | (int(hash[offset+1])&0xff)<<16 | (int(hash[offset+2])&0xff)<<8 | (int(hash[offset+3]) & 0xff)
+	otp := binaryCode % 1000000
+	code := strconv.Itoa(otp)
+	for len(code) < 6 {
+		code = "0" + code
+	}
+	return code
 }

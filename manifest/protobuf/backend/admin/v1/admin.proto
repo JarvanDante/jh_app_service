@@ -16,6 +16,8 @@ service Admin {
     rpc Logout(LogoutReq) returns (LogoutRes) {}
     rpc ChangePassword(ChangePasswordReq) returns (ChangePasswordRes) {}
     rpc GetAdminLogs(GetAdminLogsReq) returns (GetAdminLogsRes) {}
+    rpc GenerateGoogle2FA(GenerateGoogle2FAReq) returns (GenerateGoogle2FARes) {}
+    rpc BindGoogle2FA(BindGoogle2FAReq) returns (BindGoogle2FARes) {}
 }
 
 message LoginReq {
@@ -102,6 +104,7 @@ message AdminInfo {
     string last_login_ip = 7;
     string last_login_time = 8;
     string created_at = 9;
+    int32 switch_google2fa = 10;
 }
 
 // 获取管理员列表响应
@@ -110,7 +113,6 @@ message GetAdminListRes {
     int32 total = 2;
     int32 page = 3;
     int32 size = 4;
-    bool google2fa_access = 5; // Google 2FA 权限
 }
 
 // 更新管理员请求
@@ -173,4 +175,27 @@ message AdminLogInfo {
 message GetAdminLogsRes {
     repeated AdminLogInfo list = 1;  // 日志列表
     int32 count = 2;                 // 总数量
+}
+
+message GenerateGoogle2FAReq {
+    int32 id = 1; // 目标管理员ID
+}
+
+message GenerateGoogle2FARes {
+    int32 id = 1;
+    string secret = 2;
+    string otpauth_url = 3;
+    string qr_url = 4;
+    int32 switch_google2fa = 5;
+}
+
+message BindGoogle2FAReq {
+    int32 id = 1;      // 目标管理员ID
+    string secret = 2; // 谷歌密钥
+    string code = 3;   // 6位验证码
+}
+
+message BindGoogle2FARes {
+    bool success = 1;
+    string message = 2;
 }

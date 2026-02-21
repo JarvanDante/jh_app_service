@@ -24,6 +24,8 @@ type (
 		Logout(ctx context.Context, req *v1.LogoutReq) (*v1.LogoutRes, error)
 		ChangePassword(ctx context.Context, req *v1.ChangePasswordReq) (*v1.ChangePasswordRes, error)
 		GetAdminLogs(ctx context.Context, req *v1.GetAdminLogsReq) (*v1.GetAdminLogsRes, error)
+		GenerateGoogle2FA(ctx context.Context, req *v1.GenerateGoogle2FAReq) (*v1.GenerateGoogle2FARes, error)
+		BindGoogle2FA(ctx context.Context, req *v1.BindGoogle2FAReq) (*v1.BindGoogle2FARes, error)
 	}
 )
 

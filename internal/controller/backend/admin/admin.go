@@ -70,3 +70,11 @@ func (*Controller) ChangePassword(ctx context.Context, req *v2.ChangePasswordReq
 func (*Controller) GetAdminLogs(ctx context.Context, req *v2.GetAdminLogsReq) (res *v2.GetAdminLogsRes, err error) {
 	return backend.Admin().GetAdminLogs(ctx, req)
 }
+
+func (*Controller) GenerateGoogle2FA(ctx context.Context, req *v2.GenerateGoogle2FAReq) (res *v2.GenerateGoogle2FARes, err error) {
+	return backend.Admin().GenerateGoogle2FA(ctx, req)
+}
+
+func (*Controller) BindGoogle2FA(ctx context.Context, req *v2.BindGoogle2FAReq) (res *v2.BindGoogle2FARes, err error) {
+	return backend.Admin().BindGoogle2FA(ctx, req)
+}
