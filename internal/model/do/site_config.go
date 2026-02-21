@@ -25,9 +25,8 @@ type SiteConfig struct {
 	MinWithdraw          any         // 单笔最低提现金额
 	MaxWithdraw          any         // 单笔最高提现金额
 	CloseReason          any         // 关站原因
-	UrlAgentPc           any         // 前台代理系统链接地址
-	UrlAgentRegister     any         // 代理推广地址
 	UrlService           any         // 客服链接
+	UrlTg                any         // telegram链接
 	UrlMobile            any         // 手机域名
 	CreatedAt            *gtime.Time //
 	UpdatedAt            *gtime.Time //

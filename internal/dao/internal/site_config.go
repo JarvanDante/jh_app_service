@@ -34,9 +34,8 @@ type SiteConfigColumns struct {
 	MinWithdraw          string // 单笔最低提现金额
 	MaxWithdraw          string // 单笔最高提现金额
 	CloseReason          string // 关站原因
-	UrlAgentPc           string // 前台代理系统链接地址
-	UrlAgentRegister     string // 代理推广地址
 	UrlService           string // 客服链接
+	UrlTg                string // telegram链接
 	UrlMobile            string // 手机域名
 	CreatedAt            string //
 	UpdatedAt            string //
@@ -58,9 +57,8 @@ var siteConfigColumns = SiteConfigColumns{
 	MinWithdraw:          "min_withdraw",
 	MaxWithdraw:          "max_withdraw",
 	CloseReason:          "close_reason",
-	UrlAgentPc:           "url_agent_pc",
-	UrlAgentRegister:     "url_agent_register",
 	UrlService:           "url_service",
+	UrlTg:                "url_tg",
 	UrlMobile:            "url_mobile",
 	CreatedAt:            "created_at",
 	UpdatedAt:            "updated_at",

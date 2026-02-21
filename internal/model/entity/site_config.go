@@ -23,9 +23,8 @@ type SiteConfig struct {
 	MinWithdraw          int         `json:"minWithdraw"          orm:"min_withdraw"           description:"单笔最低提现金额"`
 	MaxWithdraw          int         `json:"maxWithdraw"          orm:"max_withdraw"           description:"单笔最高提现金额"`
 	CloseReason          string      `json:"closeReason"          orm:"close_reason"           description:"关站原因"`
-	UrlAgentPc           string      `json:"urlAgentPc"           orm:"url_agent_pc"           description:"前台代理系统链接地址"`
-	UrlAgentRegister     string      `json:"urlAgentRegister"     orm:"url_agent_register"     description:"代理推广地址"`
 	UrlService           string      `json:"urlService"           orm:"url_service"            description:"客服链接"`
+	UrlTg                string      `json:"urlTg"                orm:"url_tg"                 description:"telegram链接"`
 	UrlMobile            string      `json:"urlMobile"            orm:"url_mobile"             description:"手机域名"`
 	CreatedAt            *gtime.Time `json:"createdAt"            orm:"created_at"             description:""`
 	UpdatedAt            *gtime.Time `json:"updatedAt"            orm:"updated_at"             description:""`
