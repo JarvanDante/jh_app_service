@@ -7,7 +7,7 @@ grpc:
   errorStack: true
   errorLogEnabled: true
   errorLogPattern: "error-{Ymd}.log"
-  accessLogEnabled: true
+  accessLogEnabled: false
   accessLogPattern: "access-{Ymd}.log"
   balanceService: "jh_balance_service:8003" # balance服务地址
 

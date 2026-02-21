@@ -7,7 +7,7 @@ grpc:
   errorStack: true
   errorLogEnabled: true
   errorLogPattern: "error-{Ymd}.log"
-  accessLogEnabled: true
+  accessLogEnabled: false
   accessLogPattern: "access-{Ymd}.log"
 
 # Consul 配置

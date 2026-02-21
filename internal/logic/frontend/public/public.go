@@ -77,14 +77,33 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 	}
 
 	// 获取客户端IP
-	// clientIp := g.RequestFromCtx(ctx).GetClientIp()
-	clientIp := "127.0.0.1" // TODO: 从context获取真实IP
+	clientIp := util.GetClientIP(ctx)
+	if clientIp == "" {
+		clientIp = "127.0.0.1"
+	}
 
 	// 获取站点配置
 	var siteConfig *entity.SiteConfig
 	err = dao.SiteConfig.Ctx(ctx).Where("site_id", siteId).Scan(&siteConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	// 同一IP注册间隔限制（秒）
+	if siteConfig != nil && siteConfig.RegisterTimeInterval > 0 {
+		limitFrom := gtime.Now().Add(-time.Duration(siteConfig.RegisterTimeInterval) * time.Second)
+		recentCount, countErr := dao.User.Ctx(ctx).
+			Where("site_id", siteId).
+			Where("register_ip", clientIp).
+			Where("register_time >= ?", limitFrom).
+			Count()
+		if countErr != nil {
+			g.Log().Errorf(ctx, "查询同IP注册频率失败: site_id=%d, ip=%s, err=%v", siteId, clientIp, countErr)
+			return nil, fmt.Errorf("注册失败")
+		}
+		if recentCount > 0 {
+			return nil, fmt.Errorf("注册过于频繁")
+		}
 	}
 
 	now := gtime.Now()
@@ -622,7 +641,7 @@ func (s *sPublic) GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaRe
 		return nil, fmt.Errorf("生成验证码失败: 图片数据为空")
 	}
 
-	middleware.LogWithTrace(ctx, "info", "验证码图片生成成功，大小: %d bytes", len(imageData))
+	//middleware.LogWithTrace(ctx, "info", "验证码图片生成成功，大小: %d bytes", len(imageData))
 
 	// 将验证码存储到缓存（5分钟有效）
 	// 使用defer recover防止Redis panic
@@ -656,7 +675,7 @@ func (s *sPublic) GenerateCaptcha(ctx context.Context, req *v1.GenerateCaptchaRe
 	res.Image = imageData
 	res.ContentType = "image/png"
 
-	middleware.LogWithTrace(ctx, "info", "准备返回验证码响应，图片大小: %d bytes, content_type: %s", len(res.Image), res.ContentType)
+	//middleware.LogWithTrace(ctx, "info", "准备返回验证码响应，图片大小: %d bytes, content_type: %s", len(res.Image), res.ContentType)
 
 	return res, nil
 }
@@ -1132,6 +1151,23 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 	err = dao.SiteConfig.Ctx(ctx).Where("site_id", siteId).Scan(&siteConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	// 同一IP注册间隔限制（秒）
+	if siteConfig != nil && siteConfig.RegisterTimeInterval > 0 {
+		limitFrom := gtime.Now().Add(-time.Duration(siteConfig.RegisterTimeInterval) * time.Second)
+		recentCount, countErr := dao.User.Ctx(ctx).
+			Where("site_id", siteId).
+			Where("register_ip", clientIp).
+			Where("register_time >= ?", limitFrom).
+			Count()
+		if countErr != nil {
+			g.Log().Errorf(ctx, "查询同IP注册频率失败: site_id=%d, ip=%s, err=%v", siteId, clientIp, countErr)
+			return nil, fmt.Errorf("注册失败")
+		}
+		if recentCount > 0 {
+			return nil, fmt.Errorf("注册过于频繁")
+		}
 	}
 
 	// 处理邀请码（Invite 活动下线，临时关闭 inviter 绑定）
