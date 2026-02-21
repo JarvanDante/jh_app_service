@@ -278,7 +278,7 @@ func (s *sSite) GetBasicSetting(ctx context.Context, req *v1.GetBasicSettingReq)
 		UrlService:           siteConfig.UrlService,
 		UrlAgentPc:           siteConfig.UrlTg,
 		UrlMobile:            siteConfig.UrlMobile,
-		UrlAgentRegister:     "",
+		WebUrl:               siteConfig.WebUrl,
 		MinWithdraw:          int32(siteConfig.MinWithdraw),
 		MaxWithdraw:          int32(siteConfig.MaxWithdraw),
 		MobileLogo:           siteConfig.MobileLogo,
@@ -360,6 +360,10 @@ func (s *sSite) UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSetti
 	if req.UrlMobile != "" {
 		updateFields["url_mobile"] = req.UrlMobile
 		middleware.LogWithTrace(ctx, "info", "添加更新字段: url_mobile = '%s'", req.UrlMobile)
+	}
+	if req.WebUrl != "" {
+		updateFields["web_url"] = req.WebUrl
+		middleware.LogWithTrace(ctx, "info", "添加更新字段: web_url = '%s'", req.WebUrl)
 	}
 	if req.UrlService != "" {
 		updateFields["url_service"] = req.UrlService

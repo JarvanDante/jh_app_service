@@ -28,6 +28,7 @@ type SiteConfig struct {
 	UrlService           any         // 客服链接
 	UrlTg                any         // telegram链接
 	UrlMobile            any         // 手机域名
+	WebUrl               any         // 网站主域名
 	CreatedAt            *gtime.Time //
 	UpdatedAt            *gtime.Time //
 	SwitchSign           any         //

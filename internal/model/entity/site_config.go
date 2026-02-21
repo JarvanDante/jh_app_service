@@ -26,6 +26,7 @@ type SiteConfig struct {
 	UrlService           string      `json:"urlService"           orm:"url_service"            description:"客服链接"`
 	UrlTg                string      `json:"urlTg"                orm:"url_tg"                 description:"telegram链接"`
 	UrlMobile            string      `json:"urlMobile"            orm:"url_mobile"             description:"手机域名"`
+	WebUrl               string      `json:"webUrl"               orm:"web_url"                description:"网站主域名"`
 	CreatedAt            *gtime.Time `json:"createdAt"            orm:"created_at"             description:""`
 	UpdatedAt            *gtime.Time `json:"updatedAt"            orm:"updated_at"             description:""`
 	SwitchSign           string      `json:"switchSign"           orm:"switch_sign"            description:""`

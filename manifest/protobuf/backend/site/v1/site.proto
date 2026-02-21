@@ -30,7 +30,7 @@ message GetBasicSettingRes {
     string url_service = 7;                 // 客服链接
     string url_agent_pc = 8;                // 代理链接地址
     string url_mobile = 9;                  // 手机域名地址
-    string url_agent_register = 10;         // 代理推广地址
+    string web_url = 10;                    // 网站主域名
     int32 min_withdraw = 11;                // 单笔最低提现金额
     int32 max_withdraw = 12;                // 单笔最高提现金额
     string mobile_logo = 13;                // 手机端Logo
@@ -48,7 +48,7 @@ message UpdateBasicSettingReq {
     string close_reason = 5;                // 关闭原因
     string url_agent_pc = 6;                // 代理链接地址
     string url_mobile = 7;                  // 手机域名地址
-    string url_agent_register = 8;          // 代理推广地址
+    string web_url = 8;                     // 网站主域名
     int32 min_withdraw = 9;                 // 单笔最低提现金额
     int32 max_withdraw = 10;                // 单笔最高提现金额
     string mobile_logo = 11;                // 手机端Logo

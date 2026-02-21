@@ -168,6 +168,7 @@ message GetSiteSettingRes {
     string max_withdraw = 9;      // 单笔最大提现金额
     string mobile_logo = 10;      // 手机端logo
     string close_reason = 11;     // 站点关闭理由
+    string web_url = 12;          // 网站主域名
 }
 
 // 获取公告列表请求

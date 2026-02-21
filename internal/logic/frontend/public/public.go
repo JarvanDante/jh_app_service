@@ -1376,6 +1376,7 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 		MaxWithdraw:    fmt.Sprintf("%.2f", float64(siteConfig.MaxWithdraw)),
 		MobileLogo:     siteConfig.MobileLogo,
 		CloseReason:    closeReason,
+		WebUrl:         siteConfig.WebUrl,
 	}
 
 	return res, nil

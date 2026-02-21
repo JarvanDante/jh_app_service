@@ -37,6 +37,7 @@ type SiteConfigColumns struct {
 	UrlService           string // 客服链接
 	UrlTg                string // telegram链接
 	UrlMobile            string // 手机域名
+	WebUrl               string // 网站主域名
 	CreatedAt            string //
 	UpdatedAt            string //
 	SwitchSign           string //
@@ -60,6 +61,7 @@ var siteConfigColumns = SiteConfigColumns{
 	UrlService:           "url_service",
 	UrlTg:                "url_tg",
 	UrlMobile:            "url_mobile",
+	WebUrl:               "web_url",
 	CreatedAt:            "created_at",
 	UpdatedAt:            "updated_at",
 	SwitchSign:           "switch_sign",
