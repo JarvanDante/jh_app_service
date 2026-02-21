@@ -52,6 +52,10 @@ upload:
   mobile_logo:
     imgType:
       - "image/svg+xml"
+      - "image/webp"
+      - "image/png"
+      - "image/jpg"
+      - "image/jpeg"
     maxSize: 100 # KB
 
 # Global logging - JSON格式

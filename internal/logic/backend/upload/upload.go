@@ -178,9 +178,9 @@ func (s *sUpload) getAllowedFileTypes(uploadCode string) []string {
 		}
 	}
 
-	// 如果是 mobile_logo，使用特殊配置
+	// 如果是 mobile_logo，使用特殊配置（支持 svg/webp/png/jpg/jpeg）
 	if uploadCode == "mobile_logo" {
-		return []string{"image/svg+xml"}
+		return []string{"image/svg+xml", "image/webp", "image/png", "image/jpg", "image/jpeg"}
 	}
 
 	return defaultTypes
