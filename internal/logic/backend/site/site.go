@@ -276,9 +276,9 @@ func (s *sSite) GetBasicSetting(ctx context.Context, req *v1.GetBasicSettingReq)
 		IsClose:              siteConfig.IsClose == 1,
 		CloseReason:          siteConfig.CloseReason,
 		UrlService:           siteConfig.UrlService,
-		UrlAgentPc:           siteConfig.UrlAgentPc,
+		UrlAgentPc:           siteConfig.UrlTg,
 		UrlMobile:            siteConfig.UrlMobile,
-		UrlAgentRegister:     siteConfig.UrlAgentRegister,
+		UrlAgentRegister:     "",
 		MinWithdraw:          int32(siteConfig.MinWithdraw),
 		MaxWithdraw:          int32(siteConfig.MaxWithdraw),
 		MobileLogo:           siteConfig.MobileLogo,
@@ -325,7 +325,7 @@ func (s *sSite) UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSetti
 	}
 
 	middleware.LogWithTrace(ctx, "info", "更新请求参数 - RegisterTimeInterval: %d, SwitchRegister: %t, IsClose: %t", req.RegisterTimeInterval, req.SwitchRegister, req.IsClose)
-	middleware.LogWithTrace(ctx, "info", "更新请求参数 - CloseReason: '%s', UrlAgentPc: '%s', UrlService: '%s'", req.CloseReason, req.UrlAgentPc, req.UrlService)
+	middleware.LogWithTrace(ctx, "info", "更新请求参数 - CloseReason: '%s', UrlTg: '%s', UrlService: '%s'", req.CloseReason, req.UrlAgentPc, req.UrlService)
 	middleware.LogWithTrace(ctx, "info", "更新请求参数 - MinWithdraw: %d, MaxWithdraw: %d", req.MinWithdraw, req.MaxWithdraw)
 
 	// 使用map来精确控制要更新的字段
@@ -354,16 +354,12 @@ func (s *sSite) UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSetti
 		middleware.LogWithTrace(ctx, "info", "添加更新字段: close_reason = '%s'", req.CloseReason)
 	}
 	if req.UrlAgentPc != "" {
-		updateFields["url_agent_pc"] = req.UrlAgentPc
-		middleware.LogWithTrace(ctx, "info", "添加更新字段: url_agent_pc = '%s'", req.UrlAgentPc)
+		updateFields["url_tg"] = req.UrlAgentPc
+		middleware.LogWithTrace(ctx, "info", "添加更新字段: url_tg = '%s'", req.UrlAgentPc)
 	}
 	if req.UrlMobile != "" {
 		updateFields["url_mobile"] = req.UrlMobile
 		middleware.LogWithTrace(ctx, "info", "添加更新字段: url_mobile = '%s'", req.UrlMobile)
-	}
-	if req.UrlAgentRegister != "" {
-		updateFields["url_agent_register"] = req.UrlAgentRegister
-		middleware.LogWithTrace(ctx, "info", "添加更新字段: url_agent_register = '%s'", req.UrlAgentRegister)
 	}
 	if req.UrlService != "" {
 		updateFields["url_service"] = req.UrlService
@@ -1331,15 +1327,11 @@ func applyWheelBonusParamValues(ctx context.Context, siteCode string, activityId
 func (s *sSite) validateUpdateBasicSetting(req *v1.UpdateBasicSettingReq) error {
 	// 验证URL格式（简单验证）
 	if req.UrlAgentPc != "" && len(req.UrlAgentPc) < 7 {
-		return fmt.Errorf("代理链接地址格式错误")
+		return fmt.Errorf("Telegram地址格式错误")
 	}
 
 	if req.UrlMobile != "" && len(req.UrlMobile) < 7 {
 		return fmt.Errorf("手机域名地址格式错误")
-	}
-
-	if req.UrlAgentRegister != "" && len(req.UrlAgentRegister) < 7 {
-		return fmt.Errorf("代理推广地址格式错误")
 	}
 
 	// 验证提现金额

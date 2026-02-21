@@ -1365,7 +1365,7 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 	}
 
 	res = &v1.GetSiteSettingRes{
-		AgentUrl:       siteConfig.UrlAgentPc,
+		AgentUrl:       siteConfig.UrlTg,
 		SiteName:       site.Name,
 		MobileUrl:      siteConfig.UrlMobile,
 		SwitchRegister: int32(siteConfig.SwitchRegister),
