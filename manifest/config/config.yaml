@@ -13,7 +13,7 @@ grpc:
 
 # Consul 配置
 consul:
-  addr: "172.19.0.29:8500" # 容器内直接访问Consul
+  addr: "consul:8500" # 容器内直接访问Consul
   serviceName: "jh_app_service"
   servicePort: 8001
   serviceAddr: "" # 留空，让程序自动获取容器IP
@@ -32,7 +32,7 @@ jwt:
 
 # MinIO 配置
 minio:
-  endpoint: "172.19.0.23:9000" # MinIO 服务地址
+  endpoint: "minio:9000" # MinIO 服务地址
   accessKey: "minioadmin" # 访问密钥
   secretKey: "minioadmin123" # 秘密密钥
   bucket: "uploads" # 存储桶名称
@@ -77,12 +77,12 @@ database:
     stdout: true
 
   default:
-    link: "mysql:root:654321@tcp(172.19.0.4:3306)/jh_site?parseTime=true&loc=Local" # 容器内直接访问MySQL
+    link: "mysql:root:654321@tcp(mysql:3306)/jh_site?parseTime=true&loc=Local" # 容器内直接访问MySQL
     debug: true
 
 # ClickHouse 配置
 clickhouse:
-  host: "172.19.0.35" # ClickHouse服务地址
+  host: "clickhouse" # ClickHouse服务地址
   port: 9000 # ClickHouse原生协议端口（9000）
   database: "game_analytics" # 数据库名称
   username: "default" # 用户名
@@ -92,7 +92,7 @@ clickhouse:
 redis:
   # 单实例配置示例1
   default:
-    address: 172.19.0.6:6379
+    address: redis:6379
     db: 1
     pass: 654321
 

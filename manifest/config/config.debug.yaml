@@ -12,7 +12,7 @@ grpc:
 
 # Consul 配置
 consul:
-  addr: "172.19.0.29:8500" # 容器内直接访问Consul
+  addr: "consul:8500" # 容器内直接访问Consul
   serviceName: "jh_app_service_debug"
   servicePort: 8002
   serviceAddr: "172.19.0.31" # jh_app_service的容器IP
@@ -45,5 +45,5 @@ database:
     stdout: true
 
   default:
-    link: "mysql:root:654321@tcp(172.19.0.4:3306)/jh_site" # 容器内直接访问MySQL
+    link: "mysql:root:654321@tcp(mysql:3306)/jh_site" # 容器内直接访问MySQL
     debug: true
