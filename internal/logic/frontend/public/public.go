@@ -1215,6 +1215,7 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		Status:       1,
 		CreatedAt:    now,
 		UpdatedAt:    now,
+		HasPass:      1,
 	}
 
 	// 获取站点代码和货币

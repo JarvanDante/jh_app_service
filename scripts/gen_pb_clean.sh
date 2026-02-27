@@ -194,6 +194,10 @@ DIRS_TO_DELETE=(
     "internal/controller/site"
     "internal/controller/upload"
     "internal/controller/user"
+    "internal/controller/agent"
+    "internal/controller/agent_domain"
+    "internal/controller/agent_settlement"
+    "internal/controller/game"
     # 如果有其他需要删除的目录，在这里添加
     # "internal/controller/other_dir"
 )
