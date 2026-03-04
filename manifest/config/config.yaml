@@ -29,6 +29,8 @@ jaeger:
 # JWT 配置
 jwt:
   secret: "be0axSSXmguDZ2Q0EIPgRwq9e5G9nRH3zq3iEw6nllU="
+  access_expires_in: 86400      # 24小时
+  refresh_expires_in: 2592000   # 30天
 
 # MinIO 配置
 minio:
@@ -77,7 +79,7 @@ database:
     stdout: true
 
   default:
-    link: "mysql:root:375445@tcp(mysql:3306)/jh_site?parseTime=true&loc=Local" # 容器内直接访问MySQL
+    link: "mysql:root:654321@tcp(mysql:3306)/jh_site?parseTime=true&loc=Local" # 容器内直接访问MySQL
     debug: true
 
 # ClickHouse 配置
@@ -86,7 +88,7 @@ clickhouse:
   port: 9000 # ClickHouse原生协议端口（9000）
   database: "game_analytics" # 数据库名称
   username: "default" # 用户名
-  password: "375445" # 密码
+  password: "123456" # 密码
 
 # Redis 配置示例
 redis:
@@ -94,7 +96,7 @@ redis:
   default:
     address: redis:6379
     db: 1
-    pass: 375445
+    pass: 654321
 
 # RabbitMQ 配置
 rabbitmq:

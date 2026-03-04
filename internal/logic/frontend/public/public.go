@@ -246,12 +246,18 @@ func (s *sPublic) generateJWTTokenUser(user *entity.User) (token string, refresh
 
 	now := time.Now()
 
-	// Token过期时间：1小时
-	expiresIn = 3600
+	// Token过期时间（支持配置，默认24小时）
+	expiresIn = g.Cfg().MustGet(context.Background(), "jwt.access_expires_in", 86400).Int64()
+	if expiresIn <= 0 {
+		expiresIn = 86400
+	}
 	tokenExpireTime := now.Add(time.Duration(expiresIn) * time.Second)
 
-	// Refresh token过期时间：30天
-	refreshExpiresIn = 2592000 // 30 * 24 * 3600
+	// Refresh token过期时间（支持配置，默认30天）
+	refreshExpiresIn = g.Cfg().MustGet(context.Background(), "jwt.refresh_expires_in", 2592000).Int64()
+	if refreshExpiresIn <= 0 {
+		refreshExpiresIn = 2592000
+	}
 	refreshTokenExpireTime := now.Add(time.Duration(refreshExpiresIn) * time.Second)
 
 	// 生成唯一的token ID（jti）
@@ -1018,8 +1024,11 @@ func (s *sPublic) RefreshToken(ctx context.Context, req *v1.RefreshTokenReq) (re
 			// 将关联的旧access token jti也加入黑名单
 			if accessTokenJti != "" {
 				blacklistKey := fmt.Sprintf("token_blacklist:%s", accessTokenJti)
-				// access token的TTL使用1小时（access token的有效期）
-				accessTTL := int64(3600)
+				// access token的TTL与配置保持一致（默认24小时）
+				accessTTL := g.Cfg().MustGet(ctx, "jwt.access_expires_in", 86400).Int64()
+				if accessTTL <= 0 {
+					accessTTL = 86400
+				}
 				if ttl.Seconds() < float64(accessTTL) {
 					accessTTL = int64(ttl.Seconds())
 				}

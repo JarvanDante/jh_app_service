@@ -28,6 +28,8 @@ jaeger:
 # JWT 配置
 jwt:
   secret: "be0axSSXmguDZ2Q0EIPgRwq9e5G9nRH3zq3iEw6nllU="
+  access_expires_in: 86400      # 24小时
+  refresh_expires_in: 2592000   # 30天
 
 # Global logging - JSON格式
 logger:
