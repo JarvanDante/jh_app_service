@@ -9,14 +9,14 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -trimpath -ldflags="-s -w" -o /out/jh_app_service .
+RUN mkdir -p pkg && go build -trimpath -ldflags="-s -w" -o pkg/jh_app_service .
 
 FROM alpine:3.20
 WORKDIR /app
 
 RUN apk add --no-cache ca-certificates tzdata     && addgroup -S app && adduser -S -G app app
 
-COPY --from=builder /out/jh_app_service /app/jh_app_service
+COPY --from=builder /src/pkg/jh_app_service /app/jh_app_service
 COPY --from=builder /src/manifest/config /app/manifest/config
 
 EXPOSE 8000

@@ -433,7 +433,7 @@ func (s *sPublic) Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes
 
 		// 验证码不区分大小写
 		if !strings.EqualFold(cachedCode.String(), req.Code) {
-			middleware.LogWithTrace(ctx, "error", "验证码错误: 输入=%s, 期望=%s", req.Code, cachedCode.String())
+			middleware.LogWithTrace(ctx, "error", "验证码错误: key=%s", cacheKey)
 			return nil, fmt.Errorf("验证码错误")
 		}
 

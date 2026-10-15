@@ -53,6 +53,33 @@ func GetSiteIdFromGRPCMetadata(ctx context.Context) (uint, bool) {
 	return uint(siteID), true
 }
 
+// GetAdminSiteIdFromGRPCMetadata 从 gRPC metadata 中获取管理员 token 的权威站点ID。
+// 该值由网关从管理员 JWT (claims.SiteID) 注入 metadata key "admin_site_id"，
+// 不接受请求头/请求体伪造，是后台租户隔离的唯一可信来源。
+func GetAdminSiteIdFromGRPCMetadata(ctx context.Context) (uint, bool) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return 0, false
+	}
+
+	adminSiteIDs := md.Get("admin_site_id")
+	if len(adminSiteIDs) == 0 {
+		return 0, false
+	}
+
+	adminSiteIDStr := strings.TrimSpace(adminSiteIDs[0])
+	if adminSiteIDStr == "" {
+		return 0, false
+	}
+
+	adminSiteID, err := strconv.ParseInt(adminSiteIDStr, 10, 64)
+	if err != nil || adminSiteID <= 0 {
+		return 0, false
+	}
+
+	return uint(adminSiteID), true
+}
+
 // GetSiteCodeFromGRPCMetadata 从 gRPC metadata 中获取商户CODE
 func GetSiteCodeFromGRPCMetadata(ctx context.Context) (string, bool) {
 	md, ok := metadata.FromIncomingContext(ctx)

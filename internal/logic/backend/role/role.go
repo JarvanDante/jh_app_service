@@ -26,11 +26,13 @@ func init() {
 func (s *sRole) GetRoleList(ctx context.Context, req *v1.GetRoleListReq) (*v1.GetRoleListRes, error) {
 	middleware.LogWithTrace(ctx, "info", "获取角色列表请求 - SiteId: %d", req.SiteId)
 
-	// 默认站点ID为1，如果请求中有指定则使用指定的
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
 	}
+	siteId := int32(authSiteId)
 
 	// 查询角色列表
 	var roles []*entity.AdminRole
@@ -92,11 +94,15 @@ func (s *sRole) CreateRole(ctx context.Context, req *v1.CreateRoleReq) (*v1.Crea
 		}, nil
 	}
 
-	// 默认站点ID为1
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		return &v1.CreateRoleRes{
+			Success: false,
+			Message: "未获取站点ID",
+		}, nil
 	}
+	siteId := int32(authSiteId)
 
 	// 检查角色名称是否已存在
 	count, err := dao.AdminRole.Ctx(ctx).Where(do.AdminRole{
@@ -168,11 +174,15 @@ func (s *sRole) UpdateRole(ctx context.Context, req *v1.UpdateRoleReq) (*v1.Upda
 		}, nil
 	}
 
-	// 默认站点ID为1
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		return &v1.UpdateRoleRes{
+			Success: false,
+			Message: "未获取站点ID",
+		}, nil
 	}
+	siteId := int32(authSiteId)
 
 	// 检查角色是否存在
 	var role *entity.AdminRole
@@ -251,11 +261,15 @@ func (s *sRole) DeleteRole(ctx context.Context, req *v1.DeleteRoleReq) (*v1.Dele
 		}, nil
 	}
 
-	// 默认站点ID为1
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		return &v1.DeleteRoleRes{
+			Success: false,
+			Message: "未获取站点ID",
+		}, nil
 	}
+	siteId := int32(authSiteId)
 
 	// 检查角色是否存在
 	var role *entity.AdminRole
@@ -304,11 +318,13 @@ func (s *sRole) DeleteRole(ctx context.Context, req *v1.DeleteRoleReq) (*v1.Dele
 func (s *sRole) GetPermissions(ctx context.Context, req *v1.GetPermissionsReq) (*v1.GetPermissionsRes, error) {
 	middleware.LogWithTrace(ctx, "info", "获取权限列表请求 - SiteId: %d", req.SiteId)
 
-	// 默认站点ID为1
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
 	}
+	siteId := int32(authSiteId)
 
 	// 获取角色列表及其权限
 	var roles []*entity.AdminRole
@@ -375,11 +391,15 @@ func (s *sRole) SavePermission(ctx context.Context, req *v1.SavePermissionReq) (
 		}, nil
 	}
 
-	// 默认站点ID为1
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		return &v1.SavePermissionRes{
+			Success: false,
+			Message: "未获取站点ID",
+		}, nil
 	}
+	siteId := int32(authSiteId)
 
 	// 检查角色是否存在
 	var role *entity.AdminRole

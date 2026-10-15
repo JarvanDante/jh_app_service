@@ -48,6 +48,32 @@ func GetSiteIdFromContext(ctx context.Context) (uint, bool) {
 	return 0, false
 }
 
+//GetAdminSiteIdFromContext
+/**
+ * @desc：获取后台管理员的权威站点ID（租户隔离唯一可信来源）。
+ *        仅从 gRPC metadata 的 admin_site_id 读取，该值由网关基于管理员 token 注入，不可伪造。
+ *        后台接口必须用它作为租户边界，禁止信任请求体里的 site_id。
+ * @param ctx
+ * @return uint  权威站点ID
+ * @return bool  是否成功获取
+ */
+func GetAdminSiteIdFromContext(ctx context.Context) (uint, bool) {
+	return GetAdminSiteIdFromGRPCMetadata(ctx)
+}
+
+// ResolveTenantSiteId 解析当前请求的租户站点ID。
+// 后台走 admin_site_id；前台/服务间调用走网关或上游注入的 site_id。
+// 都不信任请求体里的 site_id。写接口仍应只用 GetAdminSiteIdFromContext。
+func ResolveTenantSiteId(ctx context.Context) (uint, bool) {
+	if siteId, ok := GetAdminSiteIdFromContext(ctx); ok && siteId > 0 {
+		return siteId, true
+	}
+	if siteId, ok := GetSiteIdFromContext(ctx); ok && siteId > 0 {
+		return siteId, true
+	}
+	return 0, false
+}
+
 //GetUserIdFromContext
 /**
  * @desc：获取userId -优先从 gRPC metadata 获取，如果没有再从 context 获取

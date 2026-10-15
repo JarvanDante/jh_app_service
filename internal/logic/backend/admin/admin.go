@@ -511,8 +511,14 @@ func (s *sAdmin) CreateAdmin(ctx context.Context, req *v1.CreateAdminReq) (*v1.C
 	))
 	defer span.End()
 
-	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
-	siteId := 1 // 临时硬编码，实际应该从请求中获取
+	// 安全修复(A6)：站点ID 取自管理员 token 的权威站点ID，禁止硬编码/信任请求体
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		tracing.AddSpanEvent(span, "admin_site_id_not_found")
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	siteId := int(authSiteId)
 	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
 
 	middleware.LogWithTrace(ctx, "info", "创建管理员请求 - 用户名: %s, 昵称: %s", req.Username, req.Nickname)
@@ -673,8 +679,13 @@ func (s *sAdmin) GetAdminList(ctx context.Context, req *v1.GetAdminListReq) (*v1
 	))
 	defer span.End()
 
-	// 获取站点ID
-	siteId := 1 // 临时硬编码，实际应该从请求中获取
+	// 安全修复(A6)：站点ID 取自管理员 token 的权威站点ID
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	siteId := int(authSiteId)
 	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
 
 	middleware.LogWithTrace(ctx, "info", "获取管理员列表请求 - 用户名: %s, 状态: %d, 页码: %d, 大小: %d",
@@ -804,8 +815,13 @@ func (s *sAdmin) UpdateAdmin(ctx context.Context, req *v1.UpdateAdminReq) (*v1.U
 	))
 	defer span.End()
 
-	// 获取站点ID
-	siteId := 1 // 临时硬编码，实际应该从请求中获取
+	// 安全修复(A6)：站点ID 取自管理员 token 的权威站点ID
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	siteId := int(authSiteId)
 	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
 
 	middleware.LogWithTrace(ctx, "info", "更新管理员请求 - ID: %d", req.Id)
@@ -894,7 +910,8 @@ func (s *sAdmin) UpdateAdmin(ctx context.Context, req *v1.UpdateAdminReq) (*v1.U
 		attribute.String("db.table", "admin"),
 	))
 
-	_, err = dao.Admin.Ctx(ctx).Where(do.Admin{Id: int(req.Id)}).Update(updateData)
+	// 安全修复(A6)：更新时带上 site_id 过滤，避免跨站修改管理员
+	_, err = dao.Admin.Ctx(ctx).Where(do.Admin{Id: int(req.Id), SiteId: siteId}).Update(updateData)
 	updateSpan.End()
 
 	if err != nil {
@@ -928,8 +945,13 @@ func (s *sAdmin) DeleteAdmin(ctx context.Context, req *v1.DeleteAdminReq) (*v1.D
 	))
 	defer span.End()
 
-	// 获取站点ID
-	siteId := 1 // 临时硬编码，实际应该从请求中获取
+	// 安全修复(A6)：站点ID 取自管理员 token 的权威站点ID
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	siteId := int(authSiteId)
 	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
 
 	middleware.LogWithTrace(ctx, "info", "删除管理员请求 - ID: %d", req.Id)
@@ -981,7 +1003,8 @@ func (s *sAdmin) DeleteAdmin(ctx context.Context, req *v1.DeleteAdminReq) (*v1.D
 		attribute.String("db.table", "admin"),
 	))
 
-	_, err = dao.Admin.Ctx(ctx).Where(do.Admin{Id: int(req.Id)}).Update(do.Admin{
+	// 安全修复(A6)：软删除时带上 site_id 过滤，避免跨站删除管理员
+	_, err = dao.Admin.Ctx(ctx).Where(do.Admin{Id: int(req.Id), SiteId: siteId}).Update(do.Admin{
 		DeleteAt:  gtime.Now(),
 		UpdatedAt: gtime.Now(),
 	})
@@ -1251,8 +1274,13 @@ func (s *sAdmin) GetAdminLogs(ctx context.Context, req *v1.GetAdminLogsReq) (*v1
 	))
 	defer span.End()
 
-	// 获取站点ID (从上下文或配置中获取)
-	siteId := 1 // 临时硬编码，实际应该从请求中获取
+	// 安全修复(A6)：站点ID 取自管理员 token 的权威站点ID
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	siteId := int(authSiteId)
 	tracing.SetSpanAttributes(span, attribute.Int("site_id", siteId))
 
 	// 设置默认分页参数

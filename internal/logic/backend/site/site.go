@@ -229,11 +229,13 @@ var activityParamMappings = map[string][]activityParamField{
 func (s *sSite) GetBasicSetting(ctx context.Context, req *v1.GetBasicSettingReq) (*v1.GetBasicSettingRes, error) {
 	middleware.LogWithTrace(ctx, "info", "获取站点基本设置请求 - SiteId: %d", req.SiteId)
 
-	// 默认站点ID为1，如果请求中有指定则使用指定的
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
 	}
+	siteId := int32(authSiteId)
 
 	// 查询站点基本信息
 	var siteInfo *entity.Site
@@ -301,11 +303,13 @@ func (s *sSite) GetBasicSetting(ctx context.Context, req *v1.GetBasicSettingReq)
 func (s *sSite) UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSettingReq) (*v1.UpdateBasicSettingRes, error) {
 	middleware.LogWithTrace(ctx, "info", "更新站点基本设置请求 - SiteId: %d", req.SiteId)
 
-	// 默认站点ID为1，如果请求中有指定则使用指定的
-	siteId := int32(1)
-	if req.SiteId > 0 {
-		siteId = req.SiteId
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		middleware.LogWithTrace(ctx, "error", "未获取管理员站点ID")
+		return nil, fmt.Errorf("未获取站点ID")
 	}
+	siteId := int32(authSiteId)
 
 	// 参数验证
 	if err := s.validateUpdateBasicSetting(req); err != nil {
@@ -450,15 +454,12 @@ func (s *sSite) UpdateBasicSetting(ctx context.Context, req *v1.UpdateBasicSetti
 
 // GetInviteBonusConfig 获取邀请活动配置
 func (s *sSite) GetInviteBonusConfig(ctx context.Context, req *v1.GetInviteBonusConfigReq) (*v1.GetInviteBonusConfigRes, error) {
-	siteId := req.SiteId
-	if siteId <= 0 {
-		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
-			siteId = int32(sid)
-		}
+	// 后台用 admin_site_id，前台/资金服务用 site_id；都不信任请求体 site_id
+	authSiteId, ok := middleware.ResolveTenantSiteId(ctx)
+	if !ok || authSiteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
 	}
-	if siteId <= 0 {
-		return nil, fmt.Errorf("站点ID不能为空")
-	}
+	siteId := int32(authSiteId)
 
 	code := strings.TrimSpace(req.Code)
 	if code == "" {
@@ -516,15 +517,12 @@ func (s *sSite) GetInviteBonusConfig(ctx context.Context, req *v1.GetInviteBonus
 
 // GetSiteActivityList 查询活动配置列表
 func (s *sSite) GetSiteActivityList(ctx context.Context, req *v1.GetSiteActivityListReq) (*v1.GetSiteActivityListRes, error) {
-	siteId := req.SiteId
-	if siteId <= 0 {
-		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
-			siteId = int32(sid)
-		}
+	// 后台用 admin_site_id，前台/资金服务用 site_id；都不信任请求体 site_id
+	authSiteId, ok := middleware.ResolveTenantSiteId(ctx)
+	if !ok || authSiteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
 	}
-	if siteId <= 0 {
-		return nil, fmt.Errorf("站点ID不能为空")
-	}
+	siteId := int32(authSiteId)
 
 	siteCode := registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
 	if siteCode == "" {
@@ -576,22 +574,14 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 		return nil, fmt.Errorf("活动ID不能为空")
 	}
 
-	siteCode := strings.TrimSpace(req.SiteCode)
+	// 后台用 admin_site_id，前台/资金服务用 site_id；都不信任请求体 site_id / site_code
+	authSiteId, ok := middleware.ResolveTenantSiteId(ctx)
+	if !ok || authSiteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
+	}
+	siteCode := registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(authSiteId))
 	if siteCode == "" {
-		siteId := req.SiteId
-		if siteId <= 0 {
-			if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
-				siteId = int32(sid)
-			}
-		}
-		if siteId <= 0 {
-			return nil, fmt.Errorf("站点ID不能为空")
-		}
-
-		siteCode = registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
-		if siteCode == "" {
-			return nil, fmt.Errorf("站点代码不存在: site_id=%d", siteId)
-		}
+		return nil, fmt.Errorf("站点代码不存在: site_id=%d", authSiteId)
 	}
 
 	ctx = context.WithValue(ctx, "dynamic_db_group", "site_"+siteCode)
@@ -758,15 +748,12 @@ func (s *sSite) GetSiteActivityParams(ctx context.Context, req *v1.GetSiteActivi
 
 // UpdateSiteActivity 更新活动配置
 func (s *sSite) UpdateSiteActivity(ctx context.Context, req *v1.UpdateSiteActivityReq) (*v1.UpdateSiteActivityRes, error) {
-	siteId := req.SiteId
-	if siteId <= 0 {
-		if sid, ok := middleware.GetSiteIdFromContext(ctx); ok {
-			siteId = int32(sid)
-		}
+	// 安全修复(A5)：站点ID 取自管理员 token 的权威站点ID，忽略请求体里的 site_id；物理库切换也基于该权威 siteId
+	authSiteId, ok := middleware.GetAdminSiteIdFromContext(ctx)
+	if !ok || authSiteId == 0 {
+		return nil, fmt.Errorf("未获取站点ID")
 	}
-	if siteId <= 0 {
-		return nil, fmt.Errorf("站点ID不能为空")
-	}
+	siteId := int32(authSiteId)
 
 	siteCode := registry.GetDBConfigManagerV2().GetSiteCodeBySiteID(int64(siteId))
 	if siteCode == "" {

@@ -3,6 +3,11 @@ NAMESPACE   = "default"
 DEPLOY_NAME = "gf-demo-grpc"
 DOCKER_NAME = "gf-demo-grpc"
 
+.PHONY: build
+build: ## 打包到 pkg/jh_app_service
+	mkdir -p pkg
+	go build -trimpath -ldflags="-s -w" -o pkg/jh_app_service .
+
 # Install/Update to the latest CLI tool.
 .PHONY: cli
 cli:

@@ -95,8 +95,9 @@ func (s *sUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (*v1.Ge
 	// 代理用户名筛选
 	if req.AgentUsername != "" {
 		// 先查找代理ID
+		// 修复(P2)：agent 表没有 username 列，站点内唯一标识为 agent_code
 		var agent entity.Agent
-		err := dao.Agent.Ctx(ctx).Where("site_id = ? AND username = ?", siteId, req.AgentUsername).Scan(&agent)
+		err := dao.Agent.Ctx(ctx).Where("site_id = ? AND agent_code = ?", siteId, req.AgentUsername).Scan(&agent)
 		if err != nil {
 			return &v1.GetUserListRes{List: []*v1.UserInfo{}, Count: 0}, nil
 		}
@@ -621,6 +622,31 @@ func (s *sUser) saveUserGrades(ctx context.Context, siteId int, grades []*entity
 
 				rowsAffected, _ := result.RowsAffected()
 				g.Log().Infof(ctx, "更新用户等级成功: ID=%d, 影响行数=%d", grade.Id, rowsAffected)
+
+				if rowsAffected == 0 {
+					insertData := g.Map{
+						"site_id":                siteId,
+						"name":                   grade.Name,
+						"rebate_percent_sports":  grade.RebatePercentSports,
+						"rebate_percent_lottery": grade.RebatePercentLottery,
+						"rebate_percent_live":    grade.RebatePercentLive,
+						"rebate_percent_egame":   grade.RebatePercentEgame,
+						"rebate_percent_poker":   grade.RebatePercentPoker,
+						"payment_limit":          grade.PaymentLimit,
+						"bet_limit":              grade.BetLimit,
+						"money_limit":            grade.MoneyLimit,
+						"status":                 grade.Status,
+						"created_at":             gtime.Now(),
+						"updated_at":             grade.UpdatedAt,
+					}
+
+					_, err := tx.Model(dao.UserGrade.Table()).Data(insertData).Insert()
+					if err != nil {
+						g.Log().Errorf(ctx, "更新未命中后创建用户等级失败: ID=%d, err=%v", grade.Id, err)
+						return err
+					}
+					g.Log().Infof(ctx, "更新未命中，已创建用户等级: OriginalID=%d, Name=%s", grade.Id, grade.Name)
+				}
 			} else {
 				// 创建新等级
 				grade.CreatedAt = gtime.Now()

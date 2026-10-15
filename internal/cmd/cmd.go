@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"jh_app_service/internal/controller/backend/ad"
-	"jh_app_service/internal/controller/backend/agent"
-	agentsettlement "jh_app_service/internal/controller/backend/agent_settlement"
-	agentdomain "jh_app_service/internal/controller/backend/agent_domain"
 	"jh_app_service/internal/controller/backend/admin"
+	"jh_app_service/internal/controller/backend/agent"
+	agentdomain "jh_app_service/internal/controller/backend/agent_domain"
+	agentsettlement "jh_app_service/internal/controller/backend/agent_settlement"
 	"jh_app_service/internal/controller/backend/message"
 	"jh_app_service/internal/controller/backend/notice"
 	"jh_app_service/internal/controller/backend/option"
@@ -109,6 +109,9 @@ var (
 				// 添加数据库拦截器和验证拦截器
 				grpcx.Server.ChainUnary(
 					dbInterceptor.UnaryServerInterceptor(),
+					// A3: 后台 RBAC 服务端强制（默认 audit 模式，仅记录不拦截；
+					// 由 backend.rbacEnforce 控制是否真正拦截，需先补全方法->权限映射）
+					middleware.RBACInterceptor,
 					grpcx.Server.UnaryValidate,
 				),
 				grpcx.Server.ChainStream(

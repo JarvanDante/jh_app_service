@@ -69,6 +69,14 @@ logger:
   # 时间格式
   timeFormat: "2006-01-02T15:04:05.000Z07:00"
 
+# 后台安全配置
+backend:
+  # A3 RBAC 服务端强制开关。
+  # false = audit 模式（只记录“本应拒绝”日志，不真正拦截）——默认，避免映射不全锁死管理员。
+  # true  = enforce 模式（真正拦截）。启用前必须先补全 internal/middleware/rbac.go 的
+  #         methodPermissionMap（方法->权限ID），并用真实角色数据联调确认无误杀。
+  rbacEnforce: false
+
 # 时区配置
 timezone: "Asia/Shanghai" # 北京时间
 

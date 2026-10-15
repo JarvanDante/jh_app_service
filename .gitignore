@@ -12,6 +12,8 @@ log/
 composer.lock
 gitpush.sh
 pkg/
+/jh_app_service
+/jh_app_service.orig
 bin/
 cbuild
 */.DS_Store
