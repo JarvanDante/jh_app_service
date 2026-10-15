@@ -62,6 +62,33 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: minio
+  namespace: jh-test
+spec:
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 19000
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: minio
+  namespace: jh-test
+  labels:
+    kubernetes.io/service-name: minio
+addressType: IPv4
+ports:
+  - name: api
+    port: 19000
+    protocol: TCP
+endpoints:
+  - addresses:
+      - 192.168.65.254
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: jh-app-service
   namespace: jh-prod
   labels:
@@ -119,3 +146,30 @@ metadata:
 spec:
   type: ExternalName
   externalName: host.docker.internal
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: jh-prod
+spec:
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 19000
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: minio
+  namespace: jh-prod
+  labels:
+    kubernetes.io/service-name: minio
+addressType: IPv4
+ports:
+  - name: api
+    port: 19000
+    protocol: TCP
+endpoints:
+  - addresses:
+      - 192.168.65.254
