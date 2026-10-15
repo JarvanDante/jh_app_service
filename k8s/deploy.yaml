@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jh-app-service
+  namespace: jh-test
+  labels:
+    app: jh-app-service
+    env: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jh-app-service
+  template:
+    metadata:
+      labels:
+        app: jh-app-service
+        env: test
+    spec:
+      containers:
+        - name: jh-app-service
+          image: jh_app_service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8001
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jh-app-service
+  namespace: jh-prod
+  labels:
+    app: jh-app-service
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jh-app-service
+  template:
+    metadata:
+      labels:
+        app: jh-app-service
+        env: prod
+    spec:
+      containers:
+        - name: jh-app-service
+          image: jh_app_service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8001
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 15
+            periodSeconds: 10
