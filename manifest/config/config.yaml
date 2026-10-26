@@ -39,7 +39,7 @@ minio:
   secretKey: "minioadmin123" # 秘密密钥
   bucket: "uploads" # 存储桶名称
   useSSL: false # 是否使用SSL
-  publicURL: "http://localhost:19000" # 公网访问地址
+  publicURL: "https://jh-minio.panalow.cc" # 公网访问地址
 
 # 上传配置
 upload:
