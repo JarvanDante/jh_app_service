@@ -71,3 +71,28 @@ spec:
               port: grpc
             initialDelaySeconds: 15
             periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jh-app-outbox-relay
+  namespace: jh-prod
+  labels:
+    app: jh-app-outbox-relay
+    env: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jh-app-outbox-relay
+  template:
+    metadata:
+      labels:
+        app: jh-app-outbox-relay
+        env: prod
+    spec:
+      containers:
+        - name: outbox-relay
+          image: jh_app_service:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/app/jh_app_service", "outbox-relay"]
