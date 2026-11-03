@@ -8,6 +8,7 @@ import (
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/service/backend"
+	"jh_app_service/internal/shared/aesbnc"
 	"jh_app_service/internal/tracing"
 	"path/filepath"
 	"strings"
@@ -74,8 +75,26 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		return nil, err
 	}
 
+	fileData := req.FileData
+	fileName := req.FileName
+	contentType := req.ContentType
+	fileSize := req.FileSize
+	// 游戏封面与 my 项目封面相同：AES-128-ECB + PKCS7，对象名改为 .bnc 后写入 MinIO。
+	if uploadCode == "game_cover" {
+		enc, err := aesbnc.Encrypt(fileData)
+		if err != nil {
+			tracing.SetSpanError(span, err)
+			middleware.LogWithTrace(ctx, "error", "游戏封面加密失败: %v", err)
+			return nil, fmt.Errorf("图片加密失败: %v", err)
+		}
+		fileData = enc
+		fileName = aesbnc.ToBncKey(fileName)
+		contentType = "application/octet-stream"
+		fileSize = int64(len(enc))
+	}
+
 	// 生成存储路径
-	storagePath := s.generateStoragePath(ctx, req.FileName)
+	storagePath := s.generateStoragePath(ctx, fileName)
 	tracing.SetSpanAttributes(span, attribute.String("storage_path", storagePath))
 
 	// 上传到 MinIO
@@ -84,7 +103,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		attribute.String("storage.path", storagePath),
 	))
 
-	imageUrl, err := s.uploadToMinio(ctx, req.FileData, storagePath, req.ContentType)
+	imageUrl, err := s.uploadToMinio(ctx, fileData, storagePath, contentType)
 	uploadSpan.End()
 
 	if err != nil {
@@ -105,7 +124,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 	res := &v1.UploadImageRes{
 		ImageUrl: imageUrl,
 		FilePath: storagePath,
-		FileSize: req.FileSize,
+		FileSize: fileSize,
 	}
 
 	return res, nil
@@ -182,6 +201,9 @@ func (s *sUpload) getAllowedFileTypes(uploadCode string) []string {
 	if uploadCode == "mobile_logo" {
 		return []string{"image/svg+xml", "image/webp", "image/png", "image/jpg", "image/jpeg"}
 	}
+	if uploadCode == "game_cover" {
+		return []string{"image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"}
+	}
 
 	return defaultTypes
 }
@@ -202,6 +224,9 @@ func (s *sUpload) getMaxFileSize(uploadCode string) int64 {
 	// 如果是 mobile_logo，使用特殊配置
 	if uploadCode == "mobile_logo" {
 		return 100
+	}
+	if uploadCode == "game_cover" {
+		return 5120
 	}
 
 	return defaultSize
