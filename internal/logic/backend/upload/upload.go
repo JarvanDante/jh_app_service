@@ -8,7 +8,6 @@ import (
 	"jh_app_service/internal/dao"
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/service/backend"
-	"jh_app_service/internal/shared/aesbnc"
 	"jh_app_service/internal/tracing"
 	"path/filepath"
 	"strings"
@@ -75,26 +74,8 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		return nil, err
 	}
 
-	fileData := req.FileData
-	fileName := req.FileName
-	contentType := req.ContentType
-	fileSize := req.FileSize
-	// 游戏封面与 my 项目封面相同：AES-128-ECB + PKCS7，对象名改为 .bnc 后写入 MinIO。
-	if uploadCode == "game_cover" {
-		enc, err := aesbnc.Encrypt(fileData)
-		if err != nil {
-			tracing.SetSpanError(span, err)
-			middleware.LogWithTrace(ctx, "error", "游戏封面加密失败: %v", err)
-			return nil, fmt.Errorf("图片加密失败: %v", err)
-		}
-		fileData = enc
-		fileName = aesbnc.ToBncKey(fileName)
-		contentType = "application/octet-stream"
-		fileSize = int64(len(enc))
-	}
-
-	// 生成存储路径
-	storagePath := s.generateStoragePath(ctx, fileName)
+	// 生成存储路径（game_cover 与其他 code 一样按原图存储，走 MinIO 公网地址）
+	storagePath := s.generateStoragePath(ctx, req.FileName)
 	tracing.SetSpanAttributes(span, attribute.String("storage_path", storagePath))
 
 	// 上传到 MinIO
@@ -103,7 +84,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		attribute.String("storage.path", storagePath),
 	))
 
-	imageUrl, err := s.uploadToMinio(ctx, fileData, storagePath, contentType)
+	imageUrl, err := s.uploadToMinio(ctx, req.FileData, storagePath, req.ContentType)
 	uploadSpan.End()
 
 	if err != nil {
@@ -124,7 +105,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 	res := &v1.UploadImageRes{
 		ImageUrl: imageUrl,
 		FilePath: storagePath,
-		FileSize: fileSize,
+		FileSize: req.FileSize,
 	}
 
 	return res, nil
