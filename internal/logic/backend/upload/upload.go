@@ -9,8 +9,6 @@ import (
 	"jh_app_service/internal/middleware"
 	"jh_app_service/internal/service/backend"
 	"jh_app_service/internal/tracing"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -56,8 +54,16 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		uploadCode = "default"
 	}
 
-	// 验证文件类型
-	if err := s.validateFileType(req.ContentType, uploadCode); err != nil {
+	// 按文件内容嗅探真实类型，不信任客户端 Content-Type
+	detectedType, detectedExt, ok := detectImageType(req.FileData, req.ContentType)
+	if !ok {
+		tracing.AddSpanEvent(span, "file_type_invalid", attribute.String("detected_type", detectedType))
+		middleware.LogWithTrace(ctx, "error", "文件内容不是有效图片: 声明=%s 检测=%s", req.ContentType, detectedType)
+		return nil, fmt.Errorf("不支持的文件类型: 文件内容不是有效图片")
+	}
+
+	// 验证文件类型（以检测出的类型为准）
+	if err := s.validateFileType(detectedType, uploadCode); err != nil {
 		tracing.AddSpanEvent(span, "file_type_invalid",
 			attribute.String("content_type", req.ContentType),
 			attribute.String("upload_code", uploadCode))
@@ -75,7 +81,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 	}
 
 	// 生成存储路径（game_cover 与其他 code 一样按原图存储，走 MinIO 公网地址）
-	storagePath := s.generateStoragePath(ctx, req.FileName)
+	storagePath := s.generateStoragePath(ctx, req.FileName, detectedExt)
 	tracing.SetSpanAttributes(span, attribute.String("storage_path", storagePath))
 
 	// 上传到 MinIO
@@ -84,7 +90,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		attribute.String("storage.path", storagePath),
 	))
 
-	imageUrl, err := s.uploadToMinio(ctx, req.FileData, storagePath, req.ContentType)
+	imageUrl, err := s.uploadToMinio(ctx, req.FileData, storagePath, detectedType)
 	uploadSpan.End()
 
 	if err != nil {
@@ -144,6 +150,10 @@ func (s *sUpload) validateFileType(contentType, uploadCode string) error {
 
 	for _, allowedType := range allowedTypes {
 		if contentType == allowedType {
+			return nil
+		}
+		// image/jpg 为非标准写法，与 image/jpeg 视为等价
+		if contentType == "image/jpeg" && allowedType == "image/jpg" {
 			return nil
 		}
 	}
@@ -214,7 +224,7 @@ func (s *sUpload) getMaxFileSize(uploadCode string) int64 {
 }
 
 // generateStoragePath 生成存储路径
-func (s *sUpload) generateStoragePath(ctx context.Context, fileName string) string {
+func (s *sUpload) generateStoragePath(ctx context.Context, fileName, ext string) string {
 	// 获取站点ID (这里需要根据实际情况获取，可能从上下文或配置中获取)
 	siteId, exists := middleware.GetSiteIdFromContext(ctx)
 	if !exists {
@@ -230,10 +240,8 @@ func (s *sUpload) generateStoragePath(ctx context.Context, fileName string) stri
 	now := time.Now()
 	datePath := now.Format("2006/01")
 
-	// 生成唯一文件名
-	ext := filepath.Ext(fileName)
-	baseName := strings.TrimSuffix(fileName, ext)
-	uniqueName := fmt.Sprintf("%s_%d%s", baseName, now.Unix(), ext)
+	// 生成唯一文件名，扩展名取自内容检测结果而非客户端文件名
+	uniqueName := buildObjectName(fileName, ext, now.Unix())
 
 	return fmt.Sprintf("%s/%s/%s", siteCode, datePath, uniqueName)
 }
