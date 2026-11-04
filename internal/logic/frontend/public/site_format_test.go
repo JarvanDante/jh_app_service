@@ -26,9 +26,9 @@ func TestSiteCurrencyFromConfig(t *testing.T) {
 		t.Fatal("missing currency_config must fail")
 	}
 	cfg := &registry.SiteConfig{}
-	cfg.Base.CurrencyConfig = registry.CurrencyConfig{Code: "MMK", Symbol: "K", SymbolPosition: 1, Decimals: 0, Locked: true}
+	cfg.Base.CurrencyConfig = registry.CurrencyConfig{Code: "MMK", Symbol: "K", SymbolPosition: 1, Decimals: 2, Locked: true}
 	c, err := siteCurrencyFromConfig(cfg)
-	if err != nil || c.Code != "MMK" || c.Decimals != 0 || !c.Locked {
+	if err != nil || c.Code != "MMK" || c.Decimals != 2 || !c.Locked {
 		t.Fatalf("%v %v", c, err)
 	}
 }

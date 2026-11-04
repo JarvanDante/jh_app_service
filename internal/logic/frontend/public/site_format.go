@@ -30,7 +30,7 @@ func siteCurrencyFromConfig(cfg *registry.SiteConfig) (*v1.SiteCurrency, error) 
 }
 
 // formatAmount renders an amount with the site's decimals as a plain number
-// string (no thousand separators), e.g. 1000 -> "1000" for MMK, "1000.00" for USD.
+// string (no thousand separators), e.g. 1000 -> "1000" with 0 decimals, "1000.00" with 2 (MMK/USD).
 func formatAmount(v float64, decimals int) string {
 	if decimals < 0 {
 		decimals = 0
