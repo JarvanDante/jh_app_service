@@ -1378,16 +1378,15 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 
 	// 币种/时区/语言以发布到 Consul 的站点配置为准
 	consulSiteConfig, err := registry.GetDBConfigManagerV2().GetSiteConfig(site.Code)
-	if err != nil {
-		middleware.LogWithTrace(ctx, "error", "获取站点KV配置失败: site=%s err=%v", site.Code, err)
-		return nil, fmt.Errorf("获取站点配置失败")
+	if err != nil || consulSiteConfig == nil {
+		// KV 不可用时不影响站点其他设置返回，币种/时区/语言留空
+		middleware.LogWithTrace(ctx, "warning", "获取站点KV配置失败，币种等字段留空: site=%s err=%v", site.Code, err)
+		consulSiteConfig = &registry.SiteConfig{}
 	}
-	currency, err := siteCurrencyFromConfig(consulSiteConfig)
-	if err != nil {
-		middleware.LogWithTrace(ctx, "error", "站点币种配置缺失: site=%s", site.Code)
-		return nil, err
+	currency, decimals, roundingMode := siteSettingCurrency(consulSiteConfig)
+	if currency == nil {
+		middleware.LogWithTrace(ctx, "warning", "站点KV未配置 currency_config，setting-site 不返回币种: site=%s", site.Code)
 	}
-	decimals := int(currency.Decimals)
 	supportedLangs := consulSiteConfig.Base.Locale.SupportedLangs
 	if supportedLangs == nil {
 		supportedLangs = []string{}
@@ -1407,8 +1406,8 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 		SwitchGrade:    int32(siteConfig.SwitchGrade),
 		ServiceUrl:     siteConfig.UrlService,
 		Close:          int32(siteConfig.IsClose),
-		MinWithdraw:    formatAmount(float64(siteConfig.MinWithdraw), decimals),
-		MaxWithdraw:    formatAmount(float64(siteConfig.MaxWithdraw), decimals),
+		MinWithdraw:    formatAmountMode(float64(siteConfig.MinWithdraw), decimals, roundingMode),
+		MaxWithdraw:    formatAmountMode(float64(siteConfig.MaxWithdraw), decimals, roundingMode),
 		MobileLogo:     siteConfig.MobileLogo,
 		CloseReason:    closeReason,
 		WebUrl:         siteConfig.WebUrl,
