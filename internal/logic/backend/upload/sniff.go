@@ -1,7 +1,6 @@
 package upload
 
 import (
-	"bytes"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,8 +15,8 @@ var sniffedImageExt = map[string]string{
 }
 
 // detectImageType 根据文件前 512 字节嗅探真实类型，不信任客户端 Content-Type 与文件名。
-// 仅识别 jpeg/png/gif/webp；declaredType 为 image/svg+xml 且内容确为 SVG 时
-// 保持原有 svg 支持（是否允许仍由 validateFileType 按 upload code 决定）。
+// 仅识别 jpeg/png/gif/webp；declaredType 为 image/svg+xml 且根元素确为 SVG 时
+// 保持 mobile_logo 的 svg 支持（是否允许仍由 validateFileType 按 upload code 决定；存盘前会 sanitize）。
 func detectImageType(data []byte, declaredType string) (mimeType, ext string, ok bool) {
 	head := data
 	if len(head) > 512 {
@@ -31,18 +30,6 @@ func detectImageType(data []byte, declaredType string) (mimeType, ext string, ok
 		return "image/svg+xml", ".svg", true
 	}
 	return detected, "", false
-}
-
-func looksLikeSVG(data []byte) bool {
-	head := data
-	if len(head) > 1024 {
-		head = head[:1024]
-	}
-	detected := http.DetectContentType(head)
-	if !strings.HasPrefix(detected, "text/xml") && !strings.HasPrefix(detected, "text/plain") {
-		return false
-	}
-	return bytes.Contains(bytes.ToLower(head), []byte("<svg"))
 }
 
 // buildObjectName 用原文件名主体 + 时间戳 + 检测出的扩展名生成对象名

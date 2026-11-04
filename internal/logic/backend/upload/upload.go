@@ -62,7 +62,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		return nil, fmt.Errorf("不支持的文件类型: 文件内容不是有效图片")
 	}
 
-	// 验证文件类型（以检测出的类型为准）
+	// 验证文件类型（以检测出的类型为准）；SVG 仅允许 mobile_logo
 	if err := s.validateFileType(detectedType, uploadCode); err != nil {
 		tracing.AddSpanEvent(span, "file_type_invalid",
 			attribute.String("content_type", req.ContentType),
@@ -70,11 +70,25 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		middleware.LogWithTrace(ctx, "error", "文件类型验证失败: %v", err)
 		return nil, err
 	}
+	fileData := req.FileData
+	fileSize := req.FileSize
+	if detectedType == "image/svg+xml" {
+		if uploadCode != "mobile_logo" {
+			return nil, fmt.Errorf("不支持的文件类型: image/svg+xml")
+		}
+		cleaned, err := sanitizeSVG(fileData)
+		if err != nil {
+			middleware.LogWithTrace(ctx, "error", "SVG 清洗失败: %v", err)
+			return nil, fmt.Errorf("不支持的文件类型: SVG 内容不安全或无效")
+		}
+		fileData = cleaned
+		fileSize = int64(len(cleaned))
+	}
 
 	// 验证文件大小
-	if err := s.validateFileSize(req.FileSize, uploadCode); err != nil {
+	if err := s.validateFileSize(fileSize, uploadCode); err != nil {
 		tracing.AddSpanEvent(span, "file_size_invalid",
-			attribute.Int64("file_size", req.FileSize),
+			attribute.Int64("file_size", fileSize),
 			attribute.String("upload_code", uploadCode))
 		middleware.LogWithTrace(ctx, "error", "文件大小验证失败: %v", err)
 		return nil, err
@@ -90,7 +104,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 		attribute.String("storage.path", storagePath),
 	))
 
-	imageUrl, err := s.uploadToMinio(ctx, req.FileData, storagePath, detectedType)
+	imageUrl, err := s.uploadToMinio(ctx, fileData, storagePath, detectedType)
 	uploadSpan.End()
 
 	if err != nil {
@@ -111,7 +125,7 @@ func (s *sUpload) UploadImage(ctx context.Context, req *v1.UploadImageReq) (*v1.
 	res := &v1.UploadImageRes{
 		ImageUrl: imageUrl,
 		FilePath: storagePath,
-		FileSize: req.FileSize,
+		FileSize: fileSize,
 	}
 
 	return res, nil
@@ -278,11 +292,16 @@ func (s *sUpload) uploadToMinio(ctx context.Context, fileData []byte, objectPath
 		middleware.LogWithTrace(ctx, "info", "创建MinIO bucket: %s", bucketName)
 	}
 
-	// 上传文件
+	// 上传文件；SVG 额外设置 Content-Disposition: attachment，避免浏览器当页面执行
 	reader := bytes.NewReader(fileData)
-	_, err = minioClient.PutObject(ctx, bucketName, objectPath, reader, int64(len(fileData)), minio.PutObjectOptions{
-		ContentType: contentType,
-	})
+	putOpts := minio.PutObjectOptions{ContentType: contentType}
+	if contentType == "image/svg+xml" {
+		putOpts.ContentDisposition = `attachment; filename="logo.svg"`
+		putOpts.UserMetadata = map[string]string{
+			"csp": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+		}
+	}
+	_, err = minioClient.PutObject(ctx, bucketName, objectPath, reader, int64(len(fileData)), putOpts)
 	if err != nil {
 		return "", fmt.Errorf("上传文件到MinIO失败: %v", err)
 	}

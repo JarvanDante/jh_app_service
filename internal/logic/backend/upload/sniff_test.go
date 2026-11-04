@@ -31,6 +31,7 @@ func TestDetectImageType(t *testing.T) {
 		{"html", "image/png", []byte("<html><script>alert(1)</script></html>"), "", "", false},
 		{"svg declared", "image/svg+xml", []byte(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`), "image/svg+xml", ".svg", true},
 		{"svg undeclared", "image/png", []byte(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`), "", "", false},
+		{"text contains svg", "image/svg+xml", []byte(`not an image but has <svg inside`), "", "", false},
 	}
 	for _, c := range cases {
 		m, e, ok := detectImageType(c.data, c.declared)
