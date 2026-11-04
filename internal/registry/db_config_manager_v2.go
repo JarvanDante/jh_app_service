@@ -41,6 +41,29 @@ type BaseConfig struct {
 	DbLinkBalance string `json:"db_link_balance"`
 	DbLinkGame    string `json:"db_link_game"`
 	Status        int    `json:"status"`
+	// CurrencyConfig ISO currency and number format; Currency above is the legacy display value.
+	CurrencyConfig CurrencyConfig `json:"currency_config"`
+	Locale         LocaleConfig   `json:"locale"`
+}
+
+// CurrencyConfig 站点币种与数字格式
+type CurrencyConfig struct {
+	Code           string `json:"code"`            // ISO-4217, e.g. MMK / USD
+	Symbol         string `json:"symbol"`          // e.g. K / $
+	SymbolPosition int    `json:"symbol_position"` // 1 before amount, 2 after amount
+	Decimals       int    `json:"decimals"`
+	ThousandSep    string `json:"thousand_sep"`
+	DecimalSep     string `json:"decimal_sep"`
+	RoundingMode   string `json:"rounding_mode"`
+	Locked         bool   `json:"locked"`
+}
+
+// LocaleConfig 站点语言/地区配置
+type LocaleConfig struct {
+	Locale         string   `json:"locale"`
+	DefaultLang    string   `json:"default_lang"`
+	SupportedLangs []string `json:"supported_langs"`
+	PhonePrefix    string   `json:"phone_prefix"`
 }
 
 // DomainConfig 域名配置

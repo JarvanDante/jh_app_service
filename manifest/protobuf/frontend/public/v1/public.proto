@@ -169,6 +169,24 @@ message GetSiteSettingRes {
     string mobile_logo = 10;      // 手机端logo
     string close_reason = 11;     // 站点关闭理由
     string web_url = 12;          // 网站主域名
+    SiteCurrency currency = 13;   // 站点币种与数字格式
+    string timezone = 14;         // 站点时区（IANA）
+    string locale = 15;           // 地区格式，例如 en-US
+    string default_lang = 16;     // 默认语言
+    repeated string supported_langs = 17; // 支持的语言
+    string phone_prefix = 18;     // 手机号国际区号，例如 +95
+}
+
+// 站点币种与数字格式
+message SiteCurrency {
+    string code = 1;              // ISO-4217 币种代码
+    string symbol = 2;            // 币种符号
+    int32 symbol_position = 3;    // 符号位置 1=金额前 2=金额后
+    int32 decimals = 4;           // 小数位
+    string thousand_sep = 5;      // 千分位分隔符
+    string decimal_sep = 6;       // 小数点符号
+    string rounding_mode = 7;     // 舍入规则
+    bool locked = 8;              // 币种是否已锁定
 }
 
 // 获取公告列表请求

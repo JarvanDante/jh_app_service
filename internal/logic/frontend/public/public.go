@@ -142,9 +142,10 @@ func (s *sPublic) QuickRegister(ctx context.Context, req *v1.QuickRegisterReq) (
 		return nil, fmt.Errorf("注册失败")
 	}
 
-	currency := consulSiteConfig.Base.Currency
-	if currency == "" {
-		currency = "CNY" // 默认人民币
+	currency, err := siteLegacyCurrency(consulSiteConfig)
+	if err != nil {
+		g.Log().Errorf(ctx, "站点 %s 未配置币种，拒绝注册", siteCode)
+		return nil, fmt.Errorf("注册失败：站点未配置币种")
 	}
 
 	// 在事务中保存用户和创建 Outbox 记录
@@ -1239,9 +1240,10 @@ func (s *sPublic) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.Re
 		return nil, fmt.Errorf("注册失败")
 	}
 
-	currency := consulSiteConfig.Base.Currency
-	if currency == "" {
-		currency = "CNY"
+	currency, err := siteLegacyCurrency(consulSiteConfig)
+	if err != nil {
+		g.Log().Errorf(ctx, "站点 %s 未配置币种，拒绝注册", siteCode)
+		return nil, fmt.Errorf("注册失败：站点未配置币种")
 	}
 
 	// 在事务中保存用户和创建 Outbox 记录
@@ -1374,7 +1376,30 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 		closeReason = siteConfig.CloseReason
 	}
 
+	// 币种/时区/语言以发布到 Consul 的站点配置为准
+	consulSiteConfig, err := registry.GetDBConfigManagerV2().GetSiteConfig(site.Code)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "获取站点KV配置失败: site=%s err=%v", site.Code, err)
+		return nil, fmt.Errorf("获取站点配置失败")
+	}
+	currency, err := siteCurrencyFromConfig(consulSiteConfig)
+	if err != nil {
+		middleware.LogWithTrace(ctx, "error", "站点币种配置缺失: site=%s", site.Code)
+		return nil, err
+	}
+	decimals := int(currency.Decimals)
+	supportedLangs := consulSiteConfig.Base.Locale.SupportedLangs
+	if supportedLangs == nil {
+		supportedLangs = []string{}
+	}
+
 	res = &v1.GetSiteSettingRes{
+		Currency:       currency,
+		Timezone:       consulSiteConfig.Base.TimeZone,
+		Locale:         consulSiteConfig.Base.Locale.Locale,
+		DefaultLang:    consulSiteConfig.Base.Locale.DefaultLang,
+		SupportedLangs: supportedLangs,
+		PhonePrefix:    consulSiteConfig.Base.Locale.PhonePrefix,
 		AgentUrl:       siteConfig.UrlTg,
 		SiteName:       site.Name,
 		MobileUrl:      siteConfig.UrlMobile,
@@ -1382,8 +1407,8 @@ func (s *sPublic) GetSiteSetting(ctx context.Context, req *v1.GetSiteSettingReq)
 		SwitchGrade:    int32(siteConfig.SwitchGrade),
 		ServiceUrl:     siteConfig.UrlService,
 		Close:          int32(siteConfig.IsClose),
-		MinWithdraw:    fmt.Sprintf("%.2f", float64(siteConfig.MinWithdraw)),
-		MaxWithdraw:    fmt.Sprintf("%.2f", float64(siteConfig.MaxWithdraw)),
+		MinWithdraw:    formatAmount(float64(siteConfig.MinWithdraw), decimals),
+		MaxWithdraw:    formatAmount(float64(siteConfig.MaxWithdraw), decimals),
 		MobileLogo:     siteConfig.MobileLogo,
 		CloseReason:    closeReason,
 		WebUrl:         siteConfig.WebUrl,

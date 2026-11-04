@@ -1185,6 +1185,12 @@ type GetSiteSettingRes struct {
 	MobileLogo     string                 `protobuf:"bytes,10,opt,name=mobile_logo,json=mobileLogo,proto3" json:"mobile_logo" dc:"手机端logo"`                      // 手机端logo
 	CloseReason    string                 `protobuf:"bytes,11,opt,name=close_reason,json=closeReason,proto3" json:"close_reason" dc:"站点关闭理由"`                    // 站点关闭理由
 	WebUrl         string                 `protobuf:"bytes,12,opt,name=web_url,json=webUrl,proto3" json:"web_url" dc:"网站主域名"`                                    // 网站主域名
+	Currency       *SiteCurrency          `protobuf:"bytes,13,opt,name=currency,proto3" json:"currency" dc:"站点币种与数字格式"`                                          // 站点币种与数字格式
+	Timezone       string                 `protobuf:"bytes,14,opt,name=timezone,proto3" json:"timezone" dc:"站点时区（IANA）"`                                         // 站点时区（IANA）
+	Locale         string                 `protobuf:"bytes,15,opt,name=locale,proto3" json:"locale" dc:"地区格式，例如 en-US"`                                          // 地区格式，例如 en-US
+	DefaultLang    string                 `protobuf:"bytes,16,opt,name=default_lang,json=defaultLang,proto3" json:"default_lang" dc:"默认语言"`                      // 默认语言
+	SupportedLangs []string               `protobuf:"bytes,17,rep,name=supported_langs,json=supportedLangs,proto3" json:"supported_langs" dc:"支持的语言"`            // 支持的语言
+	PhonePrefix    string                 `protobuf:"bytes,18,opt,name=phone_prefix,json=phonePrefix,proto3" json:"phone_prefix" dc:"手机号国际区号，例如 +95"`            // 手机号国际区号，例如 +95
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1303,6 +1309,149 @@ func (x *GetSiteSettingRes) GetWebUrl() string {
 	return ""
 }
 
+func (x *GetSiteSettingRes) GetCurrency() *SiteCurrency {
+	if x != nil {
+		return x.Currency
+	}
+	return nil
+}
+
+func (x *GetSiteSettingRes) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+func (x *GetSiteSettingRes) GetLocale() string {
+	if x != nil {
+		return x.Locale
+	}
+	return ""
+}
+
+func (x *GetSiteSettingRes) GetDefaultLang() string {
+	if x != nil {
+		return x.DefaultLang
+	}
+	return ""
+}
+
+func (x *GetSiteSettingRes) GetSupportedLangs() []string {
+	if x != nil {
+		return x.SupportedLangs
+	}
+	return nil
+}
+
+func (x *GetSiteSettingRes) GetPhonePrefix() string {
+	if x != nil {
+		return x.PhonePrefix
+	}
+	return ""
+}
+
+// 站点币种与数字格式
+type SiteCurrency struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Code           string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code" dc:"ISO-4217 币种代码"`                                               // ISO-4217 币种代码
+	Symbol         string                 `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol" dc:"币种符号"`                                                    // 币种符号
+	SymbolPosition int32                  `protobuf:"varint,3,opt,name=symbol_position,json=symbolPosition,proto3" json:"symbol_position" dc:"符号位置 1=金额前 2=金额后"` // 符号位置 1=金额前 2=金额后
+	Decimals       int32                  `protobuf:"varint,4,opt,name=decimals,proto3" json:"decimals" dc:"小数位"`                                                // 小数位
+	ThousandSep    string                 `protobuf:"bytes,5,opt,name=thousand_sep,json=thousandSep,proto3" json:"thousand_sep" dc:"千分位分隔符"`                     // 千分位分隔符
+	DecimalSep     string                 `protobuf:"bytes,6,opt,name=decimal_sep,json=decimalSep,proto3" json:"decimal_sep" dc:"小数点符号"`                         // 小数点符号
+	RoundingMode   string                 `protobuf:"bytes,7,opt,name=rounding_mode,json=roundingMode,proto3" json:"rounding_mode" dc:"舍入规则"`                    // 舍入规则
+	Locked         bool                   `protobuf:"varint,8,opt,name=locked,proto3" json:"locked" dc:"币种是否已锁定"`                                                // 币种是否已锁定
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *SiteCurrency) Reset() {
+	*x = SiteCurrency{}
+	mi := &file_frontend_public_v1_public_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SiteCurrency) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SiteCurrency) ProtoMessage() {}
+
+func (x *SiteCurrency) ProtoReflect() protoreflect.Message {
+	mi := &file_frontend_public_v1_public_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SiteCurrency.ProtoReflect.Descriptor instead.
+func (*SiteCurrency) Descriptor() ([]byte, []int) {
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *SiteCurrency) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *SiteCurrency) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *SiteCurrency) GetSymbolPosition() int32 {
+	if x != nil {
+		return x.SymbolPosition
+	}
+	return 0
+}
+
+func (x *SiteCurrency) GetDecimals() int32 {
+	if x != nil {
+		return x.Decimals
+	}
+	return 0
+}
+
+func (x *SiteCurrency) GetThousandSep() string {
+	if x != nil {
+		return x.ThousandSep
+	}
+	return ""
+}
+
+func (x *SiteCurrency) GetDecimalSep() string {
+	if x != nil {
+		return x.DecimalSep
+	}
+	return ""
+}
+
+func (x *SiteCurrency) GetRoundingMode() string {
+	if x != nil {
+		return x.RoundingMode
+	}
+	return ""
+}
+
+func (x *SiteCurrency) GetLocked() bool {
+	if x != nil {
+		return x.Locked
+	}
+	return false
+}
+
 // 获取公告列表请求
 type GetNoticeListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1313,7 +1462,7 @@ type GetNoticeListReq struct {
 
 func (x *GetNoticeListReq) Reset() {
 	*x = GetNoticeListReq{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[16]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1325,7 +1474,7 @@ func (x *GetNoticeListReq) String() string {
 func (*GetNoticeListReq) ProtoMessage() {}
 
 func (x *GetNoticeListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[16]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1338,7 +1487,7 @@ func (x *GetNoticeListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNoticeListReq.ProtoReflect.Descriptor instead.
 func (*GetNoticeListReq) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{16}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetNoticeListReq) GetLimit() int32 {
@@ -1358,7 +1507,7 @@ type GetNoticeListRes struct {
 
 func (x *GetNoticeListRes) Reset() {
 	*x = GetNoticeListRes{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[17]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1370,7 +1519,7 @@ func (x *GetNoticeListRes) String() string {
 func (*GetNoticeListRes) ProtoMessage() {}
 
 func (x *GetNoticeListRes) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[17]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1383,7 +1532,7 @@ func (x *GetNoticeListRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNoticeListRes.ProtoReflect.Descriptor instead.
 func (*GetNoticeListRes) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{17}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetNoticeListRes) GetList() []*NoticeItem {
@@ -1406,7 +1555,7 @@ type NoticeItem struct {
 
 func (x *NoticeItem) Reset() {
 	*x = NoticeItem{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[18]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1418,7 +1567,7 @@ func (x *NoticeItem) String() string {
 func (*NoticeItem) ProtoMessage() {}
 
 func (x *NoticeItem) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[18]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1431,7 +1580,7 @@ func (x *NoticeItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeItem.ProtoReflect.Descriptor instead.
 func (*NoticeItem) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{18}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *NoticeItem) GetTitle() string {
@@ -1472,7 +1621,7 @@ type GetAdListReq struct {
 
 func (x *GetAdListReq) Reset() {
 	*x = GetAdListReq{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[19]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1484,7 +1633,7 @@ func (x *GetAdListReq) String() string {
 func (*GetAdListReq) ProtoMessage() {}
 
 func (x *GetAdListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[19]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1497,7 +1646,7 @@ func (x *GetAdListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAdListReq.ProtoReflect.Descriptor instead.
 func (*GetAdListReq) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{19}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GetAdListReq) GetMobile() int32 {
@@ -1517,7 +1666,7 @@ type GetAdListRes struct {
 
 func (x *GetAdListRes) Reset() {
 	*x = GetAdListRes{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[20]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1529,7 +1678,7 @@ func (x *GetAdListRes) String() string {
 func (*GetAdListRes) ProtoMessage() {}
 
 func (x *GetAdListRes) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[20]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1542,7 +1691,7 @@ func (x *GetAdListRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAdListRes.ProtoReflect.Descriptor instead.
 func (*GetAdListRes) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{20}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GetAdListRes) GetList() []*AdItem {
@@ -1564,7 +1713,7 @@ type GetSiteActivityListReq struct {
 
 func (x *GetSiteActivityListReq) Reset() {
 	*x = GetSiteActivityListReq{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[21]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1576,7 +1725,7 @@ func (x *GetSiteActivityListReq) String() string {
 func (*GetSiteActivityListReq) ProtoMessage() {}
 
 func (x *GetSiteActivityListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[21]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1589,7 +1738,7 @@ func (x *GetSiteActivityListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSiteActivityListReq.ProtoReflect.Descriptor instead.
 func (*GetSiteActivityListReq) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{21}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetSiteActivityListReq) GetSiteId() int32 {
@@ -1637,7 +1786,7 @@ type SiteActivityInfo struct {
 
 func (x *SiteActivityInfo) Reset() {
 	*x = SiteActivityInfo{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[22]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1649,7 +1798,7 @@ func (x *SiteActivityInfo) String() string {
 func (*SiteActivityInfo) ProtoMessage() {}
 
 func (x *SiteActivityInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[22]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1662,7 +1811,7 @@ func (x *SiteActivityInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SiteActivityInfo.ProtoReflect.Descriptor instead.
 func (*SiteActivityInfo) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{22}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *SiteActivityInfo) GetId() int32 {
@@ -1780,7 +1929,7 @@ type GetSiteActivityListRes struct {
 
 func (x *GetSiteActivityListRes) Reset() {
 	*x = GetSiteActivityListRes{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[23]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1792,7 +1941,7 @@ func (x *GetSiteActivityListRes) String() string {
 func (*GetSiteActivityListRes) ProtoMessage() {}
 
 func (x *GetSiteActivityListRes) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[23]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1805,7 +1954,7 @@ func (x *GetSiteActivityListRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSiteActivityListRes.ProtoReflect.Descriptor instead.
 func (*GetSiteActivityListRes) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{23}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetSiteActivityListRes) GetList() []*SiteActivityInfo {
@@ -1831,7 +1980,7 @@ type AdItem struct {
 
 func (x *AdItem) Reset() {
 	*x = AdItem{}
-	mi := &file_frontend_public_v1_public_proto_msgTypes[24]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1843,7 +1992,7 @@ func (x *AdItem) String() string {
 func (*AdItem) ProtoMessage() {}
 
 func (x *AdItem) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_public_v1_public_proto_msgTypes[24]
+	mi := &file_frontend_public_v1_public_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1856,7 +2005,7 @@ func (x *AdItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdItem.ProtoReflect.Descriptor instead.
 func (*AdItem) Descriptor() ([]byte, []int) {
-	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{24}
+	return file_frontend_public_v1_public_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *AdItem) GetName() string {
@@ -2016,7 +2165,7 @@ const file_frontend_public_v1_public_proto_rawDesc = "" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\tR\tcreatedAt\"\x13\n" +
-	"\x11GetSiteSettingReq\"\x92\x03\n" +
+	"\x11GetSiteSettingReq\"\xe7\x04\n" +
 	"\x11GetSiteSettingRes\x12\x1b\n" +
 	"\tagent_url\x18\x01 \x01(\tR\bagentUrl\x12\x1b\n" +
 	"\tsite_name\x18\x02 \x01(\tR\bsiteName\x12\x1d\n" +
@@ -2033,7 +2182,23 @@ const file_frontend_public_v1_public_proto_rawDesc = "" +
 	" \x01(\tR\n" +
 	"mobileLogo\x12!\n" +
 	"\fclose_reason\x18\v \x01(\tR\vcloseReason\x12\x17\n" +
-	"\aweb_url\x18\f \x01(\tR\x06webUrl\"(\n" +
+	"\aweb_url\x18\f \x01(\tR\x06webUrl\x120\n" +
+	"\bcurrency\x18\r \x01(\v2\x14.public.SiteCurrencyR\bcurrency\x12\x1a\n" +
+	"\btimezone\x18\x0e \x01(\tR\btimezone\x12\x16\n" +
+	"\x06locale\x18\x0f \x01(\tR\x06locale\x12!\n" +
+	"\fdefault_lang\x18\x10 \x01(\tR\vdefaultLang\x12'\n" +
+	"\x0fsupported_langs\x18\x11 \x03(\tR\x0esupportedLangs\x12!\n" +
+	"\fphone_prefix\x18\x12 \x01(\tR\vphonePrefix\"\x80\x02\n" +
+	"\fSiteCurrency\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\x12\x16\n" +
+	"\x06symbol\x18\x02 \x01(\tR\x06symbol\x12'\n" +
+	"\x0fsymbol_position\x18\x03 \x01(\x05R\x0esymbolPosition\x12\x1a\n" +
+	"\bdecimals\x18\x04 \x01(\x05R\bdecimals\x12!\n" +
+	"\fthousand_sep\x18\x05 \x01(\tR\vthousandSep\x12\x1f\n" +
+	"\vdecimal_sep\x18\x06 \x01(\tR\n" +
+	"decimalSep\x12#\n" +
+	"\rrounding_mode\x18\a \x01(\tR\froundingMode\x12\x16\n" +
+	"\x06locked\x18\b \x01(\bR\x06locked\"(\n" +
 	"\x10GetNoticeListReq\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\":\n" +
 	"\x10GetNoticeListRes\x12&\n" +
@@ -2108,7 +2273,7 @@ func file_frontend_public_v1_public_proto_rawDescGZIP() []byte {
 	return file_frontend_public_v1_public_proto_rawDescData
 }
 
-var file_frontend_public_v1_public_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_frontend_public_v1_public_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_frontend_public_v1_public_proto_goTypes = []any{
 	(*QuickRegisterReq)(nil),       // 0: public.QuickRegisterReq
 	(*QuickRegisterRes)(nil),       // 1: public.QuickRegisterRes
@@ -2126,46 +2291,48 @@ var file_frontend_public_v1_public_proto_goTypes = []any{
 	(*LastMessage)(nil),            // 13: public.LastMessage
 	(*GetSiteSettingReq)(nil),      // 14: public.GetSiteSettingReq
 	(*GetSiteSettingRes)(nil),      // 15: public.GetSiteSettingRes
-	(*GetNoticeListReq)(nil),       // 16: public.GetNoticeListReq
-	(*GetNoticeListRes)(nil),       // 17: public.GetNoticeListRes
-	(*NoticeItem)(nil),             // 18: public.NoticeItem
-	(*GetAdListReq)(nil),           // 19: public.GetAdListReq
-	(*GetAdListRes)(nil),           // 20: public.GetAdListRes
-	(*GetSiteActivityListReq)(nil), // 21: public.GetSiteActivityListReq
-	(*SiteActivityInfo)(nil),       // 22: public.SiteActivityInfo
-	(*GetSiteActivityListRes)(nil), // 23: public.GetSiteActivityListRes
-	(*AdItem)(nil),                 // 24: public.AdItem
+	(*SiteCurrency)(nil),           // 16: public.SiteCurrency
+	(*GetNoticeListReq)(nil),       // 17: public.GetNoticeListReq
+	(*GetNoticeListRes)(nil),       // 18: public.GetNoticeListRes
+	(*NoticeItem)(nil),             // 19: public.NoticeItem
+	(*GetAdListReq)(nil),           // 20: public.GetAdListReq
+	(*GetAdListRes)(nil),           // 21: public.GetAdListRes
+	(*GetSiteActivityListReq)(nil), // 22: public.GetSiteActivityListReq
+	(*SiteActivityInfo)(nil),       // 23: public.SiteActivityInfo
+	(*GetSiteActivityListRes)(nil), // 24: public.GetSiteActivityListRes
+	(*AdItem)(nil),                 // 25: public.AdItem
 }
 var file_frontend_public_v1_public_proto_depIdxs = []int32{
 	12, // 0: public.GetUserInfoRes.last_recharge:type_name -> public.LastRecord
 	12, // 1: public.GetUserInfoRes.last_withdraw:type_name -> public.LastRecord
 	13, // 2: public.GetUserInfoRes.last_message:type_name -> public.LastMessage
-	18, // 3: public.GetNoticeListRes.list:type_name -> public.NoticeItem
-	24, // 4: public.GetAdListRes.list:type_name -> public.AdItem
-	22, // 5: public.GetSiteActivityListRes.list:type_name -> public.SiteActivityInfo
-	0,  // 6: public.Public.QuickRegister:input_type -> public.QuickRegisterReq
-	8,  // 7: public.Public.Register:input_type -> public.RegisterReq
-	2,  // 8: public.Public.Login:input_type -> public.LoginReq
-	4,  // 9: public.Public.GenerateCaptcha:input_type -> public.GenerateCaptchaReq
-	6,  // 10: public.Public.RefreshToken:input_type -> public.RefreshTokenReq
-	14, // 11: public.Public.GetSiteSetting:input_type -> public.GetSiteSettingReq
-	16, // 12: public.Public.GetAppNoticeList:input_type -> public.GetNoticeListReq
-	19, // 13: public.Public.GetAppAdList:input_type -> public.GetAdListReq
-	21, // 14: public.Public.GetSiteActivityList:input_type -> public.GetSiteActivityListReq
-	1,  // 15: public.Public.QuickRegister:output_type -> public.QuickRegisterRes
-	9,  // 16: public.Public.Register:output_type -> public.RegisterRes
-	3,  // 17: public.Public.Login:output_type -> public.LoginRes
-	5,  // 18: public.Public.GenerateCaptcha:output_type -> public.GenerateCaptchaRes
-	7,  // 19: public.Public.RefreshToken:output_type -> public.RefreshTokenRes
-	15, // 20: public.Public.GetSiteSetting:output_type -> public.GetSiteSettingRes
-	17, // 21: public.Public.GetAppNoticeList:output_type -> public.GetNoticeListRes
-	20, // 22: public.Public.GetAppAdList:output_type -> public.GetAdListRes
-	23, // 23: public.Public.GetSiteActivityList:output_type -> public.GetSiteActivityListRes
-	15, // [15:24] is the sub-list for method output_type
-	6,  // [6:15] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	16, // 3: public.GetSiteSettingRes.currency:type_name -> public.SiteCurrency
+	19, // 4: public.GetNoticeListRes.list:type_name -> public.NoticeItem
+	25, // 5: public.GetAdListRes.list:type_name -> public.AdItem
+	23, // 6: public.GetSiteActivityListRes.list:type_name -> public.SiteActivityInfo
+	0,  // 7: public.Public.QuickRegister:input_type -> public.QuickRegisterReq
+	8,  // 8: public.Public.Register:input_type -> public.RegisterReq
+	2,  // 9: public.Public.Login:input_type -> public.LoginReq
+	4,  // 10: public.Public.GenerateCaptcha:input_type -> public.GenerateCaptchaReq
+	6,  // 11: public.Public.RefreshToken:input_type -> public.RefreshTokenReq
+	14, // 12: public.Public.GetSiteSetting:input_type -> public.GetSiteSettingReq
+	17, // 13: public.Public.GetAppNoticeList:input_type -> public.GetNoticeListReq
+	20, // 14: public.Public.GetAppAdList:input_type -> public.GetAdListReq
+	22, // 15: public.Public.GetSiteActivityList:input_type -> public.GetSiteActivityListReq
+	1,  // 16: public.Public.QuickRegister:output_type -> public.QuickRegisterRes
+	9,  // 17: public.Public.Register:output_type -> public.RegisterRes
+	3,  // 18: public.Public.Login:output_type -> public.LoginRes
+	5,  // 19: public.Public.GenerateCaptcha:output_type -> public.GenerateCaptchaRes
+	7,  // 20: public.Public.RefreshToken:output_type -> public.RefreshTokenRes
+	15, // 21: public.Public.GetSiteSetting:output_type -> public.GetSiteSettingRes
+	18, // 22: public.Public.GetAppNoticeList:output_type -> public.GetNoticeListRes
+	21, // 23: public.Public.GetAppAdList:output_type -> public.GetAdListRes
+	24, // 24: public.Public.GetSiteActivityList:output_type -> public.GetSiteActivityListRes
+	16, // [16:25] is the sub-list for method output_type
+	7,  // [7:16] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_frontend_public_v1_public_proto_init() }
@@ -2179,7 +2346,7 @@ func file_frontend_public_v1_public_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_frontend_public_v1_public_proto_rawDesc), len(file_frontend_public_v1_public_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
